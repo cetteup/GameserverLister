@@ -122,3 +122,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+.idea/
+
+bf2hub-servers.json
+
+bf2hub-servers.txt
