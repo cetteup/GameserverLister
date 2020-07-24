@@ -15,7 +15,7 @@ while not commandOk and tries < maxTries:
     try:
         logging.info('Running gslist command')
         result = subprocess.run(['gslist', '-n', 'battlefield2', '-x', 'servers.bf2hub.com:28911',
-                                 '-Y', 'battlefield2', 'hW6m9a', '-o', 'bf2hub-servers.txt'],
+                                 '-Y', 'battlefield2', 'hW6m9a', '-o', '1'],
                                 capture_output=True, timeout=10)
         commandOk = True
     except subprocess.TimeoutExpired as e:
@@ -29,16 +29,15 @@ if result is None or 'servers found' not in str(result.stderr):
 
 # Read gslist output file
 logging.info('Reading gslist output file')
-with open('bf2hub-servers.txt', 'r') as gslistFile:
+with open('battlefield2.gsl', 'r') as gslistFile:
     rawServerList = gslistFile.read()
 
 # Parse server list
-# List format: [space-padding][ip-address][spaces][port]
+# List format: [ip-address]:[port]
 logging.info('Parsing server list')
 servers = []
-regex = re.compile(r'\s+')
 for line in rawServerList.splitlines():
-    elements = regex.split(line.strip())
+    elements = line.strip().split(':')
     servers.append({
         'ip': elements[0],
         'query_port': elements[1]
