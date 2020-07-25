@@ -1,9 +1,14 @@
+import argparse
 import json
+import logging
 import subprocess
 import sys
-import logging
 
 from nslookup import Nslookup
+
+parser = argparse.ArgumentParser(description='Retrieve a list of BF2Hub gameservers and write it to a JSON file')
+parser.add_argument('-f', '--filter', help='Filter to apply to server list', type=str, default='')
+args = parser.parse_args()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
@@ -22,7 +27,8 @@ while not commandOk and tries < maxTries:
     try:
         logging.info(f'Running gslist command against {serverIp}')
         gslistResult = subprocess.run(['gslist', '-n', 'battlefield2', '-x', f'{serverIp}:28911',
-                                       '-Y', 'battlefield2', 'hW6m9a', '-o', '1'], capture_output=True, timeout=10)
+                                       '-Y', 'battlefield2', 'hW6m9a', '-f', f'{args.filter}', '-o', '1'],
+                                      capture_output=True, timeout=10)
         commandOk = True
     except subprocess.TimeoutExpired as e:
         logging.error(f'gslist timed out, try {tries + 1}/{maxTries}')
