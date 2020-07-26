@@ -1,16 +1,22 @@
 import argparse
 import json
 import logging
+import os
 import subprocess
 import sys
 
 from nslookup import Nslookup
 
 parser = argparse.ArgumentParser(description='Retrieve a list of BF2Hub gameservers and write it to a JSON file')
+parser.add_argument('-g', '--gslist', help='Path to gslist binary', type=str, required=True)
 parser.add_argument('-f', '--filter', help='Filter to apply to server list', type=str, default='')
 args = parser.parse_args()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+
+# Make sure gslist path is valid
+if not os.path.isfile(args.gslist):
+    sys.exit("Could not find gslist executable, please double check the provided path")
 
 # Manually look up servers.bf2hub.com to be able to spread retried across servers
 lookerUpper = Nslookup()
@@ -26,7 +32,7 @@ while not commandOk and tries < maxTries:
     serverIp = dnsResult.answer[0] if tries % 2 == 0 else dnsResult.answer[-1]
     try:
         logging.info(f'Running gslist command against {serverIp}')
-        gslistResult = subprocess.run(['gslist', '-n', 'battlefield2', '-x', f'{serverIp}:28911',
+        gslistResult = subprocess.run([args.gslist, '-n', 'battlefield2', '-x', f'{serverIp}:28911',
                                        '-Y', 'battlefield2', 'hW6m9a', '-f', f'{args.filter}', '-o', '1'],
                                       capture_output=True, timeout=10)
         commandOk = True
