@@ -67,5 +67,6 @@ for line in rawServerList.splitlines():
 
 
 logging.info(f'Writing {len(servers)} servers to output file')
-with open('bf2-servers.json', 'w') as outputFile:
+rootDir = os.path.dirname(os.path.realpath(__file__))
+with open(os.path.join(rootDir, 'bf2-servers.json'), 'w') as outputFile:
     json.dump(servers, outputFile)

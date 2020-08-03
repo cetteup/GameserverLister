@@ -1,8 +1,8 @@
 import argparse
 import json
 import logging
+import os
 import sys
-import time
 
 import requests
 
@@ -90,5 +90,6 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
         attempt += 1
 
 logging.info(f'Writing {len(servers)} servers to output file')
-with open(f'{args.game.lower()}-servers.json', 'w') as outputFile:
+rootDir = os.path.dirname(os.path.realpath(__file__))
+with open(os.path.join(rootDir, f'{args.game.lower()}-servers.json'), 'w') as outputFile:
     json.dump(servers, outputFile)
