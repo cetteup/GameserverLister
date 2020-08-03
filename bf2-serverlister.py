@@ -7,7 +7,7 @@ import sys
 
 from nslookup import Nslookup
 
-parser = argparse.ArgumentParser(description='Retrieve a list of BF2Hub gameservers and write it to a JSON file')
+parser = argparse.ArgumentParser(description='Retrieve a list of BF2Hub game servers and write it to a JSON file')
 parser.add_argument('-g', '--gslist', help='Path to gslist binary', type=str, required=True)
 parser.add_argument('-f', '--filter', help='Filter to apply to server list', type=str, default='')
 args = parser.parse_args()
@@ -56,11 +56,16 @@ logging.info('Parsing server list')
 servers = []
 for line in rawServerList.splitlines():
     elements = line.strip().split(':')
-    servers.append({
+    server = {
         'ip': elements[0],
         'query_port': elements[1]
-    })
+    }
+    if server not in servers:
+        servers.append(server)
+    else:
+        logging.info('Duplicate server')
+
 
 logging.info(f'Writing {len(servers)} servers to output file')
-with open('bf2hub-servers.json', 'w') as outputFile:
+with open('bf2-servers.json', 'w') as outputFile:
     json.dump(servers, outputFile)

@@ -1,1 +1,1 @@
-bf2hub-serverlist
+battlefield-serverlisters
