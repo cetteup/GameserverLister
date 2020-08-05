@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import sys
+import time
 
 import requests
 
@@ -15,6 +16,7 @@ parser = argparse.ArgumentParser(description='Retrieve a list of Battlelog (BF3/
                                              'game servers and write it to a json file')
 parser.add_argument('-g', '--game', help='Battlelog game to retrieve server list for (BF3/BF4)', type=str, required=True)
 parser.add_argument('-p', '--page-limit', help='Number of pages to get after retrieving the last unique server', type=int, default=10)
+parser.add_argument('--sleep', help='Number of seconds to sleep between requests', type=float, default=0)
 parser.add_argument('--proxy', help='Proxy to use for requests '
                                     '(format: [protocol]://[username]:[password]@[hostname]:[port]', type=str)
 args = parser.parse_args()
@@ -56,6 +58,10 @@ no servers have been found in [args.page_limit] "pages".
 """
 logging.info('Starting server list retrieval')
 while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
+    # Sleep when requesting anything but offset 0
+    if offset > 0:
+        time.sleep(args.sleep)
+
     try:
         response = session.get(f'{BASE_URIS[args.game.lower()]}?count={perPage}&offset=0', timeout=10)
     except Exception as e:
