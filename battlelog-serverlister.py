@@ -103,7 +103,9 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
         logging.error(f'Server responded with {response.status_code}, retrying {attempt + 1}/{maxAttempts}')
         attempt += 1
 
-logging.info(f'Writing {len(servers)} servers to output file')
-rootDir = os.path.dirname(os.path.realpath(__file__))
-with open(os.path.join(rootDir, f'{args.game.lower()}-servers.json'), 'w') as outputFile:
-    json.dump(servers, outputFile)
+# Write file (unless retrieval failed due to reaching the attempt max)
+if attempt < maxAttempts:
+    logging.info(f'Writing {len(servers)} servers to output file')
+    rootDir = os.path.dirname(os.path.realpath(__file__))
+    with open(os.path.join(rootDir, f'{args.game.lower()}-servers.json'), 'w') as outputFile:
+        json.dump(servers, outputFile)
