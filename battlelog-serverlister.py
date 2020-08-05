@@ -15,6 +15,8 @@ parser = argparse.ArgumentParser(description='Retrieve a list of Battlelog (BF3/
                                              'game servers and write it to a json file')
 parser.add_argument('-g', '--game', help='Battlelog game to retrieve server list for (BF3/BF4)', type=str, required=True)
 parser.add_argument('-p', '--page-limit', help='Number of pages to get after retrieving the last unique server', type=int, default=10)
+parser.add_argument('--proxy', help='Proxy to use for requests '
+                                    '(format: [protocol]://[username]:[password]@[hostname]:[port]', type=str)
 args = parser.parse_args()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
@@ -29,6 +31,12 @@ session = requests.session()
 session.headers = {
     'X-Requested-With': 'XMLHttpRequest'
 }
+# Set up proxy if given
+if args.proxy is not None:
+    # All requests are sent via https, so just set up https proxy
+    session.proxies = {
+        'https': args.proxy
+    }
 
 offset = 0
 perPage = 60
@@ -49,7 +57,7 @@ no servers have been found in [args.page_limit] "pages".
 logging.info('Starting server list retrieval')
 while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
     try:
-        response = session.get(f'{BASE_URIS[args.game.lower()]}?count={perPage}&offset=0')
+        response = session.get(f'{BASE_URIS[args.game.lower()]}?count={perPage}&offset=0', timeout=10)
     except Exception as e:
         logging.error(f'Request failed, retrying {attempt}/{maxAttempts}')
         # Count try and start over
@@ -57,7 +65,7 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
         continue
 
     if response.status_code == 200:
-    	# Reset tries
+        # Reset tries
         attempt = 0
         # Parse response
         parsed = response.json()
@@ -78,7 +86,7 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
                 logging.debug('Got duplicate server')
         if len(servers) == serverTotalBefore:
             pagesSinceLastUniqueServer += 1
-            logging.info(f'Got nothing but duplicates (page: {int(offset/perPage)},'
+            logging.info(f'Got nothing but duplicates (page: {int(offset / perPage)},'
                          f' pages since last unique: {pagesSinceLastUniqueServer})')
         else:
             logging.info(f'Got {len(servers) - serverTotalBefore} new servers')
