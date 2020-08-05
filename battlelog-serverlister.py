@@ -50,8 +50,6 @@ logging.info('Starting server list retrieval')
 while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
     try:
         response = session.get(f'{BASE_URIS[args.game.lower()]}?count={perPage}&offset=0')
-        # Reset tries
-        attempt = 0
     except Exception as e:
         logging.error(f'Request failed, retrying {attempt}/{maxAttempts}')
         # Count try and start over
@@ -59,6 +57,8 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
         continue
 
     if response.status_code == 200:
+    	# Reset tries
+        attempt = 0
         # Parse response
         parsed = response.json()
         serverTotalBefore = len(servers)
