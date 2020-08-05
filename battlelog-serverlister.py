@@ -65,7 +65,7 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
     try:
         response = session.get(f'{BASE_URIS[args.game.lower()]}?count={perPage}&offset=0', timeout=10)
     except Exception as e:
-        logging.error(f'Request failed, retrying {attempt}/{maxAttempts}')
+        logging.error(f'Request failed, retrying {attempt + 1}/{maxAttempts}')
         # Count try and start over
         attempt += 1
         continue
@@ -100,7 +100,7 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
             pagesSinceLastUniqueServer = 0
         offset += perPage
     else:
-        logging.error(f'Server responded with {response.status_code}, retrying {attempt}/{maxAttempts}')
+        logging.error(f'Server responded with {response.status_code}, retrying {attempt + 1}/{maxAttempts}')
         attempt += 1
 
 logging.info(f'Writing {len(servers)} servers to output file')
