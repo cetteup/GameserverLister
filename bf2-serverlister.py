@@ -58,7 +58,7 @@ for line in rawServerList.splitlines():
     elements = line.strip().split(':')
     server = {
         'ip': elements[0],
-        'query_port': elements[1]
+        'queryPort': elements[1]
     }
     if server not in servers:
         servers.append(server)
