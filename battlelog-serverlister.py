@@ -5,12 +5,34 @@ import os
 import sys
 import time
 
+import gevent
+import gevent.subprocess
 import requests
+from gevent.pool import Pool
 
 BASE_URIS = {
     'bf3': 'https://battlelog.battlefield.com/bf3/servers/getAutoBrowseServers/',
     'bf4': 'https://battlelog.battlefield.com/bf4/servers/getServers/pc/'
 }
+
+
+def find_query_port(ip: str, game_port: int, current_query_port: int = -1) -> int:
+    query_port = -1
+    ports_to_try = [47200, game_port + 22000, game_port + 100, game_port]
+    # Add current query port add index 0 if valid
+    if query_port != -1:
+        ports_to_try.insert(current_query_port, 0)
+    for port_to_try in ports_to_try:
+        gamedig_result = gevent.subprocess.run(
+            args=['/usr/bin/gamedig', '--type', args.game.lower(), f'{ip}:{port_to_try}', '--maxAttempts 2', '--socketTimeout 2000'],
+            capture_output=True
+        )
+        if b'"error":"Failed all' not in gamedig_result.stdout:
+            query_port = port_to_try
+            break
+
+    return query_port
+
 
 parser = argparse.ArgumentParser(description='Retrieve a list of Battlelog (BF3/BF4) '
                                              'game servers and write it to a json file')
@@ -19,6 +41,8 @@ parser.add_argument('-p', '--page-limit', help='Number of pages to get after ret
 parser.add_argument('--sleep', help='Number of seconds to sleep between requests', type=float, default=0)
 parser.add_argument('--proxy', help='Proxy to use for requests '
                                     '(format: [protocol]://[username]:[password]@[hostname]:[port]', type=str)
+parser.add_argument('--find-query-port', dest='find_query_port', action='store_true')
+parser.set_defaults(find_query_port=False)
 args = parser.parse_args()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
@@ -95,7 +119,8 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
             serverToAdd = {
                 'guid': server['guid'],
                 'ip': server['ip'],
-                'port': server['port']
+                'gamePort': server['port'],
+                'queryPort': -1
             }
             # Add non-private servers (servers with an IP) that are new
             if len(serverToAdd['ip']) > 0 and serverToAdd['guid'] not in [s['guid'] for s in servers]:
@@ -117,6 +142,25 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
 
 # Add current server total to stats
 stats['serverTotalAfter'] = len(servers)
+
+if args.find_query_port:
+    logging.info(f'Searching query port for {len(servers)} servers')
+    searchStats = {
+        'totalSearches': len(servers),
+        'queryPortFound': 0
+    }
+    pool = Pool(12)
+    jobs = []
+    for server in servers:
+        jobs.append(pool.spawn(find_query_port, server['ip'], server['gamePort'], server['queryPort']))
+    # Wait for all jobs to complete
+    gevent.joinall(jobs)
+    for index, job in enumerate(jobs):
+        if job.value != -1:
+            servers[index]['queryPort'] = job.value
+            searchStats['queryPortFound'] += 1
+    logging.info(f'Query port search stats: {searchStats}')
+
 # Write file (unless retrieval failed due to reaching the attempt max)
 if attempt < maxAttempts:
     logging.info(f'Writing {len(servers)} servers to output file')
