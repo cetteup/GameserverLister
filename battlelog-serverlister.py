@@ -27,6 +27,10 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 if args.game.lower() not in ['bf3', 'bf4']:
     sys.exit('Game not supported, please select either BF3 or BF4')
 
+# Set paths
+rootDir = os.path.dirname(os.path.realpath(__file__))
+serverListFilePath = os.path.join(rootDir, f'{args.game.lower()}-servers.json')
+
 # Init session
 session = requests.session()
 # Set up headers
@@ -51,7 +55,15 @@ pagesSinceLastUniqueServer = 0
 attempt = 0
 maxAttempts = 3
 
-servers = []
+# Init server list with servers from existing list or empty one
+if os.path.isfile(serverListFilePath):
+    with open(serverListFilePath, 'r') as serverListFile:
+        servers = json.load(serverListFile)
+else:
+    servers = []
+stats = {
+    'serverTotalBefore': len(servers)
+}
 """
 Since pagination of the server list is completely broken, just get the first "page" over and over again until
 no servers have been found in [args.page_limit] "pages".
@@ -86,7 +98,7 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
                 'port': server['port']
             }
             # Add non-private servers (servers with an IP) that are new
-            if len(serverToAdd['ip']) > 0 and serverToAdd not in servers:
+            if len(serverToAdd['ip']) > 0 and serverToAdd['guid'] not in [s['guid'] for s in servers]:
                 servers.append(serverToAdd)
             else:
                 logging.debug('Got duplicate server')
@@ -103,9 +115,13 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
         logging.error(f'Server responded with {response.status_code}, retrying {attempt + 1}/{maxAttempts}')
         attempt += 1
 
+# Add current server total to stats
+stats['serverTotalAfter'] = len(servers)
 # Write file (unless retrieval failed due to reaching the attempt max)
 if attempt < maxAttempts:
     logging.info(f'Writing {len(servers)} servers to output file')
-    rootDir = os.path.dirname(os.path.realpath(__file__))
-    with open(os.path.join(rootDir, f'{args.game.lower()}-servers.json'), 'w') as outputFile:
+
+    with open(serverListFilePath, 'w') as outputFile:
         json.dump(servers, outputFile)
+
+logging.info(f'Run stats: {stats}')
