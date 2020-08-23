@@ -18,7 +18,16 @@ BASE_URIS = {
 
 def find_query_port(ip: str, game_port: int, current_query_port: int = -1) -> int:
     query_port = -1
-    ports_to_try = [47200, game_port + 22000, game_port + 100, game_port]
+    """
+    Order of ports to try:
+    1. default query port
+    2. game port + default port offset (mirror gamedig behavior)
+    3. game port (some servers use same port for game + query)
+    4. game port + 100 (nitrado)
+    6. game port + 5 (several hosters)
+    6. 48888 (gamed)
+    """
+    ports_to_try = [47200, game_port + 22000, game_port, game_port + 100, game_port + 5, 48888]
     # Add current query port add index 0 if valid
     if query_port != -1:
         ports_to_try.insert(current_query_port, 0)
