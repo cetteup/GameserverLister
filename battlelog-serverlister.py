@@ -42,8 +42,8 @@ def find_query_port(ip: str, game_port: int, current_query_port: int = -1) -> in
     """
     ports_to_try = [47200, game_port + 22000, game_port, game_port + 100, game_port + 5, game_port + 1, 48888]
     # Add current query port add index 0 if valid
-    if query_port != -1:
-        ports_to_try.insert(current_query_port, 0)
+    if current_query_port != -1:
+        ports_to_try.insert(0, current_query_port)
     for port_to_try in ports_to_try:
         gamedig_result = gevent.subprocess.run(
             args=['/usr/bin/gamedig', '--type', args.game.lower(), f'{ip}:{port_to_try}', '--maxAttempts 2', '--socketTimeout 2000'],
