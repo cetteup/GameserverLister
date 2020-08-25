@@ -36,7 +36,10 @@ def find_query_port(ip: str, game_port: int, current_query_port: int = -1) -> in
             args=['/usr/bin/gamedig', '--type', args.game.lower(), f'{ip}:{port_to_try}', '--maxAttempts 2', '--socketTimeout 2000'],
             capture_output=True
         )
-        if b'"error":"Failed all' not in gamedig_result.stdout:
+        # Stop searching if query was successful and response came from the correct server
+        # (some servers run on the same IP, so make sure ip and game_port match)
+        if '"error":"Failed all' not in str(gamedig_result.stdout) and \
+                f'"connect":"{ip}:{game_port}' in str(gamedig_result.stdout):
             query_port = port_to_try
             break
 
