@@ -17,6 +17,18 @@ BASE_URIS = {
 }
 
 
+def list_index_of_dict_with_value(needle: object, haystack: list) -> object:
+    """
+    Find a dict with a given value in a list of dictionaries and return index of (first) dictionary that contains value
+    :param needle:
+    :param haystack:
+    :return:
+    """
+    for list_index, list_item in enumerate(haystack):
+        if needle in list_item.values():
+            return list_index
+
+
 def find_query_port(ip: str, game_port: int, current_query_port: int = -1) -> int:
     query_port = -1
     """
@@ -95,16 +107,17 @@ maxAttempts = 3
 # Init server list with servers from existing list or empty one
 if os.path.isfile(serverListFilePath):
     with open(serverListFilePath, 'r') as serverListFile:
-        servers = json.load(serverListFile)
+        knownServers = json.load(serverListFile)
 else:
-    servers = []
+    knownServers = []
 stats = {
-    'serverTotalBefore': len(servers)
+    'serverTotalBefore': len(knownServers)
 }
 """
 Since pagination of the server list is completely broken, just get the first "page" over and over again until
 no servers have been found in [args.page_limit] "pages".
 """
+foundServers = []
 logging.info('Starting server list retrieval')
 while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
     # Sleep when requesting anything but offset 0
@@ -124,34 +137,33 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
         attempt = 0
         # Parse response
         parsed = response.json()
-        serverTotalBefore = len(servers)
+        serverTotalBefore = len(foundServers)
         # Add all servers in response (if they are new)
         for server in parsed["data"]:
-            logging.debug(f'{server["ip"]}:{server["port"]} - {server["name"]} # {server["guid"]}')
+            # logging.debug(f'{server["ip"]}:{server["port"]} - {server["name"]} # {server["guid"]}')
 
             foundServer = {
                 'guid': server['guid'],
                 'ip': server['ip'],
                 'gamePort': server['port'],
-                'queryPort': -1,
                 'lastSeenAt': datetime.now().isoformat()
             }
             # Add non-private servers (servers with an IP) that are new
-            serverGuids = [s['guid'] for s in servers]
+            serverGuids = [s['guid'] for s in foundServers]
             if len(foundServer['ip']) > 0 and foundServer['guid'] not in serverGuids:
                 logging.debug('Got new server, adding it')
-                servers.append(foundServer)
+                foundServers.append(foundServer)
             elif len(foundServer['ip']) > 0:
-                logging.debug('Got known server, updating last seen at')
-                servers[serverGuids.index(foundServer['guid'])]['lastSeenAt'] = datetime.now().isoformat()
+                logging.debug('Got duplicate server, updating last seen at')
+                foundServers[serverGuids.index(foundServer['guid'])]['lastSeenAt'] = datetime.now().isoformat()
             else:
                 logging.debug('Got duplicate server')
-        if len(servers) == serverTotalBefore:
+        if len(foundServers) == serverTotalBefore:
             pagesSinceLastUniqueServer += 1
             logging.info(f'Got nothing but duplicates (page: {int(offset / perPage)},'
                          f' pages since last unique: {pagesSinceLastUniqueServer})')
         else:
-            logging.info(f'Got {len(servers) - serverTotalBefore} new servers')
+            logging.info(f'Got {len(foundServers) - serverTotalBefore} new servers')
             # Found new unique server, reset
             pagesSinceLastUniqueServer = 0
         offset += perPage
@@ -159,32 +171,53 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
         logging.error(f'Server responded with {response.status_code}, retrying {attempt + 1}/{maxAttempts}')
         attempt += 1
 
+# Add/update found servers to/in known servers
+logging.info('Updating known server list with found servers')
+for foundServer in foundServers:
+    knownServerIndex = list_index_of_dict_with_value(foundServer['guid'], knownServers)
+    # Update existing server entry or add new one
+    if knownServerIndex is not None:
+        logging.debug(f'Found server {foundServer["guid"]} already known, updating')
+        # guid is the same, found server does not contain queryPort so it is safe to update ip,
+        # gamePort and lastSeenAt by merging knownServer and foundServer
+        knownServers[knownServerIndex] = {**knownServers[knownServerIndex], **foundServer}
+    else:
+        logging.debug(f'Found server {foundServer["guid"]} is new, adding')
+        # Add new server entry
+        knownServers.append({
+            'guid': foundServer['guid'],
+            'ip': foundServer['ip'],
+            'gamePort': foundServer['gamePort'],
+            'queryPort': -1,
+            'lastSeenAt': foundServer['lastSeenAt']
+        })
+
 # Add current server total to stats
-stats['serverTotalAfter'] = len(servers)
+stats['serverTotalAfter'] = len(knownServers)
 
 if args.find_query_port:
-    logging.info(f'Searching query port for {len(servers)} servers')
+    logging.info(f'Searching query port for {len(knownServers)} servers')
     searchStats = {
-        'totalSearches': len(servers),
+        'totalSearches': len(knownServers),
         'queryPortFound': 0
     }
     pool = Pool(12)
     jobs = []
-    for server in servers:
+    for server in knownServers:
         jobs.append(pool.spawn(find_query_port, server['ip'], server['gamePort'], server['queryPort']))
     # Wait for all jobs to complete
     gevent.joinall(jobs)
     for index, job in enumerate(jobs):
         if job.value != -1:
-            servers[index]['queryPort'] = job.value
+            knownServers[index]['queryPort'] = job.value
             searchStats['queryPortFound'] += 1
     logging.info(f'Query port search stats: {searchStats}')
 
 # Write file (unless retrieval failed due to reaching the attempt max)
 if attempt < maxAttempts:
-    logging.info(f'Writing {len(servers)} servers to output file')
+    logging.info(f'Writing {len(knownServers)} servers to output file')
 
     with open(serverListFilePath, 'w') as outputFile:
-        json.dump(servers, outputFile)
+        json.dump(knownServers, outputFile)
 
 logging.info(f'Run stats: {stats}')
