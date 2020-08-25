@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 import time
+from datetime import datetime
 
 import gevent
 import gevent.subprocess
@@ -128,15 +129,21 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
         for server in parsed["data"]:
             logging.debug(f'{server["ip"]}:{server["port"]} - {server["name"]} # {server["guid"]}')
 
-            serverToAdd = {
+            foundServer = {
                 'guid': server['guid'],
                 'ip': server['ip'],
                 'gamePort': server['port'],
-                'queryPort': -1
+                'queryPort': -1,
+                'lastSeenAt': datetime.now().isoformat()
             }
             # Add non-private servers (servers with an IP) that are new
-            if len(serverToAdd['ip']) > 0 and serverToAdd['guid'] not in [s['guid'] for s in servers]:
-                servers.append(serverToAdd)
+            serverGuids = [s['guid'] for s in servers]
+            if len(foundServer['ip']) > 0 and foundServer['guid'] not in serverGuids:
+                logging.debug('Got new server, adding it')
+                servers.append(foundServer)
+            elif len(foundServer['ip']) > 0:
+                logging.debug('Got known server, updating last seen at')
+                servers[serverGuids.index(foundServer['guid'])]['lastSeenAt'] = datetime.now().isoformat()
             else:
                 logging.debug('Got duplicate server')
         if len(servers) == serverTotalBefore:
