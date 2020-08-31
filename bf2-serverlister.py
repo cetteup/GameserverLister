@@ -4,6 +4,7 @@ import logging
 import os
 import subprocess
 import sys
+from datetime import datetime
 
 from nslookup import Nslookup
 
@@ -16,7 +17,11 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 # Make sure gslist path is valid
 if not os.path.isfile(args.gslist):
-    sys.exit("Could not find gslist executable, please double check the provided path")
+    sys.exit('Could not find gslist executable, please double check the provided path')
+
+# Set paths
+rootDir = os.path.dirname(os.path.realpath(__file__))
+serverListFilePath = os.path.join(rootDir, 'bf2-servers.json')
 
 # Manually look up servers.bf2hub.com to be able to spread retried across servers
 lookerUpper = Nslookup()
@@ -50,23 +55,33 @@ logging.info('Reading gslist output file')
 with open('battlefield2.gsl', 'r') as gslistFile:
     rawServerList = gslistFile.read()
 
+# Init server list with servers from existing list or empty one
+if os.path.isfile(serverListFilePath):
+    with open(serverListFilePath, 'r') as serverListFile:
+        logging.debug('Reading servers from existing server list')
+        servers = json.load(serverListFile)
+else:
+    servers = []
+
 # Parse server list
 # List format: [ip-address]:[port]
 logging.info('Parsing server list')
-servers = []
 for line in rawServerList.splitlines():
     elements = line.strip().split(':')
     server = {
         'ip': elements[0],
-        'queryPort': elements[1]
+        'queryPort': elements[1],
+        'lastSeenAt': datetime.now().isoformat()
     }
-    if server not in servers:
+    serverString = f'{server["ip"]}:{server["queryPort"]}'
+    serverStrings = [f'{s["ip"]}:{s["queryPort"]}' for s in servers]
+    if serverString not in serverStrings:
+        logging.debug('Got new server, adding it')
         servers.append(server)
     else:
-        logging.info('Duplicate server')
-
+        logging.debug('Known server, updating last seen at')
+        servers[serverStrings.index(serverString)]['lastSeenAt'] = datetime.now().isoformat()
 
 logging.info(f'Writing {len(servers)} servers to output file')
-rootDir = os.path.dirname(os.path.realpath(__file__))
-with open(os.path.join(rootDir, 'bf2-servers.json'), 'w') as outputFile:
+with open(serverListFilePath, 'w') as outputFile:
     json.dump(servers, outputFile)
