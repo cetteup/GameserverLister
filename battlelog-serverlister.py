@@ -62,7 +62,8 @@ def find_query_port(ip: str, game_port: int, current_query_port: int = -1) -> in
 
 parser = argparse.ArgumentParser(description='Retrieve a list of Battlelog (BF3/BF4) '
                                              'game servers and write it to a json file')
-parser.add_argument('-g', '--game', help='Battlelog game to retrieve server list for (BF3/BF4)', type=str, required=True)
+parser.add_argument('-g', '--game', help='Battlelog game to retrieve server list for (BF3/BF4)', type=str,
+                    choices=['bf3', 'bf4'], required=True)
 parser.add_argument('-p', '--page-limit', help='Number of pages to get after retrieving the last unique server', type=int, default=10)
 parser.add_argument('--sleep', help='Number of seconds to sleep between requests', type=float, default=0)
 parser.add_argument('--proxy', help='Proxy to use for requests '
@@ -72,10 +73,6 @@ parser.set_defaults(find_query_port=False)
 args = parser.parse_args()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
-
-# Make sure either bf3 of bf4 was provided as the 'game' parameter
-if args.game.lower() not in ['bf3', 'bf4']:
-    sys.exit('Game not supported, please select either BF3 or BF4')
 
 # Set paths
 rootDir = os.path.dirname(os.path.realpath(__file__))
