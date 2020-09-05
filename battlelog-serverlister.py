@@ -2,7 +2,6 @@ import argparse
 import json
 import logging
 import os
-import sys
 import time
 from datetime import datetime
 
@@ -17,7 +16,7 @@ BASE_URIS = {
 }
 
 
-def list_index_of_dict_with_value(needle: object, haystack: list) -> object:
+def list_index_of_dict_with_value(needle: object, haystack: list) -> int:
     """
     Find a dict with a given value in a list of dictionaries and return index of (first) dictionary that contains value
     :param needle:
@@ -106,6 +105,7 @@ maxAttempts = 3
 # Init server list with servers from existing list or empty one
 if os.path.isfile(serverListFilePath):
     with open(serverListFilePath, 'r') as serverListFile:
+        logging.info('Reading servers from existing server list')
         knownServers = json.load(serverListFile)
 else:
     knownServers = []
@@ -139,8 +139,6 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
         serverTotalBefore = len(foundServers)
         # Add all servers in response (if they are new)
         for server in parsed["data"]:
-            # logging.debug(f'{server["ip"]}:{server["port"]} - {server["name"]} # {server["guid"]}')
-
             foundServer = {
                 'guid': server['guid'],
                 'ip': server['ip'],
@@ -150,13 +148,13 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
             # Add non-private servers (servers with an IP) that are new
             serverGuids = [s['guid'] for s in foundServers]
             if len(foundServer['ip']) > 0 and foundServer['guid'] not in serverGuids:
-                logging.debug('Got new server, adding it')
+                logging.debug(f'Got new server {server["guid"]}, adding it')
                 foundServers.append(foundServer)
             elif len(foundServer['ip']) > 0:
-                logging.debug('Got duplicate server, updating last seen at')
+                logging.debug(f'Got duplicate server {server["guid"]}, updating last seen at')
                 foundServers[serverGuids.index(foundServer['guid'])]['lastSeenAt'] = datetime.now().isoformat()
             else:
-                logging.debug('Got duplicate server')
+                logging.debug(f'Got private server {server["guid"]}, ignoring it')
         if len(foundServers) == serverTotalBefore:
             pagesSinceLastUniqueServer += 1
             logging.info(f'Got nothing but duplicates (page: {int(offset / perPage)},'
@@ -191,6 +189,7 @@ for foundServer in foundServers:
             'lastSeenAt': foundServer['lastSeenAt']
         })
 # Iterate over copy of server list and remove any expired servers from the (actual) server list
+logging.info(f'Checking server expiration ttl for {len(knownServers)} servers')
 stats['expiredServersRemoved'] = 0
 stats['expiredServersRecovered'] = 0
 for index, server in enumerate(knownServers[:]):

@@ -59,10 +59,14 @@ with open('battlefield2.gsl', 'r') as gslistFile:
 # Init server list with servers from existing list or empty one
 if os.path.isfile(serverListFilePath):
     with open(serverListFilePath, 'r') as serverListFile:
-        logging.debug('Reading servers from existing server list')
+        logging.info('Reading servers from existing server list')
         servers = json.load(serverListFile)
 else:
     servers = []
+
+stats = {
+    'serverTotalBefore': len(servers)
+}
 
 # Parse server list
 # List format: [ip-address]:[port]
@@ -77,21 +81,28 @@ for line in rawServerList.splitlines():
     serverString = f'{server["ip"]}:{server["queryPort"]}'
     serverStrings = [f'{s["ip"]}:{s["queryPort"]}' for s in servers]
     if serverString not in serverStrings:
-        logging.debug('Got new server, adding it')
+        logging.debug(f'Got new server {server["ip"]}:{server["queryPort"]}, adding it')
         servers.append(server)
     else:
-        logging.debug('Known server, updating last seen at')
+        logging.debug(f'Got known server {server["ip"]}:{server["queryPort"]}, updating last seen at')
         servers[serverStrings.index(serverString)]['lastSeenAt'] = datetime.now().isoformat()
 
 # Iterate over copy of server list and remove any expired servers from the (actual) server list
+logging.info(f'Checking server expiration ttl for {len(servers)} servers')
+stats['expiredServersRemoved'] = 0
 for index, server in enumerate(servers[:]):
     lastSeenAt = datetime.fromisoformat(server['lastSeenAt']) if 'lastSeenAt' in server.keys() else datetime.min
     timePassed = datetime.now() - lastSeenAt
     if timePassed.total_seconds() >= args.expired_ttl * 60 * 60:
         logging.debug(f'Server {server["ip"]}:{server["queryPort"]} has not been seen in {args.expired_ttl} hours, removing it')
         servers.remove(server)
+        stats['expiredServersRemoved'] += 1
 
+# Add current server total to stats
+stats['serverTotalAfter'] = len(servers)
 
 logging.info(f'Writing {len(servers)} servers to output file')
 with open(serverListFilePath, 'w') as outputFile:
     json.dump(servers, outputFile)
+
+logging.info(f'Run stats: {stats}')
