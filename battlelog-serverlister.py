@@ -65,6 +65,7 @@ parser = argparse.ArgumentParser(description='Retrieve a list of Battlelog (BF3/
 parser.add_argument('-g', '--game', help='Battlelog game to retrieve server list for (BF3/BF4)', type=str,
                     choices=['bf3', 'bf4'], required=True)
 parser.add_argument('-p', '--page-limit', help='Number of pages to get after retrieving the last unique server', type=int, default=10)
+parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)', type=int, default=24)
 parser.add_argument('--sleep', help='Number of seconds to sleep between requests', type=float, default=0)
 parser.add_argument('--proxy', help='Proxy to use for requests '
                                     '(format: [protocol]://[username]:[password]@[hostname]:[port]', type=str)
@@ -189,6 +190,32 @@ for foundServer in foundServers:
             'queryPort': -1,
             'lastSeenAt': foundServer['lastSeenAt']
         })
+# Iterate over copy of server list and remove any expired servers from the (actual) server list
+stats['expiredServersRemoved'] = 0
+stats['expiredServersRecovered'] = 0
+for index, server in enumerate(knownServers[:]):
+    lastSeenAt = datetime.fromisoformat(server['lastSeenAt']) if 'lastSeenAt' in server.keys() else datetime.min
+    timePassed = datetime.now() - lastSeenAt
+    if timePassed.total_seconds() >= args.expired_ttl * 60 * 60:
+        # Check if server can be accessed directly
+        requestOk = True
+        found = False
+        try:
+            response = session.get(f'https://battlelog.battlefield.com/{args.game.lower()}/servers/show/pc/{server["guid"]}?json=1')
+            found = True if response.status_code == 200 else False
+        except Exception as e:
+            logging.error(f'Failed to fetch server {server["guid"]} for expiration check')
+            requestOk = False
+
+        # Remove server if request was sent successfully but server was not found
+        if requestOk and not found:
+            logging.debug(f'Server {server["guid"]} has not been seen in {args.expired_ttl} hours, removing it')
+            knownServers.remove(server)
+            stats['expiredServersRemoved'] += 1
+        elif requestOk and found:
+            logging.debug(f'Server {server["guid"]} did not appear in list but is still online, updating last seen at')
+            knownServers[knownServers.index(server)]['lastSeenAt'] = datetime.now().isoformat()
+            stats['expiredServersRecovered'] += 1
 
 # Add current server total to stats
 stats['serverTotalAfter'] = len(knownServers)

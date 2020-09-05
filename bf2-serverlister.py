@@ -11,6 +11,7 @@ from nslookup import Nslookup
 parser = argparse.ArgumentParser(description='Retrieve a list of BF2Hub game servers and write it to a JSON file')
 parser.add_argument('-g', '--gslist', help='Path to gslist binary', type=str, required=True)
 parser.add_argument('-f', '--filter', help='Filter to apply to server list', type=str, default='')
+parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)', type=int, default=24)
 args = parser.parse_args()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
@@ -81,6 +82,15 @@ for line in rawServerList.splitlines():
     else:
         logging.debug('Known server, updating last seen at')
         servers[serverStrings.index(serverString)]['lastSeenAt'] = datetime.now().isoformat()
+
+# Iterate over copy of server list and remove any expired servers from the (actual) server list
+for index, server in enumerate(servers[:]):
+    lastSeenAt = datetime.fromisoformat(server['lastSeenAt']) if 'lastSeenAt' in server.keys() else datetime.min
+    timePassed = datetime.now() - lastSeenAt
+    if timePassed.total_seconds() >= args.expired_ttl * 60 * 60:
+        logging.debug(f'Server {server["ip"]}:{server["queryPort"]} has not been seen in {args.expired_ttl} hours, removing it')
+        servers.remove(server)
+
 
 logging.info(f'Writing {len(servers)} servers to output file')
 with open(serverListFilePath, 'w') as outputFile:
