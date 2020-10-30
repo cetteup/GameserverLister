@@ -46,7 +46,7 @@ def find_query_port(ip: str, game_port: int, current_query_port: int = -1) -> in
         ports_to_try.insert(0, current_query_port)
     for port_to_try in ports_to_try:
         gamedig_result = gevent.subprocess.run(
-            args=['/usr/bin/gamedig', '--type', args.game.lower(), f'{ip}:{port_to_try}',
+            args=[args.gamedig_bin, '--type', args.game.lower(), f'{ip}:{port_to_try}',
                   '--maxAttempts 2', '--socketTimeout 2000', '--givenPortOnly'],
             capture_output=True
         )
@@ -71,6 +71,7 @@ parser.add_argument('--proxy', help='Proxy to use for requests '
                                     '(format: [protocol]://[username]:[password]@[hostname]:[port]', type=str)
 parser.add_argument('--find-query-port', dest='find_query_port', action='store_true')
 parser.set_defaults(find_query_port=False)
+parser.add_argument('--gamedig-bin', help='Path to gamedig binary', type=str, default='/usr/bin/gamedig')
 args = parser.parse_args()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
