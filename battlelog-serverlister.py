@@ -12,7 +12,8 @@ from gevent.pool import Pool
 
 BASE_URIS = {
     'bf3': 'https://battlelog.battlefield.com/bf3/servers/getAutoBrowseServers/',
-    'bf4': 'https://battlelog.battlefield.com/bf4/servers/getServers/pc/'
+    'bf4': 'https://battlelog.battlefield.com/bf4/servers/getServers/pc/',
+    'bfh': 'https://battlelog.battlefield.com/bfh/servers/getServers/pc/'
 }
 
 
@@ -62,7 +63,7 @@ def find_query_port(ip: str, game_port: int, current_query_port: int = -1) -> in
 parser = argparse.ArgumentParser(description='Retrieve a list of Battlelog (BF3/BF4) '
                                              'game servers and write it to a json file')
 parser.add_argument('-g', '--game', help='Battlelog game to retrieve server list for (BF3/BF4)', type=str,
-                    choices=['bf3', 'bf4'], required=True)
+                    choices=['bf3', 'bf4', 'bfh'], required=True)
 parser.add_argument('-p', '--page-limit', help='Number of pages to get after retrieving the last unique server', type=int, default=10)
 parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)', type=int, default=24)
 parser.add_argument('--sleep', help='Number of seconds to sleep between requests', type=float, default=0)
@@ -77,6 +78,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 # Set paths
 rootDir = os.path.dirname(os.path.realpath(__file__))
 serverListFilePath = os.path.join(rootDir, f'{args.game.lower()}-servers.json')
+
+logging.info(f'Listing server for {args.game.lower()}')
 
 # Init session
 session = requests.session()
@@ -130,7 +133,6 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
         # Count try and start over
         attempt += 1
         continue
-
     if response.status_code == 200:
         # Reset tries
         attempt = 0
