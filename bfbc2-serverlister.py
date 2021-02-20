@@ -5,6 +5,7 @@ import os
 import subprocess
 import sys
 from datetime import datetime
+from random import randint
 
 import gevent.subprocess
 from gevent.pool import Pool
@@ -120,6 +121,9 @@ if args.find_query_port:
     jobs = []
     for server in servers:
         """
+        Most Bad Company 2 server seem to be hosted directly by members of the community, resulting in pretty random
+        query ports as well as strange/incorrect server configurations. So, try a bunch of ports and validate found
+        query ports using the connect property OR the server name
         Order of ports to try:
         1. default query port
         2. game port + default port offset (mirror gamedig behavior)
@@ -128,9 +132,12 @@ if args.find_query_port:
         5. game port + 10
         6. game port + 5 (several hosters)
         7. game port + 1
+        8. random port between default game port and default query port
+        9. random port between game port and game port + default offset
         """
         portsToTry = [48888, server['gamePort'] + 29321, server['gamePort'], server['gamePort'] + 100,
-                      server['gamePort'] + 10, server['gamePort'] + 5, server['gamePort'] + 1]
+                      server['gamePort'] + 10, server['gamePort'] + 5, server['gamePort'] + 1,
+                      randint(19567, 48888), randint(server['gamePort'], server['gamePort'] + 29321)]
         jobs.append(pool.spawn(find_query_port, args.gamedig_bin, 'bfbc2', server, portsToTry, bfbc2_server_validator))
     # Wait for all jobs to complete
     gevent.joinall(jobs)
