@@ -5,10 +5,11 @@ import os
 import time
 from datetime import datetime
 
-import gevent
 import gevent.subprocess
 import requests
 from gevent.pool import Pool
+
+from helpers import find_query_port, battlelog_server_validator
 
 BASE_URIS = {
     'bf3': 'https://battlelog.battlefield.com/bf3/servers/getAutoBrowseServers/',
@@ -29,49 +30,21 @@ def list_index_of_dict_with_value(needle: object, haystack: list) -> int:
             return list_index
 
 
-def find_query_port(ip: str, game_port: int, current_query_port: int = -1) -> int:
-    query_port = -1
-    """
-    Order of ports to try:
-    1. default query port
-    2. game port + default port offset (mirror gamedig behavior)
-    3. game port (some servers use same port for game + query)
-    4. game port + 100 (nitrado)
-    6. game port + 5 (several hosters)
-    6. 48888 (gamed)
-    """
-    ports_to_try = [47200, game_port + 22000, game_port, game_port + 100, game_port + 5, game_port + 1, 48888]
-    # Add current query port add index 0 if valid
-    if current_query_port != -1:
-        ports_to_try.insert(0, current_query_port)
-    for port_to_try in ports_to_try:
-        gamedig_result = gevent.subprocess.run(
-            args=[args.gamedig_bin, '--type', args.game.lower(), f'{ip}:{port_to_try}',
-                  '--maxAttempts 2', '--socketTimeout 2000', '--givenPortOnly'],
-            capture_output=True
-        )
-        # Stop searching if query was successful and response came from the correct server
-        # (some servers run on the same IP, so make sure ip and game_port match)
-        if '"error":"Failed all' not in str(gamedig_result.stdout) and \
-                f'"connect":"{ip}:{game_port}' in str(gamedig_result.stdout):
-            query_port = port_to_try
-            break
-
-    return query_port
-
-
 parser = argparse.ArgumentParser(description='Retrieve a list of Battlelog (BF3/BF4) '
                                              'game servers and write it to a json file')
 parser.add_argument('-g', '--game', help='Battlelog game to retrieve server list for (BF3/BF4)', type=str,
                     choices=['bf3', 'bf4', 'bfh'], required=True)
-parser.add_argument('-p', '--page-limit', help='Number of pages to get after retrieving the last unique server', type=int, default=10)
-parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)', type=int, default=24)
+parser.add_argument('-p', '--page-limit', help='Number of pages to get after retrieving the last unique server',
+                    type=int, default=10)
+parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)',
+                    type=int, default=24)
 parser.add_argument('--sleep', help='Number of seconds to sleep between requests', type=float, default=0)
 parser.add_argument('--proxy', help='Proxy to use for requests '
                                     '(format: [protocol]://[username]:[password]@[hostname]:[port]', type=str)
 parser.add_argument('--find-query-port', dest='find_query_port', action='store_true')
 parser.set_defaults(find_query_port=False)
 parser.add_argument('--gamedig-bin', help='Path to gamedig binary', type=str, default='/usr/bin/gamedig')
+parser.add_argument('--gamedig-concurrency', help='Number of gamedig queries to run in parallel', type=int, default=12)
 args = parser.parse_args()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
@@ -203,7 +176,8 @@ for index, server in enumerate(knownServers[:]):
         requestOk = True
         found = False
         try:
-            response = session.get(f'https://battlelog.battlefield.com/{args.game.lower()}/servers/show/pc/{server["guid"]}?json=1')
+            response = session.get(f'https://battlelog.battlefield.com/{args.game.lower()}/'
+                                   f'servers/show/pc/{server["guid"]}?json=1')
             found = True if response.status_code == 200 else False
         except Exception as e:
             logging.error(f'Failed to fetch server {server["guid"]} for expiration check')
@@ -224,14 +198,27 @@ stats['serverTotalAfter'] = len(knownServers)
 
 if args.find_query_port:
     logging.info(f'Searching query port for {len(knownServers)} servers')
+
     searchStats = {
         'totalSearches': len(knownServers),
         'queryPortFound': 0
     }
-    pool = Pool(12)
+    pool = Pool(args.gamedig_concurrency)
     jobs = []
     for server in knownServers:
-        jobs.append(pool.spawn(find_query_port, server['ip'], server['gamePort'], server['queryPort']))
+        """
+        Order of ports to try:
+        1. default query port
+        2. game port + default port offset (mirror gamedig behavior)
+        3. game port (some servers use same port for game + query)
+        4. game port + 100 (nitrado)
+        6. game port + 5 (several hosters)
+        6. 48888 (gamed)
+        """
+        portsToTry = [47200, server['gamePort'] + 22000, server['gamePort'], server['gamePort'] + 100,
+                      server['gamePort'] + 5, server['gamePort'] + 1, 48888]
+        jobs.append(pool.spawn(find_query_port, args.gamedig_bin, args.game, server,
+                               portsToTry, battlelog_server_validator))
     # Wait for all jobs to complete
     gevent.joinall(jobs)
     for index, job in enumerate(jobs):
