@@ -80,21 +80,26 @@ logging.info('Parsing server list')
 for line in rawServerList.splitlines():
     rawServerInfo = line.strip().split(' ', 1)[1]
     parsed = parse_raw_server_info(rawServerInfo)
-    server = {
+    foundServer = {
         'name': parsed['hostname'],
         'ip': parsed['hostaddr'],
         'gamePort': int(parsed['hostport']),
-        'queryPort': -1,
         'lastSeenAt': datetime.now().isoformat()
     }
-    serverString = f'{server["ip"]}:{server["gamePort"]}'
+    serverString = f'{foundServer["ip"]}:{foundServer["gamePort"]}'
     serverStrings = [f'{s["ip"]}:{s["gamePort"]}' for s in servers]
     if serverString not in serverStrings:
-        logging.debug(f'Got new server {server["ip"]}:{server["gamePort"]}, adding it')
-        servers.append(server)
+        logging.debug(f'Got new server {foundServer["ip"]}:{foundServer["gamePort"]}, adding it')
+        servers.append({
+            'name': foundServer['name'],
+            'ip': foundServer['ip'],
+            'gamePort': foundServer['gamePort'],
+            'queryPort': -1,
+            'lastSeenAt': foundServer['lastSeenAt']
+        })
     else:
-        logging.debug(f'Got known server {server["ip"]}:{server["gamePort"]}, updating last seen at')
-        servers[serverStrings.index(serverString)]['lastSeenAt'] = datetime.now().isoformat()
+        logging.debug(f'Got known server {foundServer["ip"]}:{foundServer["gamePort"]}, updating it')
+        servers[serverStrings.index(serverString)] = {**servers[serverStrings.index(serverString)], **foundServer}
 
 # Iterate over copy of server list and remove any expired servers from the (actual) server list
 logging.info(f'Checking server expiration ttl for {len(servers)} servers')
