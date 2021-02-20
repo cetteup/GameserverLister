@@ -45,6 +45,6 @@ def parse_raw_server_info(raw_server_info: str) -> dict:
     values = [value for (index, value) in enumerate(elements) if index % 2 == 1]
 
     # Build dict
-    server = {key: urllib.parse.unquote(values[index].replace('"', '')) for (index, key) in enumerate(keys)}
+    server = {key: urllib.parse.unquote(values[index].replace('"', '')).strip() for (index, key) in enumerate(keys)}
 
     return server
