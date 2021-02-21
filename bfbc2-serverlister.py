@@ -84,7 +84,7 @@ for line in rawServerList.splitlines():
         'name': parsed['hostname'],
         'ip': parsed['hostaddr'],
         'gamePort': int(parsed['hostport']),
-        'lastSeenAt': datetime.now().isoformat()
+        'lastSeenAt': datetime.now().astimezone().isoformat()
     }
     serverString = f'{foundServer["ip"]}:{foundServer["gamePort"]}'
     serverStrings = [f'{s["ip"]}:{s["gamePort"]}' for s in servers]
@@ -105,8 +105,9 @@ for line in rawServerList.splitlines():
 logging.info(f'Checking server expiration ttl for {len(servers)} servers')
 stats['expiredServersRemoved'] = 0
 for index, server in enumerate(servers[:]):
-    lastSeenAt = datetime.fromisoformat(server['lastSeenAt']) if 'lastSeenAt' in server.keys() else datetime.min
-    timePassed = datetime.now() - lastSeenAt
+    lastSeenAt = (datetime.fromisoformat(server['lastSeenAt'])
+                  if 'lastSeenAt' in server.keys() else datetime.min).astimezone()
+    timePassed = datetime.now().astimezone() - lastSeenAt
     if timePassed.total_seconds() >= args.expired_ttl * 60 * 60:
         logging.debug(f'Server {server["ip"]}:{server["gamePort"]} has not been seen in {args.expired_ttl} hours, removing it')
         servers.remove(server)

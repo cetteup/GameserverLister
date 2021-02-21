@@ -119,7 +119,7 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
                 'guid': server['guid'],
                 'ip': server['ip'],
                 'gamePort': server['port'],
-                'lastSeenAt': datetime.now().isoformat()
+                'lastSeenAt': datetime.now().astimezone().isoformat()
             }
             # Add non-private servers (servers with an IP) that are new
             serverGuids = [s['guid'] for s in foundServers]
@@ -128,7 +128,7 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
                 foundServers.append(foundServer)
             elif len(foundServer['ip']) > 0:
                 logging.debug(f'Got duplicate server {server["guid"]}, updating last seen at')
-                foundServers[serverGuids.index(foundServer['guid'])]['lastSeenAt'] = datetime.now().isoformat()
+                foundServers[serverGuids.index(foundServer['guid'])]['lastSeenAt'] = datetime.now().astimezone().isoformat()
             else:
                 logging.debug(f'Got private server {server["guid"]}, ignoring it')
         if len(foundServers) == serverTotalBefore:
@@ -169,8 +169,9 @@ logging.info(f'Checking server expiration ttl for {len(knownServers)} servers')
 stats['expiredServersRemoved'] = 0
 stats['expiredServersRecovered'] = 0
 for index, server in enumerate(knownServers[:]):
-    lastSeenAt = datetime.fromisoformat(server['lastSeenAt']) if 'lastSeenAt' in server.keys() else datetime.min
-    timePassed = datetime.now() - lastSeenAt
+    lastSeenAt = (datetime.fromisoformat(server['lastSeenAt']) if
+                  'lastSeenAt' in server.keys() else datetime.min).astimezone()
+    timePassed = datetime.now().astimezone() - lastSeenAt
     if timePassed.total_seconds() >= args.expired_ttl * 60 * 60:
         # Check if server can be accessed directly
         requestOk = True
@@ -190,7 +191,7 @@ for index, server in enumerate(knownServers[:]):
             stats['expiredServersRemoved'] += 1
         elif requestOk and found:
             logging.debug(f'Server {server["guid"]} did not appear in list but is still online, updating last seen at')
-            knownServers[knownServers.index(server)]['lastSeenAt'] = datetime.now().isoformat()
+            knownServers[knownServers.index(server)]['lastSeenAt'] = datetime.now().astimezone().isoformat()
             stats['expiredServersRecovered'] += 1
 
 # Add current server total to stats
