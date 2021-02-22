@@ -8,8 +8,21 @@ from datetime import datetime
 
 from nslookup import Nslookup
 
+PROJECTS = {
+    'bf2hub': {
+        'serverHostname': 'servers.bf2hub.com',
+        'serverPort': 28911
+    },
+    'playbf2': {
+        'serverHostname': 'battlefield2.ms.playbf2.ru',
+        'serverPort': 28910
+    }
+}
+
 parser = argparse.ArgumentParser(description='Retrieve a list of BF2Hub game servers and write it to a JSON file')
 parser.add_argument('-g', '--gslist', help='Path to gslist binary', type=str, required=True)
+parser.add_argument('-p', '--project', help='Project who\'s master server should be queried', type=str,
+                    choices=['bf2hub', 'playbf2'], default='bf2hub')
 parser.add_argument('-f', '--filter', help='Filter to apply to server list', type=str, default='')
 parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)', type=int, default=24)
 args = parser.parse_args()
@@ -24,9 +37,9 @@ if not os.path.isfile(args.gslist):
 rootDir = os.path.dirname(os.path.realpath(__file__))
 serverListFilePath = os.path.join(rootDir, 'bf2-servers.json')
 
-# Manually look up servers.bf2hub.com to be able to spread retried across servers
+# Manually look up hostname to be able to spread retried across servers
 lookerUpper = Nslookup()
-dnsResult = lookerUpper.dns_lookup('servers.bf2hub.com')
+dnsResult = lookerUpper.dns_lookup(PROJECTS[args.project]['serverHostname'])
 
 # Run gslist and capture output
 commandOk = False
@@ -38,9 +51,9 @@ while not commandOk and tries < maxTries:
     serverIp = dnsResult.answer[0] if tries % 2 == 0 else dnsResult.answer[-1]
     try:
         logging.info(f'Running gslist command against {serverIp}')
-        gslistResult = subprocess.run([args.gslist, '-n', 'battlefield2', '-x', f'{serverIp}:28911',
-                                       '-Y', 'battlefield2', 'hW6m9a', '-f', f'{args.filter}', '-o', '1'],
-                                      capture_output=True, timeout=10)
+        gslistResult = subprocess.run([args.gslist, '-n', 'battlefield2', '-x',
+                                       f'{serverIp}:{PROJECTS[args.project]["serverPort"]}', '-Y', 'battlefield2',
+                                       'hW6m9a', '-f', f'{args.filter}', '-o', '1'], capture_output=True, timeout=10)
         commandOk = True
     except subprocess.TimeoutExpired as e:
         logging.error(f'gslist timed out, try {tries + 1}/{maxTries}')
