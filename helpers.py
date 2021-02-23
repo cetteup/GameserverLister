@@ -1,4 +1,5 @@
 import json
+import logging
 import urllib.parse
 from typing import Callable
 
@@ -18,9 +19,21 @@ def find_query_port(gamedig_path: str, game: str, server: dict, ports_to_try: li
                   '--maxAttempts 2', '--socketTimeout 2000', '--givenPortOnly'],
             capture_output=True
         )
+
+        # Make sure gamedig did not log any errors to stderr and has some output in stdout
+        if len(gamedig_result.stderr) > 0 or len(gamedig_result.stdout) == 0:
+            continue
+
+        # Try to parse JSON returned by gamedig
+        try:
+            parsed_result = json.loads(gamedig_result.stdout)
+        except json.JSONDecodeError as e:
+            logging.debug(e)
+            logging.error('Failed to parse gamedig command output')
+            continue
+
         # Stop searching if query was successful and response came from the correct server
         # (some servers run on the same IP, so make sure ip and game_port match)
-        parsed_result = json.loads(gamedig_result.stdout)
         if not parsed_result.get('error', '').startswith('Failed all') and validator(server, parsed_result):
             query_port = port_to_try
             break
