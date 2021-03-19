@@ -81,16 +81,17 @@ for line in rawServerList.splitlines():
     rawServerInfo = line.strip().split(' ', 1)[1]
     parsed = parse_raw_server_info(rawServerInfo)
     foundServer = {
+        'guid': abs(int(parsed['B-U-sguid'])),
         'name': parsed['hostname'],
         'ip': parsed['hostaddr'],
         'gamePort': int(parsed['hostport']),
         'lastSeenAt': datetime.now().astimezone().isoformat()
     }
-    serverString = f'{foundServer["ip"]}:{foundServer["gamePort"]}'
-    serverStrings = [f'{s["ip"]}:{s["gamePort"]}' for s in servers]
-    if serverString not in serverStrings:
-        logging.debug(f'Got new server {foundServer["ip"]}:{foundServer["gamePort"]}, adding it')
+    serverGuids = [s['guid'] for s in servers]
+    if foundServer['guid'] not in serverGuids:
+        logging.debug(f'Got new server {foundServer["guid"]}, adding it')
         servers.append({
+            'guid': foundServer['guid'],
             'name': foundServer['name'],
             'ip': foundServer['ip'],
             'gamePort': foundServer['gamePort'],
@@ -98,8 +99,9 @@ for line in rawServerList.splitlines():
             'lastSeenAt': foundServer['lastSeenAt']
         })
     else:
-        logging.debug(f'Got known server {foundServer["ip"]}:{foundServer["gamePort"]}, updating it')
-        servers[serverStrings.index(serverString)] = {**servers[serverStrings.index(serverString)], **foundServer}
+        logging.debug(f'Got known server {foundServer["guid"]}, updating it')
+        index = serverGuids.index(foundServer['guid'])
+        servers[index] = {**servers[index], **foundServer}
 
 # Iterate over copy of server list and remove any expired servers from the (actual) server list
 logging.info(f'Checking server expiration ttl for {len(servers)} servers')
@@ -109,7 +111,7 @@ for index, server in enumerate(servers[:]):
                   if 'lastSeenAt' in server.keys() else datetime.min).astimezone()
     timePassed = datetime.now().astimezone() - lastSeenAt
     if timePassed.total_seconds() >= args.expired_ttl * 60 * 60:
-        logging.debug(f'Server {server["ip"]}:{server["gamePort"]} has not been seen in {args.expired_ttl} hours, removing it')
+        logging.debug(f'Server {server["guid"]} has not been seen in {args.expired_ttl} hours, removing it')
         servers.remove(server)
         stats['expiredServersRemoved'] += 1
 
