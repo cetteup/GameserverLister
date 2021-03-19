@@ -14,6 +14,10 @@ def find_query_port(gamedig_path: str, game: str, server: dict, ports_to_try: li
         ports_to_try.insert(0, server['queryPort'])
     # Try all unique ports
     for port_to_try in list(set(ports_to_try)):
+        if not 0 < port_to_try < 65535:
+            logging.warning(f'Skipping query port to try which is outside of valid port range ({port_to_try})')
+            continue
+
         gamedig_result = gevent.subprocess.run(
             args=[gamedig_path, '--type', game, f'{server["ip"]}:{port_to_try}',
                   '--maxAttempts 2', '--socketTimeout 2000', '--givenPortOnly'],

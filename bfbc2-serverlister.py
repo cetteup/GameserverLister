@@ -138,11 +138,12 @@ if args.find_query_port:
         5. game port + 10
         6. game port + 5 (several hosters)
         7. game port + 1
-        8. random port between default game port and default query port
-        9. random port between game port and game port + default offset
+        8. game port + 29000
+        9. random port between default game port and default query port
+        10. random port between game port and game port + default offset
         """
         portsToTry = [48888, server['gamePort'] + 29321, server['gamePort'], server['gamePort'] + 100,
-                      server['gamePort'] + 10, server['gamePort'] + 5, server['gamePort'] + 1,
+                      server['gamePort'] + 10, server['gamePort'] + 5, server['gamePort'] + 1, server['gamePort'] + 29000,
                       randint(19567, 48888), randint(server['gamePort'], server['gamePort'] + 29321)]
         jobs.append(pool.spawn(find_query_port, args.gamedig_bin, 'bfbc2', server, portsToTry, bfbc2_server_validator))
     # Wait for all jobs to complete
