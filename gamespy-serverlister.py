@@ -10,14 +10,16 @@ from nslookup import Nslookup
 
 from constants import GSLIST_GAMES
 
-parser = argparse.ArgumentParser(description='Retrieve a list of BF2Hub game servers and write it to a JSON file')
+parser = argparse.ArgumentParser(description='Retrieve a list of game servers for GameSpy-based Battlefield games '
+                                             'and write it to a JSON file')
 parser.add_argument('-g', '--gslist', help='Path to gslist binary', type=str, required=True)
 parser.add_argument('-b', '--game', help='Battlefield game to query servers for', type=str,
                     choices=['bf1942', 'bfvietnam', 'bf2', 'bf2142'], default='bf2')
 parser.add_argument('-p', '--project', help='Project who\'s master server should be queried (BF2 only)', type=str,
                     choices=['bf2hub', 'playbf2'], default='bf2hub')
 parser.add_argument('-f', '--filter', help='Filter to apply to server list', type=str, default='')
-parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)', type=int, default=24)
+parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)',
+                    type=int, default=24)
 args = parser.parse_args()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
