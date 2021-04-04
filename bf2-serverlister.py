@@ -8,20 +8,13 @@ from datetime import datetime
 
 from nslookup import Nslookup
 
-PROJECTS = {
-    'bf2hub': {
-        'serverHostname': 'servers.bf2hub.com',
-        'serverPort': 28911
-    },
-    'playbf2': {
-        'serverHostname': 'battlefield2.ms.playbf2.ru',
-        'serverPort': 28910
-    }
-}
+from constants import GSLIST_GAMES
 
 parser = argparse.ArgumentParser(description='Retrieve a list of BF2Hub game servers and write it to a JSON file')
 parser.add_argument('-g', '--gslist', help='Path to gslist binary', type=str, required=True)
-parser.add_argument('-p', '--project', help='Project who\'s master server should be queried', type=str,
+parser.add_argument('-b', '--game', help='Battlefield game to query servers for', type=str,
+                    choices=['bf1942', 'bfvietnam', 'bf2', 'bf2142'], default='bf2')
+parser.add_argument('-p', '--project', help='Project who\'s master server should be queried (BF2 only)', type=str,
                     choices=['bf2hub', 'playbf2'], default='bf2hub')
 parser.add_argument('-f', '--filter', help='Filter to apply to server list', type=str, default='')
 parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)', type=int, default=24)
@@ -35,11 +28,21 @@ if not os.path.isfile(args.gslist):
 
 # Set paths
 rootDir = os.path.dirname(os.path.realpath(__file__))
-serverListFilePath = os.path.join(rootDir, 'bf2-servers.json')
+serverListFilePath = os.path.join(rootDir, f'{args.game}-servers.json')
+
+# Set game and project
+game = GSLIST_GAMES[args.game]
+project = None
+if args.game == 'bf2':
+    # Use given project for BF2
+    project = args.project
+else:
+    # Use first available project for other games
+    project = list(game['servers'].keys())[0]
 
 # Manually look up hostname to be able to spread retried across servers
 lookerUpper = Nslookup()
-dnsResult = lookerUpper.dns_lookup(PROJECTS[args.project]['serverHostname'])
+dnsResult = lookerUpper.dns_lookup(game['servers'][project]['hostname'])
 
 # Run gslist and capture output
 commandOk = False
@@ -51,9 +54,10 @@ while not commandOk and tries < maxTries:
     serverIp = dnsResult.answer[0] if tries % 2 == 0 else dnsResult.answer[-1]
     try:
         logging.info(f'Running gslist command against {serverIp}')
-        gslistResult = subprocess.run([args.gslist, '-n', 'battlefield2', '-x',
-                                       f'{serverIp}:{PROJECTS[args.project]["serverPort"]}', '-Y', 'battlefield2',
-                                       'hW6m9a', '-f', f'{args.filter}', '-o', '1'], capture_output=True, timeout=10)
+        gslistResult = subprocess.run([args.gslist, '-n', game['gameName'], '-x',
+                                       f'{serverIp}:{game["servers"][project]["port"]}', '-Y', game['gameName'],
+                                       game['gameKey'], '-t', game['encType'], '-f', f'{args.filter}', '-o', '1'],
+                                      capture_output=True, timeout=10)
         commandOk = True
     except subprocess.TimeoutExpired as e:
         logging.error(f'gslist timed out, try {tries + 1}/{maxTries}')
@@ -66,7 +70,7 @@ if gslistResult is None or 'servers found' not in str(gslistResult.stderr):
 
 # Read gslist output file
 logging.info('Reading gslist output file')
-with open('battlefield2.gsl', 'r') as gslistFile:
+with open(f'{game["gameName"]}.gsl', 'r') as gslistFile:
     rawServerList = gslistFile.read()
 
 # Init server list with servers from existing list or empty one
@@ -108,7 +112,8 @@ for index, server in enumerate(servers[:]):
                   'lastSeenAt' in server.keys() else datetime.min).astimezone()
     timePassed = datetime.now().astimezone() - lastSeenAt
     if timePassed.total_seconds() >= args.expired_ttl * 60 * 60:
-        logging.debug(f'Server {server["ip"]}:{server["queryPort"]} has not been seen in {args.expired_ttl} hours, removing it')
+        logging.debug(f'Server {server["ip"]}:{server["queryPort"]} has not been seen in'
+                      f' {args.expired_ttl} hours, removing it')
         servers.remove(server)
         stats['expiredServersRemoved'] += 1
 
