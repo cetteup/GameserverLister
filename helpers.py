@@ -65,3 +65,10 @@ def parse_raw_server_info(raw_server_info: str) -> dict:
     server = {key: urllib.parse.unquote(values[index].replace('"', '')).strip() for (index, key) in enumerate(keys)}
 
     return server
+
+
+def guid_from_ip_port(ip: str, port: str) -> str:
+    guid = '-'.join([f'{int(octet)*128:0>x}' for octet in ip.split('.')])
+    guid += f'-{int(port)*128:0>x}'
+
+    return guid

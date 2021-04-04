@@ -9,6 +9,7 @@ from datetime import datetime
 from nslookup import Nslookup
 
 from constants import GSLIST_GAMES
+from helpers import guid_from_ip_port
 
 parser = argparse.ArgumentParser(description='Retrieve a list of game servers for GameSpy-based Battlefield games '
                                              'and write it to a JSON file')
@@ -106,6 +107,7 @@ for line in rawServerList.splitlines():
     if len(elements[1]) > 5:
         break
     server = {
+        'guid': guid_from_ip_port(elements[0], elements[1]),
         'ip': elements[0],
         'queryPort': elements[1],
         'lastSeenAt': datetime.now().astimezone().isoformat()
@@ -117,6 +119,7 @@ for line in rawServerList.splitlines():
         servers.append(server)
     else:
         logging.debug(f'Got known server {server["ip"]}:{server["queryPort"]}, updating last seen at')
+        servers[serverStrings.index(serverString)]['guid'] = server['guid']
         servers[serverStrings.index(serverString)]['lastSeenAt'] = datetime.now().astimezone().isoformat()
 
 # Iterate over copy of server list and remove any expired servers from the (actual) server list
