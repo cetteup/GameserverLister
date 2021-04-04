@@ -20,6 +20,9 @@ parser.add_argument('-p', '--project', help='Project who\'s master server should
 parser.add_argument('-f', '--filter', help='Filter to apply to server list', type=str, default='')
 parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)',
                     type=int, default=24)
+parser.add_argument('-s', '--super-query', help='Query each server in the list for it\'s status', dest='super_query',
+                    action='store_true')
+parser.set_defaults(super_query=False)
 args = parser.parse_args()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
@@ -42,6 +45,8 @@ else:
     # Use first available project for other games
     project = list(game['servers'].keys())[0]
 
+logging.info(f'Fetching server list for {args.game} via {project}')
+
 # Manually look up hostname to be able to spread retried across servers
 lookerUpper = Nslookup()
 dnsResult = lookerUpper.dns_lookup(game['servers'][project]['hostname'])
@@ -56,10 +61,15 @@ while not commandOk and tries < maxTries:
     serverIp = dnsResult.answer[0] if tries % 2 == 0 else dnsResult.answer[-1]
     try:
         logging.info(f'Running gslist command against {serverIp}')
-        gslistResult = subprocess.run([args.gslist, '-n', game['gameName'], '-x',
-                                       f'{serverIp}:{game["servers"][project]["port"]}', '-Y', game['gameName'],
-                                       game['gameKey'], '-t', game['encType'], '-f', f'{args.filter}', '-o', '1'],
-                                      capture_output=True, timeout=10)
+        command = [args.gslist, '-n', game['gameName'], '-x', f'{serverIp}:{game["servers"][project]["port"]}',
+                   '-Y', game['gameName'], game['gameKey'], '-t', game['encType'], '-f', f'{args.filter}', '-o', '1']
+        timeout = 10
+        # Add super query argument if requested
+        if args.super_query:
+            command.extend(['-Q', game['superQueryType']])
+            # Extend timeout to account for server queries
+            timeout = 20
+        gslistResult = subprocess.run(command, capture_output=True, timeout=timeout)
         commandOk = True
     except subprocess.TimeoutExpired as e:
         logging.error(f'gslist timed out, try {tries + 1}/{maxTries}')
@@ -92,6 +102,9 @@ stats = {
 logging.info('Parsing server list')
 for line in rawServerList.splitlines():
     elements = line.strip().split(':')
+    # Stop parsing once we reach the first line with query server data
+    if len(elements[1]) > 5:
+        break
     server = {
         'ip': elements[0],
         'queryPort': elements[1],

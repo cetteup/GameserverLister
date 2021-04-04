@@ -3,6 +3,7 @@ GSLIST_GAMES = {
         'gameName': 'bfield1942',
         'gameKey': 'HpWx9z',
         'encType': '2',
+        'superQueryType': '0',
         'servers': {
             'bf1942.sk': {
                 'hostname': 'master.bf1942.sk',
@@ -14,6 +15,7 @@ GSLIST_GAMES = {
         'gameName': 'bfvietnam',
         'gameKey': 'h2P9dJ',
         'encType': '2',
+        'superQueryType': '0',
         'servers': {
             'qtracker': {
                 'hostname': 'master2.qtracker.com',
@@ -25,6 +27,7 @@ GSLIST_GAMES = {
         'gameName': 'stella',
         'gameKey': 'M8o1Qw',
         'encType': '-1',
+        'superQueryType': '8',
         'servers': {
             'openspy': {
                 'hostname': 'stella.ms5.openspy.net',
@@ -36,6 +39,7 @@ GSLIST_GAMES = {
         'gameName': 'battlefield2',
         'gameKey': 'hW6m9a',
         'encType': '-1',
+        'superQueryType': '8',
         'servers': {
             'bf2hub': {
                 'hostname': 'servers.bf2hub.com',
