@@ -68,7 +68,9 @@ def parse_raw_server_info(raw_server_info: str) -> dict:
 
 
 def guid_from_ip_port(ip: str, port: str) -> str:
-    guid = '-'.join([f'{int(octet)*128:0>x}' for octet in ip.split('.')])
-    guid += f'-{int(port)*128:0>x}'
+    int_port = int(port)
+    guid = f'{pow(int_port, 3):0>x}-'
+    guid = '-'.join([f'{int((pow(int(octet) + 2, 2)*pow(int_port, 2))/(int_port*8)):0>x}' for
+                     (index, octet) in enumerate(ip.split('.'))])
 
     return guid
