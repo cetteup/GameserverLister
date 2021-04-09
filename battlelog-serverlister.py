@@ -230,11 +230,9 @@ if args.find_query_port:
             searchStats['queryPortFound'] += 1
     logging.info(f'Query port search stats: {searchStats}')
 
-# Write file (unless retrieval failed due to reaching the attempt max)
-if attempt < args.max_attempts:
-    logging.info(f'Writing {len(knownServers)} servers to output file')
-
-    with open(serverListFilePath, 'w') as outputFile:
-        json.dump(knownServers, outputFile)
+# Write file
+logging.info(f'Writing {len(knownServers)} servers to output file')
+with open(serverListFilePath, 'w') as outputFile:
+    json.dump(knownServers, outputFile)
 
 logging.info(f'Run stats: {stats}')
