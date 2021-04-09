@@ -179,7 +179,7 @@ for index, server in enumerate(knownServers[:]):
         try:
             response = session.get(f'https://battlelog.battlefield.com/{args.game.lower()}/'
                                    f'servers/show/pc/{server["guid"]}?json=1')
-            found = True if response.status_code == 200 else False
+            found = False if response.status_code == 422 else True
         except Exception as e:
             logging.error(f'Failed to fetch server {server["guid"]} for expiration check')
             requestOk = False
