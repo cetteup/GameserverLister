@@ -46,9 +46,12 @@ parser.add_argument('--find-query-port', dest='find_query_port', action='store_t
 parser.set_defaults(find_query_port=False)
 parser.add_argument('--gamedig-bin', help='Path to gamedig binary', type=str, default='/usr/bin/gamedig')
 parser.add_argument('--gamedig-concurrency', help='Number of gamedig queries to run in parallel', type=int, default=12)
+parser.add_argument('--debug', help='Enables logging of lots of debugging information', dest='debug',
+                    action='store_true')
+parser.set_defaults(debug=False)
 args = parser.parse_args()
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO, format='%(asctime)s %(message)s')
 
 # Set paths
 rootDir = os.path.dirname(os.path.realpath(__file__))
@@ -103,6 +106,7 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < args.max_attemp
     try:
         response = session.get(f'{BASE_URIS[args.game.lower()]}?count={perPage}&offset=0', timeout=10)
     except Exception as e:
+        logging.debug(e)
         logging.error(f'Request failed, retrying {attempt + 1}/{args.max_attempts}')
         # Count try and start over
         attempt += 1
@@ -181,6 +185,7 @@ for index, server in enumerate(knownServers[:]):
                                    f'servers/show/pc/{server["guid"]}?json=1')
             found = False if response.status_code == 422 else True
         except Exception as e:
+            logging.debug(e)
             logging.error(f'Failed to fetch server {server["guid"]} for expiration check')
             requestOk = False
 
