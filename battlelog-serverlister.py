@@ -39,6 +39,7 @@ parser.add_argument('-p', '--page-limit', help='Number of pages to get after ret
 parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)',
                     type=int, default=24)
 parser.add_argument('--sleep', help='Number of seconds to sleep between requests', type=float, default=0)
+parser.add_argument('--max-attempts', help='Max number of attempts for fetching a page of servers', type=int, default=3)
 parser.add_argument('--proxy', help='Proxy to use for requests '
                                     '(format: [protocol]://[username]:[password]@[hostname]:[port]', type=str)
 parser.add_argument('--find-query-port', dest='find_query_port', action='store_true')
@@ -77,7 +78,6 @@ As a workaround, just stop after not retrieving a new/unique server for [args.pa
 """
 pagesSinceLastUniqueServer = 0
 attempt = 0
-maxAttempts = 3
 
 # Init server list with servers from existing list or empty one
 if os.path.isfile(serverListFilePath):
@@ -95,15 +95,15 @@ no servers have been found in [args.page_limit] "pages".
 """
 foundServers = []
 logging.info('Starting server list retrieval')
-while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
-    # Sleep when requesting anything but offset 0
+while pagesSinceLastUniqueServer < args.page_limit and attempt < args.max_attempts:
+    # Sleep when requesting anything but offset 0 (use increased sleep when retrying)
     if offset > 0:
         time.sleep(args.sleep)
 
     try:
         response = session.get(f'{BASE_URIS[args.game.lower()]}?count={perPage}&offset=0', timeout=10)
     except Exception as e:
-        logging.error(f'Request failed, retrying {attempt + 1}/{maxAttempts}')
+        logging.error(f'Request failed, retrying {attempt + 1}/{args.max_attempts}')
         # Count try and start over
         attempt += 1
         continue
@@ -141,7 +141,7 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < maxAttempts:
             pagesSinceLastUniqueServer = 0
         offset += perPage
     else:
-        logging.error(f'Server responded with {response.status_code}, retrying {attempt + 1}/{maxAttempts}')
+        logging.error(f'Server responded with {response.status_code}, retrying {attempt + 1}/{args.max_attempts}')
         attempt += 1
 
 # Add/update found servers to/in known servers
@@ -231,7 +231,7 @@ if args.find_query_port:
     logging.info(f'Query port search stats: {searchStats}')
 
 # Write file (unless retrieval failed due to reaching the attempt max)
-if attempt < maxAttempts:
+if attempt < args.max_attempts:
     logging.info(f'Writing {len(knownServers)} servers to output file')
 
     with open(serverListFilePath, 'w') as outputFile:
