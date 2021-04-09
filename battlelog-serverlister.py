@@ -225,6 +225,8 @@ if args.find_query_port:
     for index, job in enumerate(jobs):
         if job.value != -1:
             knownServers[index]['queryPort'] = job.value
+            # Update last seen at timestamp if server was queried successfully
+            knownServers[index]['lastSeenAt'] = datetime.now().astimezone().isoformat()
             searchStats['queryPortFound'] += 1
     logging.info(f'Query port search stats: {searchStats}')
 
