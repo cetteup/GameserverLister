@@ -98,7 +98,7 @@ logging.info('Starting server list retrieval')
 while pagesSinceLastUniqueServer < args.page_limit and attempt < args.max_attempts:
     # Sleep when requesting anything but offset 0 (use increased sleep when retrying)
     if offset > 0:
-        time.sleep(args.sleep)
+        time.sleep(pow(args.sleep, attempt + 1))
 
     try:
         response = session.get(f'{BASE_URIS[args.game.lower()]}?count={perPage}&offset=0', timeout=10)
