@@ -105,7 +105,7 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < args.max_attemp
 
     try:
         response = session.get(f'{BASE_URIS[args.game.lower()]}?count={perPage}&offset=0', timeout=10)
-    except Exception as e:
+    except requests.exceptions.RequestException as e:
         logging.debug(e)
         logging.error(f'Request failed, retrying {attempt + 1}/{args.max_attempts}')
         # Count try and start over
@@ -118,7 +118,7 @@ while pagesSinceLastUniqueServer < args.page_limit and attempt < args.max_attemp
         parsed = response.json()
         serverTotalBefore = len(foundServers)
         # Add all servers in response (if they are new)
-        for server in parsed["data"]:
+        for server in parsed['data']:
             foundServer = {
                 'guid': server['guid'],
                 'ip': server['ip'],
