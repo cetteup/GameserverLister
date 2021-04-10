@@ -170,6 +170,7 @@ for foundServer in foundServers:
         })
 # Iterate over copy of server list and remove any expired servers from the (actual) server list
 logging.info(f'Checking server expiration ttl for {len(knownServers)} servers')
+requestsSinceLastOk = 0
 stats['expiredServersRemoved'] = 0
 stats['expiredServersRecovered'] = 0
 for index, server in enumerate(knownServers[:]):
@@ -177,6 +178,7 @@ for index, server in enumerate(knownServers[:]):
                   'lastSeenAt' in server.keys() else datetime.min).astimezone()
     timePassed = datetime.now().astimezone() - lastSeenAt
     if timePassed.total_seconds() >= args.expired_ttl * 60 * 60:
+        time.sleep(1 + pow(args.sleep, requestsSinceLastOk % args.max_attempts))
         # Check if server can be accessed directly
         requestOk = True
         found = False
@@ -184,7 +186,12 @@ for index, server in enumerate(knownServers[:]):
             response = session.get(f'https://battlelog.battlefield.com/{args.game.lower()}/'
                                    f'servers/show/pc/{server["guid"]}?json=1')
             found = False if response.status_code == 422 else True
-        except Exception as e:
+            # Reset requests since last ok counter if server returned info/not found, else increase counter and sleep
+            if response.status_code in [200, 422]:
+                requestsSinceLastOk = 0
+            else:
+                requestsSinceLastOk += 1
+        except requests.exceptions.RequestException as e:
             logging.debug(e)
             logging.error(f'Failed to fetch server {server["guid"]} for expiration check')
             requestOk = False
