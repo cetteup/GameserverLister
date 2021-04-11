@@ -4,7 +4,7 @@ import logging
 import os
 import subprocess
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import randint
 
 import gevent.subprocess
@@ -124,7 +124,8 @@ if args.find_query_port:
 
     searchStats = {
         'totalSearches': len(servers),
-        'queryPortFound': 0
+        'queryPortFound': 0,
+        'queryPortReset': 0
     }
     pool = Pool(args.gamedig_concurrency)
     jobs = []
@@ -154,10 +155,19 @@ if args.find_query_port:
     # Wait for all jobs to complete
     gevent.joinall(jobs)
     for index, job in enumerate(jobs):
+        server = servers[index]
+        logging.debug(f'Checking query port search result for {server["guid"]}')
         if job.value != -1:
-            servers[index]['queryPort'] = job.value
-            servers[index]['lastQueriedAt'] = datetime.now().astimezone().isoformat()
+            logging.debug(f'Query port found ({job.value}), updating server')
+            server['queryPort'] = job.value
+            server['lastQueriedAt'] = datetime.now().astimezone().isoformat()
             searchStats['queryPortFound'] += 1
+        elif server['queryPort'] != -1 and \
+                (server.get('lastQueriedAt', '') == '' or
+                 datetime.now().astimezone() > datetime.fromisoformat(server['lastQueriedAt']) + timedelta(hours=args.expired_ttl)):
+            logging.debug(f'Query port expired, resetting to -1 (was {server["queryPort"]})')
+            server['queryPort'] = -1
+            searchStats['queryPortReset'] += 1
     logging.info(f'Query port search stats: {searchStats}')
 
 logging.info(f'Writing {len(servers)} servers to output file')
