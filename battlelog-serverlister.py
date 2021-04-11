@@ -166,7 +166,8 @@ for foundServer in foundServers:
             'ip': foundServer['ip'],
             'gamePort': foundServer['gamePort'],
             'queryPort': -1,
-            'lastSeenAt': foundServer['lastSeenAt']
+            'lastSeenAt': foundServer['lastSeenAt'],
+            'lastQueriedAt': ''
         })
 # Iterate over copy of server list and remove any expired servers from the (actual) server list
 logging.info(f'Checking server expiration ttl for {len(knownServers)} servers')
@@ -243,6 +244,7 @@ if args.find_query_port:
     for index, job in enumerate(jobs):
         if job.value != -1:
             knownServers[index]['queryPort'] = job.value
+            knownServers[index]['lastQueriedAt'] = datetime.now().astimezone().isoformat()
             searchStats['queryPortFound'] += 1
     logging.info(f'Query port search stats: {searchStats}')
 

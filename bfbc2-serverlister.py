@@ -96,7 +96,8 @@ for line in rawServerList.splitlines():
             'ip': foundServer['ip'],
             'gamePort': foundServer['gamePort'],
             'queryPort': -1,
-            'lastSeenAt': foundServer['lastSeenAt']
+            'lastSeenAt': foundServer['lastSeenAt'],
+            'lastQueriedAt': ''
         })
     else:
         logging.debug(f'Got known server {foundServer["guid"]}, updating it')
@@ -155,6 +156,7 @@ if args.find_query_port:
     for index, job in enumerate(jobs):
         if job.value != -1:
             servers[index]['queryPort'] = job.value
+            servers[index]['lastQueriedAt'] = datetime.now().astimezone().isoformat()
             searchStats['queryPortFound'] += 1
     logging.info(f'Query port search stats: {searchStats}')
 
