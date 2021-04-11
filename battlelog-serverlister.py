@@ -225,11 +225,17 @@ if args.find_query_port:
         2. game port + default port offset (mirror gamedig behavior)
         3. game port (some servers use same port for game + query)
         4. game port + 100 (nitrado)
-        6. game port + 5 (several hosters)
+        5. game port + 5 (several hosters)
         6. 48888 (gamed)
+        7. game port + 6 (i3D)
+        8. game port + 8 (i3D)
+        9. game port + 15 (i3D)
+        10. game port - 5 (i3D)
+        11. game port - 15 (i3D)
         """
         portsToTry = [47200, server['gamePort'] + 22000, server['gamePort'], server['gamePort'] + 100,
-                      server['gamePort'] + 5, server['gamePort'] + 1, 48888]
+                      server['gamePort'] + 5, server['gamePort'] + 1, 48888, server['gamePort'] + 6,
+                      server['gamePort'] + 8, server['gamePort'] + 15, server['gamePort'] - 5, server['gamePort'] - 15]
         jobs.append(pool.spawn(find_query_port, args.gamedig_bin, args.game, server,
                                portsToTry, battlelog_server_validator))
     # Wait for all jobs to complete
