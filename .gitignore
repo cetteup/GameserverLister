@@ -125,12 +125,6 @@ dmypy.json
 
 .idea/
 
-bf2hub-servers.json
-
-battlefield2.gsl
-
-bf3-servers.json
-
-bf4-servers.json
-
-bf2-servers.json
+# Game server list files
+*.gsl
+*.json

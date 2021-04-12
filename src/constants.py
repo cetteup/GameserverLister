@@ -1,4 +1,7 @@
-GSLIST_GAMES = {
+import os
+
+ROOT_DIR = rootDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
+GSLIST_CONFIGS = {
     'bf1942': {
         'gameName': 'bfield1942',
         'gameKey': 'HpWx9z',
@@ -51,4 +54,9 @@ GSLIST_GAMES = {
             }
         }
     }
+}
+BATTLELOG_GAME_BASE_URIS = {
+    'bf3': 'https://battlelog.battlefield.com/bf3/servers/getAutoBrowseServers/',
+    'bf4': 'https://battlelog.battlefield.com/bf4/servers/getServers/pc/',
+    'bfh': 'https://battlelog.battlefield.com/bfh/servers/getServers/pc/'
 }
