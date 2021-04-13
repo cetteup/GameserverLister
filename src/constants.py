@@ -58,5 +58,6 @@ GSLIST_CONFIGS = {
 BATTLELOG_GAME_BASE_URIS = {
     'bf3': 'https://battlelog.battlefield.com/bf3/servers/getAutoBrowseServers/',
     'bf4': 'https://battlelog.battlefield.com/bf4/servers/getServers/pc/',
-    'bfh': 'https://battlelog.battlefield.com/bfh/servers/getServers/pc/'
+    'bfh': 'https://battlelog.battlefield.com/bfh/servers/getServers/pc/',
+    'mohwf': 'https://battlelog.battlefield.com/mohw/servers/getAutoBrowseServers/'
 }

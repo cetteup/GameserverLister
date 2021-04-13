@@ -15,7 +15,7 @@ from nslookup import Nslookup
 
 from src.constants import ROOT_DIR, BATTLELOG_GAME_BASE_URIS, GSLIST_CONFIGS
 from src.helpers import find_query_port, bfbc2_server_validator, parse_raw_server_info, battlelog_server_validator, \
-    guid_from_ip_port
+    guid_from_ip_port, mohwf_server_validator
 
 
 class ServerLister:
@@ -302,7 +302,12 @@ class BattlelogServerLister(FrostbiteServerLister):
         self.page_limit = page_limit
         self.sleep = sleep
         self.max_attempts = max_attempts
-        self.server_validator = battlelog_server_validator
+        # Medal of Honor: Warfighter servers return the query port as part of the connect string, not the game port
+        # => use different validator
+        if self.game == 'mohwf':
+            self.server_validator = mohwf_server_validator
+        else:
+            self.server_validator = battlelog_server_validator
 
         # Init session
         self.session = requests.session()

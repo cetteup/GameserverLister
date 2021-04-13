@@ -38,19 +38,25 @@ def find_query_port(gamedig_path: str, game: str, server: dict, ports_to_try: li
 
         # Stop searching if query was successful and response came from the correct server
         # (some servers run on the same IP, so make sure ip and game_port match)
-        if not parsed_result.get('error', '').startswith('Failed all') and validator(server, parsed_result):
+        if not parsed_result.get('error', '').startswith('Failed all') and \
+                validator(server, port_to_try, parsed_result):
             query_port = port_to_try
             break
 
     return query_port
 
 
-def battlelog_server_validator(server: dict, parsed_result: dict) -> bool:
+def battlelog_server_validator(server: dict, used_query_port: int, parsed_result: dict) -> bool:
     return parsed_result.get('connect') == f'{server["ip"]}:{server["gamePort"]}'
 
 
-def bfbc2_server_validator(server: dict, parsed_result: dict) -> bool:
-    return battlelog_server_validator(server, parsed_result) or parsed_result.get('name') == server['name']
+def mohwf_server_validator(server: dict, used_query_port: int, parsed_result: dict) -> bool:
+    return parsed_result.get('connect') == f'{server["ip"]}:{used_query_port}'
+
+
+def bfbc2_server_validator(server: dict, used_query_port: int, parsed_result: dict) -> bool:
+    return battlelog_server_validator(server, used_query_port, parsed_result) or \
+           parsed_result.get('name') == server['name']
 
 
 def parse_raw_server_info(raw_server_info: str) -> dict:

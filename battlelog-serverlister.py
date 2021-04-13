@@ -4,10 +4,10 @@ import os
 
 from src.serverlisters import BattlelogServerLister
 
-parser = argparse.ArgumentParser(description='Retrieve a list of Battlelog (BF3/BF4/BFH) '
+parser = argparse.ArgumentParser(description='Retrieve a list of Battlelog (BF3/BF4/BFH/MOHWF) '
                                              'game servers and write it to a json file')
-parser.add_argument('-g', '--game', help='Battlelog game to retrieve server list for (BF3/BF4/BFH)', type=str,
-                    choices=['bf3', 'bf4', 'bfh'], required=True)
+parser.add_argument('-g', '--game', help='Battlelog game to retrieve server list for (BF3/BF4/BFH/MOHWF)', type=str,
+                    choices=['bf3', 'bf4', 'bfh', 'mohwf'], required=True)
 parser.add_argument('-p', '--page-limit', help='Number of pages to get after retrieving the last unique server',
                     type=int, default=10)
 parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)',
