@@ -280,11 +280,12 @@ class BC2ServerLister(FrostbiteServerLister):
         7. game port + 1
         8. game port + 29233 (i3D.net)
         9. game port + 29000
-        10. random port between default game port and default query port
-        11. random port between game port and game port + default offset
+        10. game port + 29323
+        11. random port between default game port and default query port
+        12. random port between game port and game port + default offset
         """
         ports_to_try = [48888, game_port + 29321, game_port, game_port + 100, game_port + 10, game_port + 5,
-                        game_port + 1, game_port + 29233, game_port + 29000,
+                        game_port + 1, game_port + 29233, game_port + 29000, game_port + 29323,
                         randint(19567, 48888), randint(game_port, game_port + 29321)]
 
         return ports_to_try
@@ -466,8 +467,10 @@ class BattlelogServerLister(FrostbiteServerLister):
                 9. game port + 15 (i3D)
                 10. game port - 5 (i3D)
                 11. game port - 15 (i3D)
+                12. game port - 23000 (G4G.pl)
                 """
         ports_to_try = [47200, game_port + 22000, game_port, game_port + 100, game_port + 5, game_port + 1,
-                        48888, game_port + 6, game_port + 8, game_port + 15, game_port - 5, game_port - 15]
+                        48888, game_port + 6, game_port + 8, game_port + 15, game_port - 5, game_port - 15,
+                        game_port - 23000]
 
         return ports_to_try
