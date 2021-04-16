@@ -11,8 +11,8 @@ parser = argparse.ArgumentParser(description='Retrieve a list of game servers fo
 parser.add_argument('-g', '--gslist', help='Path to gslist binary', type=str, required=True)
 parser.add_argument('-b', '--game', help='Battlefield game to query servers for', type=str,
                     choices=['bf1942', 'bfvietnam', 'bf2', 'bf2142'], default='bf2')
-parser.add_argument('-p', '--project', help='Project who\'s master server should be queried (BF2 only)', type=str,
-                    choices=['bf2hub', 'playbf2'], default='bf2hub')
+parser.add_argument('-p', '--project', help='Project who\'s master server should be queried (BF1942 and BF2 only)',
+                    type=str, choices=['bf1942.sk', 'qtracker', 'bf2hub', 'playbf2'])
 parser.add_argument('-f', '--filter', help='Filter to apply to server list', type=str, default='')
 parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)',
                     type=int, default=24)
@@ -33,12 +33,13 @@ serverListFilePath = os.path.join(rootDir, f'{args.game}-servers.json')
 
 # Set project
 project = None
-if args.game.lower() == 'bf2':
-    # Use given project for BF2
+availableProjects = list(GSLIST_CONFIGS[args.game.lower()]['servers'].keys())
+if len(availableProjects) > 1 and args.project.lower() in availableProjects:
+    # More than one project available and given project is valid => use given project
     project = args.project.lower()
 else:
-    # Use first available project for other games
-    project = list(GSLIST_CONFIGS[args.game.lower()]['servers'].keys())[0]
+    # Only one project available or given project is invalid => use default project
+    project = availableProjects[0]
 
 # Init GameSpy server lister
 lister = GameSpyServerLister(args.game, project, args.gslist, args.filter, args.super_query, args.expired_ttl)

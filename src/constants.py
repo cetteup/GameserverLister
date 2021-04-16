@@ -11,6 +11,10 @@ GSLIST_CONFIGS = {
             'bf1942.sk': {
                 'hostname': 'master.bf1942.sk',
                 'port': 28900
+            },
+            'qtracker': {
+                'hostname': 'master2.qtracker.com',
+                'port': 28900
             }
         }
     },
