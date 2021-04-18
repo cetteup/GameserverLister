@@ -85,6 +85,10 @@ QUAKE3_CONFIGS = {
             'cod4x.me': {
                 'hostname': 'cod4master.cod4x.me',
                 'port': 20810
+            },
+            'doszgep.cloud': {
+                'hostname': 'cod4master.doszgep.cloud',
+                'port': 20810
             }
         }
     },
