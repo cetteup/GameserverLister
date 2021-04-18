@@ -1,1 +1,1 @@
-battlefield-serverlisters
+gameserver-listers
