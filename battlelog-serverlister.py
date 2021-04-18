@@ -27,10 +27,6 @@ args = parser.parse_args()
 
 logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO, format='%(asctime)s %(message)s')
 
-# Set paths
-rootDir = os.path.dirname(os.path.realpath(__file__))
-serverListFilePath = os.path.join(rootDir, f'{args.game.lower()}-servers.json')
-
 logging.info(f'Listing servers for {args.game.lower()}')
 
 # Init Battelog server lister

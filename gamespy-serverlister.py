@@ -27,10 +27,6 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 if not os.path.isfile(args.gslist):
     sys.exit('Could not find gslist executable, please double check the provided path')
 
-# Set paths
-rootDir = os.path.dirname(os.path.realpath(__file__))
-serverListFilePath = os.path.join(rootDir, f'{args.game}-servers.json')
-
 # Set project
 project = None
 availableProjects = list(GSLIST_CONFIGS[args.game.lower()]['servers'].keys())
