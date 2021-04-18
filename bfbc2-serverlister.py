@@ -5,7 +5,8 @@ import sys
 
 from src.serverlisters import BC2ServerLister
 
-parser = argparse.ArgumentParser(description='Retrieve a list of BF2Hub game servers and write it to a JSON file')
+parser = argparse.ArgumentParser(description='Retrieve a list of Bad Company 2 game servers and '
+                                             'write it to a JSON file')
 parser.add_argument('-b', '--ealist', help='Path to ealist binary', type=str, required=True)
 parser.add_argument('-u', '--username', help='Username of EA user to use for ealist', type=str, required=True)
 parser.add_argument('-p', '--password', help='Password of EA user to use for ealist', type=str, required=True)

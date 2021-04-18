@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser(description='Retrieve a list of game servers fo
 parser.add_argument('-g', '--gslist', help='Path to gslist binary', type=str, required=True)
 parser.add_argument('-b', '--game', help='Battlefield game to query servers for', type=str,
                     choices=['bf1942', 'bfvietnam', 'bf2', 'bf2142'], default='bf2')
-parser.add_argument('-p', '--project', help='Project who\'s master server should be queried (BF1942 and BF2 only)',
+parser.add_argument('-p', '--project', help='Project who\'s principal server should be queried (BF1942 and BF2 only)',
                     type=str, choices=['bf1942.sk', 'qtracker', 'bf2hub', 'playbf2'])
 parser.add_argument('-f', '--filter', help='Filter to apply to server list', type=str, default='')
 parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)',
