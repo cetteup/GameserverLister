@@ -24,6 +24,7 @@ class ServerLister:
     game: str
     server_list_file_path: str
     expired_ttl: int
+    servers: list = []
 
     def __init__(self, game: str, expired_ttl:  int):
         self.game = game.lower()
@@ -36,8 +37,6 @@ class ServerLister:
             with open(self.server_list_file_path, 'r') as serverListFile:
                 logging.info('Reading servers from existing server list')
                 self.servers = json.load(serverListFile)
-        else:
-            self.servers = []
 
     def update_server_list(self):
         pass
