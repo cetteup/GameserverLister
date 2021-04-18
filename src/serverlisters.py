@@ -138,27 +138,21 @@ class GameSpyServerLister(ServerLister):
         # Parse server list
         # List format: [ip-address]:[port]
         logging.info('Parsing server list')
+        found_servers = []
         for line in raw_server_list.splitlines():
             elements = line.strip().split(':')
             # Stop parsing once we reach the first line with query server data
             if len(elements[1]) > 5:
                 break
-            server = {
+
+            found_servers.append({
                 'guid': guid_from_ip_port(elements[0], elements[1]),
                 'ip': elements[0],
                 'queryPort': elements[1],
                 'lastSeenAt': datetime.now().astimezone().isoformat()
-            }
-            server_string = f'{server["ip"]}:{server["queryPort"]}'
-            server_strings = [f'{s["ip"]}:{s["queryPort"]}' for s in self.servers]
-            if server_string not in server_strings:
-                logging.debug(f'Got new server {server["ip"]}:{server["queryPort"]}, adding it')
-                self.servers.append(server)
-            else:
-                logging.debug(f'Got known server {server["ip"]}:{server["queryPort"]}, updating last seen at')
-                index = server_strings.index(server_string)
-                self.servers[index]['guid'] = server['guid']
-                self.servers[index]['lastSeenAt'] = datetime.now().astimezone().isoformat()
+            })
+
+        self.add_update_servers(found_servers)
 
 
 class FrostbiteServerLister(ServerLister):
@@ -254,16 +248,24 @@ class BC2ServerLister(FrostbiteServerLister):
         # Parse server list
         # List format: [ip-address]:[port]
         logging.info('Parsing server list')
+        found_servers = []
         for line in raw_server_list.splitlines():
             raw_server_info = line.strip().split(' ', 1)[1]
             parsed = parse_raw_server_info(raw_server_info)
-            found_server = {
+            found_servers.append({
                 'guid': abs(int(parsed['B-U-sguid'])),
                 'name': parsed['hostname'],
                 'ip': parsed['hostaddr'],
                 'gamePort': int(parsed['hostport']),
                 'lastSeenAt': datetime.now().astimezone().isoformat()
-            }
+            })
+
+        self.add_update_servers(found_servers)
+
+    def add_update_servers(self, found_servers: list):
+        # Add/update found servers to/in known servers
+        logging.info('Updating known server list with found servers')
+        for found_server in found_servers:
             server_guids = [s['guid'] for s in self.servers]
             if found_server['guid'] not in server_guids:
                 logging.debug(f'Got new server {found_server["guid"]}, adding it')
@@ -405,10 +407,13 @@ class BattlelogServerLister(FrostbiteServerLister):
                     pages_since_last_unique_server = 0
                 offset += per_page
             else:
-                logging.error(
-                    f'Server responded with {response.status_code}, retrying {attempt + 1}/{self.max_attempts}')
+                logging.error(f'Server responded with {response.status_code}, '
+                              f'retrying {attempt + 1}/{self.max_attempts}')
                 attempt += 1
 
+        self.add_update_servers(found_servers)
+
+    def add_update_servers(self, found_servers: list):
         # Add/update found servers to/in known servers
         logging.info('Updating known server list with found servers')
         for found_server in found_servers:
