@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 # Set principal
 principal = None
 availablePrincipals = list(QUAKE3_CONFIGS[args.game.lower()]['servers'].keys())
-if len(availablePrincipals) > 1 and args.principal.lower() in availablePrincipals:
+if len(availablePrincipals) > 1 and str(args.principal).lower() in availablePrincipals:
     # More than one principal available and given principal is valid => use given principal
     principal = args.principal.lower()
 else:

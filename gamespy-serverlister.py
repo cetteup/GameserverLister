@@ -30,7 +30,7 @@ if not os.path.isfile(args.gslist):
 # Set project
 project = None
 availableProjects = list(GSLIST_CONFIGS[args.game.lower()]['servers'].keys())
-if len(availableProjects) > 1 and args.project.lower() in availableProjects:
+if len(availableProjects) > 1 and str(args.project).lower() in availableProjects:
     # More than one project available and given project is valid => use given project
     project = args.project.lower()
 else:
