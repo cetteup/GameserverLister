@@ -67,6 +67,15 @@ BATTLELOG_GAME_BASE_URIS = {
     'mohwf': 'https://battlelog.battlefield.com/mohw/servers/getAutoBrowseServers/'
 }
 QUAKE3_CONFIGS = {
+    'cod2': {
+        'protocol': 115,
+        'servers': {
+            'activision': {
+                'hostname': 'cod2master.activision.com',
+                'port': 20710
+            }
+        }
+    },
     'cod4': {
         'protocol': 6,
         'servers': {
