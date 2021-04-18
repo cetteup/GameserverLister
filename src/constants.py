@@ -138,5 +138,36 @@ QUAKE3_CONFIGS = {
             }
 
         }
+    },
+    'rtcw': {
+        'protocol': 57,
+        'servers': {
+            'idsoftware': {
+                'hostname': 'wolfmaster.idsoftware.com',
+                'port': 27950
+            }
+        }
+    },
+    'swjk': {
+        'protocol': 26,
+        'servers': {
+            'ravensoft': {
+                'hostname': 'masterjk3.ravensoft.com',
+                'port': 29060
+            }
+        }
+    },
+    'wolfensteinet': {
+        'protocol': 84,
+        'servers': {
+            'idsoftware': {
+                'hostname': 'etmaster.idsoftware.com',
+                'port': 27950
+            },
+            'etlegacy.com': {
+                'hostname': 'master.etlegacy.com',
+                'port': 27950
+            }
+        }
     }
 }
