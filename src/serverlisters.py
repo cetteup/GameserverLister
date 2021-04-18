@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import socket
 import subprocess
 import sys
 import time
@@ -12,8 +13,9 @@ import gevent
 import requests
 from gevent.pool import Pool
 from nslookup import Nslookup
+from pyq3serverlist import PrincipalServer, PyQ3SLError, PyQ3SLTimeoutError
 
-from src.constants import ROOT_DIR, BATTLELOG_GAME_BASE_URIS, GSLIST_CONFIGS
+from src.constants import ROOT_DIR, BATTLELOG_GAME_BASE_URIS, GSLIST_CONFIGS, QUAKE3_CONFIGS
 from src.helpers import find_query_port, bfbc2_server_validator, parse_raw_server_info, battlelog_server_validator, \
     guid_from_ip_port, mohwf_server_validator
 
@@ -39,6 +41,21 @@ class ServerLister:
 
     def update_server_list(self):
         pass
+
+    def add_update_servers(self, found_servers: list):
+        # Add/update found servers to/in known servers
+        logging.info('Updating known server list with found servers')
+        for found_server in found_servers:
+            known_server_guids = [s['guid'] for s in self.servers]
+            # Update existing server entry or add new one
+            if found_server['guid'] in known_server_guids:
+                logging.debug(f'Found server {found_server["guid"]} already known, updating')
+                index = known_server_guids.index(found_server['guid'])
+                self.servers[index] = {**self.servers[index], **found_server}
+            else:
+                logging.debug(f'Found server {found_server["guid"]} is new, adding')
+                # Add new server entry
+                self.servers.append(found_server)
 
     def remove_expired_servers(self) -> tuple:
         # Iterate over copy of server list and remove any expired servers from the (actual) server list
@@ -479,3 +496,50 @@ class BattlelogServerLister(FrostbiteServerLister):
                         game_port - 23000]
 
         return ports_to_try
+
+
+class Quake3ServerLister(ServerLister):
+    principal: PrincipalServer
+    keywords: str
+
+    def __init__(self, game: str, principal_server: str, expired_ttl: int):
+        super().__init__(game, expired_ttl)
+        # Merge default config with given principal config
+        default_config = {'keywords': 'full empty', 'network_protocol': socket.SOCK_DGRAM, 'server_entry_prefix': b''}
+        principal_config = {key: value for (key, value) in QUAKE3_CONFIGS[self.game].items()
+                            if key in default_config.keys()}
+        keywords, network_protocol, server_entry_prefix = {**default_config, **principal_config}.values()
+        hostname, port = QUAKE3_CONFIGS[self.game]['servers'][principal_server].values()
+        self.principal = PrincipalServer(hostname, port, QUAKE3_CONFIGS[self.game]['protocol'],
+                                         network_protocol, server_entry_prefix)
+        self.keywords = keywords
+
+    def update_server_list(self):
+        query_ok = False
+        attempt = 0
+        max_attempts = 3
+        found_servers = []
+        while not query_ok and attempt < max_attempts:
+            try:
+                # Get servers
+                found_servers = self.principal.get_servers(self.keywords)
+                query_ok = True
+            except PyQ3SLTimeoutError:
+                logging.error(f'Principal server query timed out, attempt {attempt + 1}/{max_attempts}')
+                attempt += 1
+            except PyQ3SLError as e:
+                logging.debug(e)
+                logging.error(f'Failed to query principal server, attempt {attempt + 1}/{max_attempts}')
+                attempt += 1
+
+        # Create servers dicts, adding required attributes
+        found_server_dicts = []
+        for found_server in found_servers:
+            found_server_dicts.append({
+                'guid': guid_from_ip_port(found_server.ip, found_server.port),
+                'ip': found_server.ip,
+                'queryPort': found_server.port,
+                'lastSeenAt': datetime.now().astimezone().isoformat()
+            })
+
+        self.add_update_servers(found_server_dicts)
