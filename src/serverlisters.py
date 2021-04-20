@@ -454,7 +454,17 @@ class BattlelogServerLister(FrostbiteServerLister):
                 try:
                     response = self.session.get(f'https://battlelog.battlefield.com/{self.game}/'
                                                 f'servers/show/pc/{server["guid"]}?json=1')
-                    found = False if response.status_code == 422 else True
+                    if response.status_code == 200:
+                        # Server was found on Battlelog => make sure it is still public
+                        parsed = response.json()
+                        found = parsed['message']['SERVER_INFO']['ip'] != ''
+                    elif response.status_code == 422:
+                        # Battlelog responded with 422, explicitly indicating that the server was not found
+                        found = False
+                    else:
+                        # Battlelog responded with some other status code (rate limit 403 for example)
+                        # => treat server as found
+                        found = True
                     # Reset requests since last ok counter if server returned info/not found,
                     # else increase counter and sleep
                     if response.status_code in [200, 422]:
