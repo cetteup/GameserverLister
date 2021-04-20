@@ -82,15 +82,17 @@ class GameSpyServerLister(ServerLister):
     gslist_bin_path: str
     gslist_filter: str
     gslist_super_query: bool
+    gslist_timeout: int
 
     def __init__(self, game: str, project: str, gslist_bin_path: str, gslist_filter: str, gslist_super_query: bool,
-                 expired_ttl: int):
+                 gslist_timeout: int, expired_ttl: int):
         super().__init__(game, expired_ttl)
         self.project = project.lower()
         self.gslist_config = GSLIST_CONFIGS[self.game]
         self.gslist_bin_path = gslist_bin_path
         self.gslist_filter = gslist_filter
         self.gslist_super_query = gslist_super_query
+        self.gslist_timeout = gslist_timeout
 
     def update_server_list(self):
         logging.info(f'Fetching server list for {self.game} via {self.project}')
@@ -113,12 +115,12 @@ class GameSpyServerLister(ServerLister):
                            f'{server_ip}:{self.gslist_config["servers"][self.project]["port"]}',
                            '-Y', self.gslist_config['gameName'], self.gslist_config['gameKey'],
                            '-t', self.gslist_config['encType'], '-f', f'{self.gslist_filter}', '-o', '1']
-                timeout = 10
+                timeout = self.gslist_timeout
                 # Add super query argument if requested
                 if self.gslist_super_query:
                     command.extend(['-Q', self.gslist_config['superQueryType']])
                     # Extend timeout to account for server queries
-                    timeout = 20
+                    timeout += 10
                 gslist_result = subprocess.run(command, capture_output=True, timeout=timeout)
                 command_ok = True
             except subprocess.TimeoutExpired as e:
