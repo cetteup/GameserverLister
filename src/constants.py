@@ -58,6 +58,26 @@ GSLIST_CONFIGS = {
                 'port': 28910
             }
         }
+    },
+    'vietcong': {
+        'gameName': 'vietcong',
+        'gameKey': 'bq98mE',
+        'encType': '2',
+        'superQueryType': '0',
+        'servers': {
+            'vietcong.tk': {
+                'hostname': 'brvps.tk',
+                'port': 28900
+            },
+            'vietcong1.eu': {
+                'hostname': 'vietcong1.eu',
+                'port': 28900
+            },
+            'qtracker': {
+                'hostname': 'master2.qtracker.com',
+                'port': 28900
+            }
+        }
     }
 }
 BATTLELOG_GAME_BASE_URIS = {
