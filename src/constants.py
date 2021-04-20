@@ -3,6 +3,18 @@ import socket
 
 ROOT_DIR = rootDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 GSLIST_CONFIGS = {
+    'crysis': {
+        'gameName': 'crysis',
+        'gameKey': 'ZvZDcL',
+        'encType': '-1',
+        'superQueryType': '8',
+        'servers': {
+            'crymp.net': {
+                'hostname': 'master.crymp.net',
+                'port': 28910
+            }
+        }
+    },
     'bf1942': {
         'gameName': 'bfield1942',
         'gameKey': 'HpWx9z',
