@@ -15,6 +15,18 @@ GSLIST_CONFIGS = {
             }
         }
     },
+    'crysiswars': {
+        'gameName': 'crysiswars',
+        'gameKey': 'zKbZiM',
+        'encType': '-1',
+        'superQueryType': '8',
+        'servers': {
+            'jedi95.us': {
+                'hostname': 'master.g.jedi95.us',
+                'port': 28910
+            }
+        }
+    },
     'bf1942': {
         'gameName': 'bfield1942',
         'gameKey': 'HpWx9z',
