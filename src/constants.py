@@ -130,7 +130,7 @@ QUAKE3_CONFIGS = {
         }
     },
     'cod2': {
-        'protocol': 115,
+        'protocol': 118,
         'servers': {
             'activision': {
                 'hostname': 'cod2master.activision.com',
