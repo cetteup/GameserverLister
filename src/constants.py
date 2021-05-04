@@ -64,6 +64,10 @@ GSLIST_CONFIGS = {
             'openspy': {
                 'hostname': 'stella.ms5.openspy.net',
                 'port': 28910
+            },
+            'play2142': {
+                'hostname': 'stella.ms.play2142.ru',
+                'port': 28910
             }
         }
     },
