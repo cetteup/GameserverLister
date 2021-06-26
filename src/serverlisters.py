@@ -387,6 +387,7 @@ class BattlelogServerLister(FrostbiteServerLister):
                         'guid': server['guid'],
                         'ip': server['ip'],
                         'gamePort': server['port'],
+                        'name': server['name'],
                         'lastSeenAt': datetime.now().astimezone().isoformat()
                     }
                     # Add non-private servers (servers with an IP) that are new
@@ -435,6 +436,7 @@ class BattlelogServerLister(FrostbiteServerLister):
                     'ip': found_server['ip'],
                     'gamePort': found_server['gamePort'],
                     'queryPort': -1,
+                    'name': found_server['name'],
                     'lastSeenAt': found_server['lastSeenAt'],
                     'lastQueriedAt': ''
                 })
