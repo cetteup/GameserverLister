@@ -101,8 +101,6 @@ class GameSpyServerLister(ServerLister):
         self.gslist_timeout = gslist_timeout
 
     def update_server_list(self):
-        logging.info(f'Fetching server list for {self.game} via {self.project}')
-
         # Manually look up hostname to be able to spread retried across servers
         looker_upper = Nslookup()
         dns_result = looker_upper.dns_lookup(self.gslist_config['servers'][self.project]['hostname'])

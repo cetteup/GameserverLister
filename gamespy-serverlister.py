@@ -22,7 +22,7 @@ parser.add_argument('-s', '--super-query', help='Query each server in the list f
 parser.set_defaults(super_query=False)
 args = parser.parse_args()
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)-8s %(message)s')
 
 # Make sure gslist path is valid
 if not os.path.isfile(args.gslist):
@@ -37,6 +37,8 @@ if len(availableProjects) > 1 and str(args.project).lower() in availableProjects
 else:
     # Only one project available or given project is invalid => use default project
     project = availableProjects[0]
+
+logging.info(f'Listing servers for {args.game.lower()} via {project.lower()}')
 
 # Init GameSpy server lister
 lister = GameSpyServerLister(args.game, project, args.gslist, args.filter, args.super_query,

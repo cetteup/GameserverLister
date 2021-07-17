@@ -24,7 +24,8 @@ parser.add_argument('--debug', help='Enables logging of lots of debugging inform
 parser.set_defaults(debug=False)
 args = parser.parse_args()
 
-logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO,
+                    format='%(asctime)s %(levelname)-8s %(message)s')
 
 logging.info(f'Listing servers for {args.game.lower()}')
 

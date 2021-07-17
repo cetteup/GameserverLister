@@ -14,7 +14,7 @@ parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in li
                     type=int, default=24)
 args = parser.parse_args()
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)-8s %(message)s')
 
 # Set principal
 principal = None
@@ -25,6 +25,8 @@ if len(availablePrincipals) > 1 and str(args.principal).lower() in availablePrin
 else:
     # Only one principal available or given principal is invalid => use default principal
     principal = availablePrincipals[0]
+
+logging.info(f'Listing servers for {args.game.lower()} via {principal.lower()}')
 
 # Init GameSpy server lister
 lister = Quake3ServerLister(args.game, principal, args.expired_ttl)

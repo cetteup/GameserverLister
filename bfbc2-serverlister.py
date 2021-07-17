@@ -19,7 +19,7 @@ parser.add_argument('--use-wine', help='Run the ealist executable through wine',
 parser.set_defaults(find_query_port=False, use_wine=False)
 args = parser.parse_args()
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)-8s %(message)s')
 
 # Make sure ealist path is valid
 if not os.path.isfile(args.ealist):
