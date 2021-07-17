@@ -139,7 +139,8 @@ class GameSpyServerLister(ServerLister):
         # Make sure any server were found
         # (gslist sends all output to stderr so check there)
         if gslist_result is None or 'servers found' not in str(gslist_result.stderr):
-            sys.exit('gslist could not retrieve any servers')
+            logging.error('gslist could not retrieve any servers, exiting')
+            sys.exit(1)
 
         # Read gslist output file
         logging.info('Reading gslist output file')
@@ -248,7 +249,8 @@ class BC2ServerLister(FrostbiteServerLister):
         # Make sure any server were found
         # (ealist sends all output to stderr so check there)
         if ealist_result is None or 'servers found' not in str(ealist_result.stderr):
-            sys.exit('ealist could not retrieve any servers')
+            logging.error('ealist could not retrieve any servers, exiting')
+            sys.exit(1)
 
         # Read ealist output file
         logging.info('Reading ealist output file')
