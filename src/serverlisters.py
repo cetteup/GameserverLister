@@ -569,7 +569,7 @@ class Quake3ServerLister(ServerLister):
         found_server_dicts = []
         for found_server in found_servers:
             found_server_dicts.append({
-                'guid': guid_from_ip_port(found_server.ip, found_server.port),
+                'guid': guid_from_ip_port(found_server.ip, str(found_server.port)),
                 'ip': found_server.ip,
                 'queryPort': found_server.port,
                 'lastSeenAt': datetime.now().astimezone().isoformat()
