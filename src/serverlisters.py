@@ -102,8 +102,13 @@ class GameSpyServerLister(ServerLister):
 
     def update_server_list(self):
         # Manually look up hostname to be able to spread retried across servers
+        hostname = self.gslist_config['servers'][self.project]['hostname']
         looker_upper = Nslookup()
-        dns_result = looker_upper.dns_lookup(self.gslist_config['servers'][self.project]['hostname'])
+        dns_result = looker_upper.dns_lookup(hostname)
+
+        if len(dns_result.answer) == 0:
+            logging.error(f'DNS lookup for {hostname} failed, exiting')
+            sys.exit(1)
 
         # Run gslist and capture output
         command_ok = False
