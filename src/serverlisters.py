@@ -54,7 +54,13 @@ class ServerLister:
             else:
                 logging.debug(f'Found server {found_server["guid"]} is new, adding')
                 # Add new server entry
-                self.servers.append(found_server)
+                self.servers.append({
+                    'guid': found_server['guid'],
+                    'ip': found_server['ip'],
+                    'queryPort': found_server['queryPort'],
+                    'firstSeenAt': found_server['lastSeenAt'],
+                    'lastSeenAt': found_server['lastSeenAt']
+                })
 
     def remove_expired_servers(self) -> tuple:
         # Iterate over copy of server list and remove any expired servers from the (actual) server list
@@ -277,6 +283,7 @@ class BC2ServerLister(FrostbiteServerLister):
                     'ip': found_server['ip'],
                     'gamePort': found_server['gamePort'],
                     'queryPort': -1,
+                    'firstSeenAt': found_server['lastSeenAt'],
                     'lastSeenAt': found_server['lastSeenAt'],
                     'lastQueriedAt': ''
                 })
@@ -437,6 +444,7 @@ class BattlelogServerLister(FrostbiteServerLister):
                     'gamePort': found_server['gamePort'],
                     'queryPort': -1,
                     'name': found_server['name'],
+                    'firstSeenAt': found_server['lastSeenAt'],
                     'lastSeenAt': found_server['lastSeenAt'],
                     'lastQueriedAt': ''
                 })
