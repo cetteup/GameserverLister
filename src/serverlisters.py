@@ -133,6 +133,7 @@ class GameSpyServerLister(ServerLister):
                 gslist_result = subprocess.run(command, capture_output=True, timeout=timeout)
                 command_ok = True
             except subprocess.TimeoutExpired as e:
+                logging.debug(e)
                 logging.error(f'gslist timed out, try {tries + 1}/{max_tries}')
                 tries += 1
 
@@ -243,6 +244,7 @@ class BC2ServerLister(FrostbiteServerLister):
                 ealist_result = subprocess.run(command, capture_output=True, timeout=10)
                 command_ok = True
             except subprocess.TimeoutExpired as e:
+                logging.debug(e)
                 logging.error(f'ealist timed out, try {tries + 1}/{max_tries}')
                 tries += 1
 
