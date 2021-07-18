@@ -242,6 +242,15 @@ QUAKE3_CONFIGS = {
             }
         }
     },
+    'tremulous': {
+        'protocol': 69,
+        'servers': {
+            'tremulous.net': {
+                'hostname': 'master.tremulous.net',
+                'port': 30710
+            }
+        }
+    },
     'urbanterror': {
         'protocol': 68,
         'servers': {

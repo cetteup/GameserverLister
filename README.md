@@ -41,6 +41,7 @@ Q3Rally | Quake3 | deathmask.net
 Quake 3 Arena | Quake3 | quake3arena.com, urbanterror.info, excessiveplus.net, ioquake3.org, huxxer.de, maverickservers.com, deathmask.net
 Return to Castle Wolfenstein | Quake3 | id Software
 Star Wars: Jedi Knight: Jedi Academy | Quake3 | Raven Software
+Tremulous | Quake3 | tremulous.net
 UrbanTerror | Quake3 | FrozenSand
 Vietcong | GameSpy | vietcong.tk, vietcong1.eu, qtracker
 Wolfenstein: Enemy Territory | Quake3 | id Software, etlegacy.com
