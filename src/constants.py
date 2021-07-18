@@ -176,6 +176,16 @@ QUAKE3_CONFIGS = {
             }
         }
     },
+    'q3rally': {
+        'protocol': 71,
+        'game_name': 'Q3Rally',
+        'servers': {
+            'deathmask.net': {
+                'hostname': 'dpmaster.deathmask.net',
+                'port': 27950
+            }
+        }
+    },
     'quake3arena': {
         'protocol': 68,
         'servers': {
