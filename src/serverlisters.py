@@ -538,13 +538,18 @@ class Quake3ServerLister(ServerLister):
     def __init__(self, game: str, principal_server: str, expired_ttl: int):
         super().__init__(game, expired_ttl)
         # Merge default config with given principal config
-        default_config = {'keywords': 'full empty', 'network_protocol': socket.SOCK_DGRAM, 'server_entry_prefix': b''}
+        default_config = {
+            'keywords': 'full empty',
+            'game_name': '',
+            'network_protocol': socket.SOCK_DGRAM,
+            'server_entry_prefix': b''
+        }
         principal_config = {key: value for (key, value) in QUAKE3_CONFIGS[self.game].items()
                             if key in default_config.keys()}
-        keywords, network_protocol, server_entry_prefix = {**default_config, **principal_config}.values()
+        keywords, game_name, network_protocol, server_entry_prefix = {**default_config, **principal_config}.values()
         hostname, port = QUAKE3_CONFIGS[self.game]['servers'][principal_server].values()
         self.principal = PrincipalServer(hostname, port, QUAKE3_CONFIGS[self.game]['protocol'],
-                                         network_protocol, server_entry_prefix)
+                                         game_name, network_protocol, server_entry_prefix)
         self.keywords = keywords
 
     def update_server_list(self):
