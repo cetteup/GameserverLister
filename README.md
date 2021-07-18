@@ -36,6 +36,7 @@ CoD4x Mod | Quake3 | cod4x.me, doszgep.cloud
 Crysis | GameSpy| crymp.net
 Crysis Wars | GameSpy | jedi95.us
 Medal of Honor Warfighter | Battlelog | battlelog.com
+OpenArena | Quake3 | deathmask.net
 Quake 3 Arena | Quake3 | quake3arena.com, urbanterror.info, excessiveplus.net, ioquake3.org, huxxer.de, maverickservers.com, deathmask.net
 Return to Castle Wolfenstein | Quake3 | id Software
 Star Wars: Jedi Knight: Jedi Academy | Quake3 | Raven Software

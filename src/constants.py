@@ -167,6 +167,15 @@ QUAKE3_CONFIGS = {
             }
         }
     },
+    'openarena': {
+        'protocol': 71,
+        'servers': {
+            'deathmask.net': {
+                'hostname': 'dpmaster.deathmask.net',
+                'port': 27950
+            }
+        }
+    },
     'quake3arena': {
         'protocol': 68,
         'servers': {
