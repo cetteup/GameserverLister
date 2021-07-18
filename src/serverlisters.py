@@ -157,7 +157,7 @@ class GameSpyServerLister(ServerLister):
 
         # Read gslist output file
         logging.info('Reading gslist output file')
-        with open(f'{self.gslist_config["gameName"]}.gsl', 'r') as gslist_file:
+        with open(os.path.join(self.server_list_dir_path, f'{self.gslist_config["gameName"]}.gsl'), 'r') as gslist_file:
             raw_server_list = gslist_file.read()
 
         # Parse server list
@@ -269,7 +269,7 @@ class BC2ServerLister(FrostbiteServerLister):
 
         # Read ealist output file
         logging.info('Reading ealist output file')
-        gsl_file_path = os.path.join(ROOT_DIR, 'bfbc2-pc-server.gsl')
+        gsl_file_path = os.path.join(self.server_list_dir_path, 'bfbc2-pc-server.gsl')
         with open(gsl_file_path, 'r') as ealist_file:
             raw_server_list = ealist_file.read()
 
