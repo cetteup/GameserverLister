@@ -22,23 +22,25 @@ from src.helpers import find_query_port, bfbc2_server_validator, parse_raw_serve
 
 class ServerLister:
     game: str
+    server_list_dir_path: str
     server_list_file_path: str
     expired_ttl: int
     servers: list = []
 
     def __init__(self, game: str, expired_ttl:  int, list_dir: str):
         self.game = game.lower()
-        self.server_list_file_path = os.path.join(list_dir, f'{self.game}-servers.json')
+        self.server_list_dir_path = os.path.realpath(list_dir)
+        self.server_list_file_path = os.path.join(self.server_list_dir_path, f'{self.game}-servers.json')
 
         self.expired_ttl = expired_ttl
 
         # Create list dir if it does not exist
-        if not os.path.isdir(list_dir):
+        if not os.path.isdir(self.server_list_dir_path):
             try:
-                os.mkdir(list_dir)
+                os.mkdir(self.server_list_dir_path)
             except IOError as e:
                 logging.debug(e)
-                logging.error(f'Failed to create missing server list directory at {os.path.realpath(list_dir)}')
+                logging.error(f'Failed to create missing server list directory at {self.server_list_dir_path}')
                 sys.exit(1)
 
         # Init server list with servers from existing list or empty one
@@ -139,7 +141,8 @@ class GameSpyServerLister(ServerLister):
                     command.extend(['-Q', self.gslist_config['superQueryType']])
                     # Extend timeout to account for server queries
                     timeout += 10
-                gslist_result = subprocess.run(command, capture_output=True, timeout=timeout)
+                gslist_result = subprocess.run(command, capture_output=True,
+                                               cwd=self.server_list_dir_path, timeout=timeout)
                 command_ok = True
             except subprocess.TimeoutExpired as e:
                 logging.debug(e)
@@ -251,7 +254,7 @@ class BC2ServerLister(FrostbiteServerLister):
                 if self.use_wine:
                     command.insert(0, '/usr/bin/wine')
 
-                ealist_result = subprocess.run(command, capture_output=True, timeout=10)
+                ealist_result = subprocess.run(command, capture_output=True, cwd=self.server_list_dir_path, timeout=10)
                 command_ok = True
             except subprocess.TimeoutExpired as e:
                 logging.debug(e)
