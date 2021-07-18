@@ -242,6 +242,15 @@ QUAKE3_CONFIGS = {
             }
         }
     },
+    'urbanterror': {
+        'protocol': 68,
+        'servers': {
+            'urbanterror.info': {
+                'hostname': 'master.urbanterror.info',
+                'port': 27900
+            }
+        }
+    },
     'wolfensteinet': {
         'protocol': 84,
         'servers': {
