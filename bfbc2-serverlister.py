@@ -12,6 +12,8 @@ parser.add_argument('-u', '--username', help='Username of EA user to use for eal
 parser.add_argument('-p', '--password', help='Password of EA user to use for ealist', type=str, required=True)
 parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)',
                     type=int, default=24)
+parser.add_argument('-d', '--list-dir', help='Path to directory in which servers lists will be stored', type=str,
+                    default='.')
 parser.add_argument('--find-query-port', dest='find_query_port', action='store_true')
 parser.add_argument('--gamedig-bin', help='Path to gamedig binary', type=str, default='/usr/bin/gamedig')
 parser.add_argument('--gamedig-concurrency', help='Number of gamedig queries to run in parallel', type=int, default=12)
@@ -26,7 +28,7 @@ if not os.path.isfile(args.ealist):
     sys.exit('Could not find ealist executable, please double check the provided path')
 
 # Init BC2 lister
-lister = BC2ServerLister(args.ealist, args.username, args.password, args.expired_ttl, args.use_wine)
+lister = BC2ServerLister(args.ealist, args.username, args.password, args.expired_ttl, args.list_dir, args.use_wine)
 # Init stats dict
 stats = {
     'serverTotalBefore': len(lister.servers),

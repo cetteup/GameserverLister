@@ -12,6 +12,8 @@ parser.add_argument('-p', '--principal', help='Principal server to query', type=
                     choices=[p for g in QUAKE3_CONFIGS for p in QUAKE3_CONFIGS[g]['servers'].keys()])
 parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)',
                     type=int, default=24)
+parser.add_argument('-d', '--list-dir', help='Path to directory in which servers lists will be stored', type=str,
+                    default='.')
 args = parser.parse_args()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)-8s %(message)s')
@@ -29,7 +31,7 @@ else:
 logging.info(f'Listing servers for {args.game.lower()} via {principal.lower()}')
 
 # Init GameSpy server lister
-lister = Quake3ServerLister(args.game, principal, args.expired_ttl)
+lister = Quake3ServerLister(args.game, principal, args.expired_ttl, args.list_dir)
 # Init stats dict
 stats = {
     'serverTotalBefore': len(lister.servers),

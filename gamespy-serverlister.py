@@ -17,6 +17,8 @@ parser.add_argument('-f', '--filter', help='Filter to apply to server list', typ
 parser.add_argument('-t', '--timeout', help='Timeout to use for gslist command', type=int, default=10)
 parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)',
                     type=int, default=24)
+parser.add_argument('-d', '--list-dir', help='Path to directory in which servers lists will be stored', type=str,
+                    default='.')
 parser.add_argument('-s', '--super-query', help='Query each server in the list for it\'s status', dest='super_query',
                     action='store_true')
 parser.set_defaults(super_query=False)
@@ -42,7 +44,7 @@ logging.info(f'Listing servers for {args.game.lower()} via {project.lower()}')
 
 # Init GameSpy server lister
 lister = GameSpyServerLister(args.game, project, args.gslist, args.filter, args.super_query,
-                             args.timeout, args.expired_ttl)
+                             args.timeout, args.expired_ttl, args.list_dir)
 # Init stats dict
 stats = {
     'serverTotalBefore': len(lister.servers),

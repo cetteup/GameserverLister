@@ -11,6 +11,8 @@ parser.add_argument('-p', '--page-limit', help='Number of pages to get after ret
                     type=int, default=10)
 parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)',
                     type=int, default=24)
+parser.add_argument('-d', '--list-dir', help='Path to directory in which servers lists will be stored', type=str,
+                    default='.')
 parser.add_argument('--sleep', help='Number of seconds to sleep between requests', type=float, default=0)
 parser.add_argument('--max-attempts', help='Max number of attempts for fetching a page of servers', type=int, default=3)
 parser.add_argument('--proxy', help='Proxy to use for requests '
@@ -30,7 +32,8 @@ logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO,
 logging.info(f'Listing servers for {args.game.lower()}')
 
 # Init Battelog server lister
-lister = BattlelogServerLister(args.game, args.page_limit, args.expired_ttl, args.sleep, args.max_attempts, args.proxy)
+lister = BattlelogServerLister(args.game, args.page_limit, args.expired_ttl, args.list_dir,
+                               args.sleep, args.max_attempts, args.proxy)
 # Init stats dict
 stats = {
     'serverTotalBefore': len(lister.servers),

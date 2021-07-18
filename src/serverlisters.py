@@ -26,11 +26,20 @@ class ServerLister:
     expired_ttl: int
     servers: list = []
 
-    def __init__(self, game: str, expired_ttl:  int):
+    def __init__(self, game: str, expired_ttl:  int, list_dir: str):
         self.game = game.lower()
-        self.server_list_file_path = os.path.join(ROOT_DIR, f'{self.game}-servers.json')
+        self.server_list_file_path = os.path.join(list_dir, f'{self.game}-servers.json')
 
         self.expired_ttl = expired_ttl
+
+        # Create list dir if it does not exist
+        if not os.path.isdir(list_dir):
+            try:
+                os.mkdir(list_dir)
+            except IOError as e:
+                logging.debug(e)
+                logging.error(f'Failed to create missing server list directory at {os.path.realpath(list_dir)}')
+                sys.exit(1)
 
         # Init server list with servers from existing list or empty one
         if os.path.isfile(self.server_list_file_path):
@@ -91,8 +100,8 @@ class GameSpyServerLister(ServerLister):
     gslist_timeout: int
 
     def __init__(self, game: str, project: str, gslist_bin_path: str, gslist_filter: str, gslist_super_query: bool,
-                 gslist_timeout: int, expired_ttl: int):
-        super().__init__(game, expired_ttl)
+                 gslist_timeout: int, expired_ttl: int, list_dir: str):
+        super().__init__(game, expired_ttl, list_dir)
         self.project = project.lower()
         self.gslist_config = GSLIST_CONFIGS[self.game]
         self.gslist_bin_path = gslist_bin_path
@@ -171,8 +180,8 @@ class GameSpyServerLister(ServerLister):
 class FrostbiteServerLister(ServerLister):
     server_validator: Callable = lambda: True
 
-    def __init__(self, game: str, expired_ttl: int,):
-        super().__init__(game, expired_ttl)
+    def __init__(self, game: str, expired_ttl: int, list_dir: str):
+        super().__init__(game, expired_ttl, list_dir)
 
     def find_query_ports(self, gamedig_bin_path: str, gamedig_concurrency: int, expired_ttl: int):
         logging.info(f'Searching query port for {len(self.servers)} servers')
@@ -218,8 +227,9 @@ class BC2ServerLister(FrostbiteServerLister):
     password: str
     use_wine: bool
 
-    def __init__(self, ealist_bin_path: str, username: str, password: str, expired_ttl: int, use_wine: bool):
-        super().__init__('bfbc2', expired_ttl)
+    def __init__(self, ealist_bin_path: str, username: str, password: str, expired_ttl: int,
+                 list_dir: str, use_wine: bool):
+        super().__init__('bfbc2', expired_ttl, list_dir)
         self.ealist_bin_path = ealist_bin_path
         self.username = username
         self.password = password
@@ -331,8 +341,9 @@ class BattlelogServerLister(FrostbiteServerLister):
     max_attempts: int
     session: requests.Session
 
-    def __init__(self, game: str, page_limit: int, expired_ttl: int, sleep: float, max_attempts: int, proxy: str):
-        super().__init__(game, expired_ttl)
+    def __init__(self, game: str, page_limit: int, expired_ttl: int, list_dir: str,
+                 sleep: float, max_attempts: int, proxy: str):
+        super().__init__(game, expired_ttl, list_dir)
         self.page_limit = page_limit
         self.sleep = sleep
         self.max_attempts = max_attempts
@@ -535,8 +546,8 @@ class Quake3ServerLister(ServerLister):
     principal: PrincipalServer
     keywords: str
 
-    def __init__(self, game: str, principal_server: str, expired_ttl: int):
-        super().__init__(game, expired_ttl)
+    def __init__(self, game: str, principal_server: str, expired_ttl: int, list_dir: str):
+        super().__init__(game, expired_ttl, list_dir)
         # Merge default config with given principal config
         default_config = {
             'keywords': 'full empty',
