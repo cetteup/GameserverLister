@@ -42,6 +42,7 @@ Return to Castle Wolfenstein | Quake3 | id Software
 Star Wars: Jedi Knight: Jedi Academy | Quake3 | Raven Software
 Vietcong | GameSpy | vietcong.tk, vietcong1.eu, qtracker
 Wolfenstein: Enemy Territory | Quake3 | id Software, etlegacy.com
+Xonotic | Quake3 | deathmask.net, tchr.no
 
 ## Game server query ports
 

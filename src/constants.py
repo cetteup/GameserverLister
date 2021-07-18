@@ -244,5 +244,19 @@ QUAKE3_CONFIGS = {
                 'port': 27950
             }
         }
+    },
+    'xonotic': {
+        'protocol': 3,
+        'game_name': 'Xonotic',
+        'servers': {
+            'deathmask.net': {
+                'hostname': 'dpmaster.deathmask.net',
+                'port': 27950
+            },
+            'tchr.no': {
+                'hostname': 'dpmaster.tchr.no',
+                'port': 27950
+            }
+        }
     }
 }
