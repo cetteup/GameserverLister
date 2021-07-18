@@ -17,7 +17,7 @@ from pyq3serverlist import PrincipalServer, PyQ3SLError, PyQ3SLTimeoutError
 
 from src.constants import ROOT_DIR, BATTLELOG_GAME_BASE_URIS, GSLIST_CONFIGS, QUAKE3_CONFIGS
 from src.helpers import find_query_port, bfbc2_server_validator, parse_raw_server_info, battlelog_server_validator, \
-    guid_from_ip_port, mohwf_server_validator
+    guid_from_ip_port, mohwf_server_validator, is_valid_port
 
 
 class ServerLister:
@@ -198,6 +198,10 @@ class FrostbiteServerLister(ServerLister):
         jobs = []
         for server in self.servers:
             ports_to_try = self.build_port_to_try_list(server['gamePort'])
+
+            # Remove any invalid ports
+            ports_to_try = [p for p in ports_to_try if is_valid_port(p)]
+
             jobs.append(
                 pool.spawn(find_query_port, gamedig_bin_path, self.game, server, ports_to_try, self.server_validator)
             )

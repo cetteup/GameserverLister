@@ -14,7 +14,7 @@ def find_query_port(gamedig_path: str, game: str, server: dict, ports_to_try: li
         ports_to_try.insert(0, server['queryPort'])
     # Try all unique ports
     for port_to_try in list(set(ports_to_try)):
-        if not 0 < port_to_try < 65536:
+        if not is_valid_port(port_to_try):
             logging.warning(f'Skipping query port to try which is outside of valid port range ({port_to_try})')
             continue
 
@@ -44,6 +44,10 @@ def find_query_port(gamedig_path: str, game: str, server: dict, ports_to_try: li
             break
 
     return query_port
+
+
+def is_valid_port(port: int) -> bool:
+    return 0 < port < 65536
 
 
 def battlelog_server_validator(server: dict, used_query_port: int, parsed_result: dict) -> bool:
