@@ -65,13 +65,16 @@ class ServerLister:
             else:
                 logging.debug(f'Found server {found_server["guid"]} is new, adding')
                 # Add new server entry
-                self.servers.append({
-                    'guid': found_server['guid'],
-                    'ip': found_server['ip'],
-                    'queryPort': found_server['queryPort'],
-                    'firstSeenAt': found_server['lastSeenAt'],
-                    'lastSeenAt': found_server['lastSeenAt']
-                })
+                self.servers.append(self.build_server_list_dict(found_server))
+
+    def build_server_list_dict(self, found_server: dict) -> dict:
+        return {
+            'guid': found_server['guid'],
+            'ip': found_server['ip'],
+            'queryPort': found_server['queryPort'],
+            'firstSeenAt': found_server['lastSeenAt'],
+            'lastSeenAt': found_server['lastSeenAt']
+        }
 
     def remove_expired_servers(self) -> tuple:
         # Iterate over copy of server list and remove any expired servers from the (actual) server list
@@ -186,6 +189,18 @@ class FrostbiteServerLister(ServerLister):
     def __init__(self, game: str, expired_ttl: int, list_dir: str):
         super().__init__(game, expired_ttl, list_dir)
 
+    def build_server_list_dict(self, found_server: dict) -> dict:
+        return {
+            'guid': found_server['guid'],
+            'name': found_server['name'],
+            'ip': found_server['ip'],
+            'gamePort': found_server['gamePort'],
+            'queryPort': -1,
+            'firstSeenAt': found_server['lastSeenAt'],
+            'lastSeenAt': found_server['lastSeenAt'],
+            'lastQueriedAt': ''
+        }
+
     def find_query_ports(self, gamedig_bin_path: str, gamedig_concurrency: int, expired_ttl: int):
         logging.info(f'Searching query port for {len(self.servers)} servers')
 
@@ -293,28 +308,6 @@ class BC2ServerLister(FrostbiteServerLister):
             })
 
         self.add_update_servers(found_servers)
-
-    def add_update_servers(self, found_servers: list):
-        # Add/update found servers to/in known servers
-        logging.info('Updating known server list with found servers')
-        for found_server in found_servers:
-            server_guids = [s['guid'] for s in self.servers]
-            if found_server['guid'] not in server_guids:
-                logging.debug(f'Got new server {found_server["guid"]}, adding it')
-                self.servers.append({
-                    'guid': found_server['guid'],
-                    'name': found_server['name'],
-                    'ip': found_server['ip'],
-                    'gamePort': found_server['gamePort'],
-                    'queryPort': -1,
-                    'firstSeenAt': found_server['lastSeenAt'],
-                    'lastSeenAt': found_server['lastSeenAt'],
-                    'lastQueriedAt': ''
-                })
-            else:
-                logging.debug(f'Got known server {found_server["guid"]}, updating it')
-                index = server_guids.index(found_server['guid'])
-                self.servers[index] = {**self.servers[index], **found_server}
 
     def build_port_to_try_list(self, game_port: int) -> list:
         """
@@ -447,32 +440,6 @@ class BattlelogServerLister(FrostbiteServerLister):
                 attempt += 1
 
         self.add_update_servers(found_servers)
-
-    def add_update_servers(self, found_servers: list):
-        # Add/update found servers to/in known servers
-        logging.info('Updating known server list with found servers')
-        for found_server in found_servers:
-            known_server_guids = [s['guid'] for s in self.servers]
-            # Update existing server entry or add new one
-            if found_server['guid'] in known_server_guids:
-                logging.debug(f'Found server {found_server["guid"]} already known, updating')
-                index = known_server_guids.index(found_server['guid'])
-                # guid is the same, found server does not contain queryPort so it is safe to update ip,
-                # gamePort and lastSeenAt by merging knownServer and foundServer
-                self.servers[index] = {**self.servers[index], **found_server}
-            else:
-                logging.debug(f'Found server {found_server["guid"]} is new, adding')
-                # Add new server entry
-                self.servers.append({
-                    'guid': found_server['guid'],
-                    'name': found_server['name'],
-                    'ip': found_server['ip'],
-                    'gamePort': found_server['gamePort'],
-                    'queryPort': -1,
-                    'firstSeenAt': found_server['lastSeenAt'],
-                    'lastSeenAt': found_server['lastSeenAt'],
-                    'lastQueriedAt': ''
-                })
 
     def remove_expired_servers(self) -> tuple:
         # Iterate over copy of server list and remove any expired servers from the (actual) server list
