@@ -46,6 +46,8 @@ Star Wars: Jedi Knight: Jedi Academy | Quake3 | Raven Software
 Tremulous | Quake3 | tremulous.net
 UrbanTerror | Quake3 | FrozenSand
 Vietcong | GameSpy | vietcong.tk, vietcong1.eu, qtracker
+Warfork | Quake3 | deathmask.net
+Warsow | Quake3 | deathmask.net
 Wolfenstein: Enemy Territory | Quake3 | id Software, etlegacy.com
 Xonotic | Quake3 | deathmask.net, tchr.no
 

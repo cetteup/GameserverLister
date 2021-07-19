@@ -282,6 +282,26 @@ QUAKE3_CONFIGS = {
             }
         }
     },
+    'warfork': {
+        'protocol': 23,
+        'game_name': 'Warfork',
+        'servers': {
+            'deathmask.net': {
+                'hostname': 'dpmaster.deathmask.net',
+                'port': 27950
+            }
+        }
+    },
+    'warsow': {
+        'protocol': 22,
+        'game_name': 'Warsow',
+        'servers': {
+            'deathmask.net': {
+                'hostname': 'dpmaster.deathmask.net',
+                'port': 27950
+            }
+        }
+    },
     'wolfensteinet': {
         'protocol': 84,
         'servers': {
