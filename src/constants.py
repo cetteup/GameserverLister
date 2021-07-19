@@ -87,6 +87,18 @@ GSLIST_CONFIGS = {
             }
         }
     },
+    'postal2': {
+        'gameName': 'postal2',
+        'gameKey': 'yw3R9c',
+        'encType': '0',
+        'superQueryType': '0',
+        'servers': {
+            '333networks.com': {
+                'hostname': 'master.333networks.com',
+                'port': 28900
+            }
+        }
+    },
     'vietcong': {
         'gameName': 'vietcong',
         'gameKey': 'bq98mE',
