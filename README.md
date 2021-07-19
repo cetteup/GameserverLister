@@ -36,6 +36,7 @@ CoD4x Mod | Quake3 | cod4x.me, doszgep.cloud
 Crysis | GameSpy| crymp.net
 Crysis Wars | GameSpy | jedi95.us
 Medal of Honor Warfighter | Battlelog | battlelog.com
+Nexuiz | Quake3 | deathmask.net
 OpenArena | Quake3 | deathmask.net
 Postal 2 | GameSpy | 333networks.com
 Q3Rally | Quake3 | deathmask.net

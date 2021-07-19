@@ -179,6 +179,16 @@ QUAKE3_CONFIGS = {
             }
         }
     },
+    'nexuiz': {
+        'protocol': 3,
+        'game_name': 'Nexuiz',
+        'servers': {
+            'deathmask.net': {
+                'hostname': 'dpmaster.deathmask.net',
+                'port': 27950
+            }
+        }
+    },
     'openarena': {
         'protocol': 71,
         'servers': {
