@@ -43,6 +43,9 @@ Q3Rally | Quake3 | deathmask.net
 Quake | Quake3 | deathmask.net
 Quake 3 Arena | Quake3 | quake3arena.com, urbanterror.info, excessiveplus.net, ioquake3.org, huxxer.de, maverickservers.com, deathmask.net
 Return to Castle Wolfenstein | Quake3 | id Software
+Soldier of Fortune II: Double Helix (Demo/sof2mp-1.02t) | Quake3 | Raven Software
+Soldier of Fortune II: Double Helix (Full/sof2mp-1.00) | Quake3 | Raven Software
+Soldier of Fortune II: Double Helix (Gold/sof2mp-1.02) | Quake3 | Raven Software
 Star Wars: Jedi Knight: Jedi Academy | Quake3 | Raven Software
 Tremulous | Quake3 | tremulous.net
 UrbanTerror | Quake3 | FrozenSand
