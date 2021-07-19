@@ -208,6 +208,16 @@ QUAKE3_CONFIGS = {
             }
         }
     },
+    'quake': {
+        'protocol': 3,
+        'game_name': 'DarkPlaces-Quake',
+        'servers': {
+            'deathmask.net': {
+                'hostname': 'dpmaster.deathmask.net',
+                'port': 27950
+            }
+        }
+    },
     'quake3arena': {
         'protocol': 68,
         'servers': {
