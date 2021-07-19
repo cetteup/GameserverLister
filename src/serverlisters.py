@@ -551,7 +551,10 @@ class BattlelogServerLister(FrostbiteServerLister):
 
 class Quake3ServerLister(ServerLister):
     principal: PrincipalServer
+    protocol: int
+    game_name: str
     keywords: str
+    server_entry_prefix: bytes
 
     def __init__(self, game: str, principal_server: str, expired_ttl: int, list_dir: str):
         super().__init__(game, expired_ttl, list_dir)
@@ -566,9 +569,11 @@ class Quake3ServerLister(ServerLister):
                             if key in default_config.keys()}
         keywords, game_name, network_protocol, server_entry_prefix = {**default_config, **principal_config}.values()
         hostname, port = QUAKE3_CONFIGS[self.game]['servers'][principal_server].values()
-        self.principal = PrincipalServer(hostname, port, QUAKE3_CONFIGS[self.game]['protocol'],
-                                         game_name, network_protocol, server_entry_prefix)
+        self.principal = PrincipalServer(hostname, port, network_protocol)
+        self.protocol = QUAKE3_CONFIGS[self.game]['protocol']
+        self.game_name = game_name
         self.keywords = keywords
+        self.server_entry_prefix = server_entry_prefix
 
     def update_server_list(self):
         query_ok = False
@@ -578,7 +583,8 @@ class Quake3ServerLister(ServerLister):
         while not query_ok and attempt < max_attempts:
             try:
                 # Get servers
-                found_servers = self.principal.get_servers(self.keywords)
+                found_servers = self.principal.get_servers(self.protocol, self.game_name,
+                                                           self.keywords, self.server_entry_prefix)
                 query_ok = True
             except PyQ3SLTimeoutError:
                 logging.error(f'Principal server query timed out, attempt {attempt + 1}/{max_attempts}')
