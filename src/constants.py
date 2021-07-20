@@ -2,122 +2,124 @@ import os
 import socket
 
 ROOT_DIR = rootDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
+GAMESPY_PRINCIPALS = {
+    '333networks.com-1': {
+        'hostname': 'master.333networks.com',
+        'port': 28900
+    },
+    '333networks.com-2': {
+        'hostname': 'rhea.333networks.com',
+        'port': 28900
+    },
+    'bf1942.sk': {
+        'hostname': 'master.bf1942.sk',
+        'port': 28900
+    },
+    'bf2hub': {
+        'hostname': 'servers.bf2hub.com',
+        'port': 28911
+    },
+    'crymp.net': {
+        'hostname': 'master.crymp.net',
+        'port': 28910
+    },
+    'errorist.eu': {
+        'hostname': 'master.errorist.eu',
+        'port': 28900
+    },
+    'jedi95.us': {
+        'hostname': 'master.g.jedi95.us',
+        'port': 28910
+    },
+    'newbiesplayground.net': {
+        'hostname': 'master.newbiesplayground.net',
+        'port': 28900
+    },
+    'oldunreal.com': {
+        'hostname': 'master2.oldunreal.com',
+        'port': 28900
+    },
+    'openspy': {
+        'hostname': 'stella.ms5.openspy.net',
+        'port': 28910
+    },
+    'play2142': {
+        'hostname': 'stella.ms.play2142.ru',
+        'port': 28910
+    },
+    'playbf2': {
+        'hostname': 'battlefield2.ms.playbf2.ru',
+        'port': 28910
+    },
+    'qtracker': {
+        'hostname': 'master2.qtracker.com',
+        'port': 28900
+    },
+    'vietcong.tk': {
+        'hostname': 'brvps.tk',
+        'port': 28900
+    },
+    'vietcong1.eu': {
+        'hostname': 'vietcong1.eu',
+        'port': 28900
+    }
+}
 GSLIST_CONFIGS = {
     'crysis': {
         'gameName': 'crysis',
         'gameKey': 'ZvZDcL',
         'encType': '-1',
         'superQueryType': '8',
-        'servers': {
-            'crymp.net': {
-                'hostname': 'master.crymp.net',
-                'port': 28910
-            }
-        }
+        'servers': ['crymp.net']
     },
     'crysiswars': {
         'gameName': 'crysiswars',
         'gameKey': 'zKbZiM',
         'encType': '-1',
         'superQueryType': '8',
-        'servers': {
-            'jedi95.us': {
-                'hostname': 'master.g.jedi95.us',
-                'port': 28910
-            }
-        }
+        'servers': ['jedi95.us']
     },
     'bf1942': {
         'gameName': 'bfield1942',
         'gameKey': 'HpWx9z',
         'encType': '2',
         'superQueryType': '0',
-        'servers': {
-            'bf1942.sk': {
-                'hostname': 'master.bf1942.sk',
-                'port': 28900
-            },
-            'qtracker': {
-                'hostname': 'master2.qtracker.com',
-                'port': 28900
-            }
-        }
+        'servers': ['bf1942.sk', 'qtracker']
     },
     'bfvietnam': {
         'gameName': 'bfvietnam',
         'gameKey': 'h2P9dJ',
         'encType': '2',
         'superQueryType': '0',
-        'servers': {
-            'qtracker': {
-                'hostname': 'master2.qtracker.com',
-                'port': 28900
-            }
-        }
+        'servers': ['qtracker']
     },
     'bf2142': {
         'gameName': 'stella',
         'gameKey': 'M8o1Qw',
         'encType': '-1',
         'superQueryType': '8',
-        'servers': {
-            'openspy': {
-                'hostname': 'stella.ms5.openspy.net',
-                'port': 28910
-            },
-            'play2142': {
-                'hostname': 'stella.ms.play2142.ru',
-                'port': 28910
-            }
-        }
+        'servers': ['openspy', 'play2142']
     },
     'bf2': {
         'gameName': 'battlefield2',
         'gameKey': 'hW6m9a',
         'encType': '-1',
         'superQueryType': '8',
-        'servers': {
-            'bf2hub': {
-                'hostname': 'servers.bf2hub.com',
-                'port': 28911
-            },
-            'playbf2': {
-                'hostname': 'battlefield2.ms.playbf2.ru',
-                'port': 28910
-            }
-        }
+        'servers': ['bf2hub', 'playbf2']
     },
     'postal2': {
         'gameName': 'postal2',
         'gameKey': 'yw3R9c',
         'encType': '0',
         'superQueryType': '0',
-        'servers': {
-            '333networks.com': {
-                'hostname': 'master.333networks.com',
-                'port': 28900
-            }
-        }
+        'servers': ['333networks.com-1']
     },
     'vietcong': {
         'gameName': 'vietcong',
         'gameKey': 'bq98mE',
         'encType': '2',
         'superQueryType': '0',
-        'servers': {
-            'vietcong.tk': {
-                'hostname': 'brvps.tk',
-                'port': 28900
-            },
-            'vietcong1.eu': {
-                'hostname': 'vietcong1.eu',
-                'port': 28900
-            },
-            'qtracker': {
-                'hostname': 'master2.qtracker.com',
-                'port': 28900
-            }
-        }
+        'servers': ['vietcong.tk', 'vietcong1.eu', 'qtracker']
     }
 }
 BATTLELOG_GAME_BASE_URIS = {

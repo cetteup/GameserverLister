@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 
-from src.constants import GSLIST_CONFIGS
+from src.constants import GSLIST_CONFIGS, GAMESPY_PRINCIPALS
 from src.serverlisters import GameSpyServerLister
 
 parser = argparse.ArgumentParser(description='Retrieve a list of game servers for GameSpy-based games '
@@ -11,8 +11,8 @@ parser = argparse.ArgumentParser(description='Retrieve a list of game servers fo
 parser.add_argument('-g', '--gslist', help='Path to gslist binary', type=str, required=True)
 parser.add_argument('-b', '--game', help='Game to query servers for', type=str,
                     choices=list(GSLIST_CONFIGS.keys()), default=list(GSLIST_CONFIGS.keys())[0])
-parser.add_argument('-p', '--project', help='Principal server to query',
-                    type=str, choices=[p for g in GSLIST_CONFIGS for p in GSLIST_CONFIGS[g]['servers'].keys()])
+parser.add_argument('-p', '--principal', help='Principal server to query',
+                    type=str, choices=list(GAMESPY_PRINCIPALS.keys()))
 parser.add_argument('-f', '--filter', help='Filter to apply to server list', type=str, default='')
 parser.add_argument('-t', '--timeout', help='Timeout to use for gslist command', type=int, default=10)
 parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)',
@@ -30,20 +30,20 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)-8s %(me
 if not os.path.isfile(args.gslist):
     sys.exit('Could not find gslist executable, please double check the provided path')
 
-# Set project
-project = None
-availableProjects = list(GSLIST_CONFIGS[args.game.lower()]['servers'].keys())
-if len(availableProjects) > 1 and str(args.project).lower() in availableProjects:
-    # More than one project available and given project is valid => use given project
-    project = args.project.lower()
+# Set principal
+principal = None
+availablePrincipals = GSLIST_CONFIGS[args.game]['servers']
+if len(availablePrincipals) > 1 and str(args.principal).lower() in GSLIST_CONFIGS[args.game]['servers']:
+    # More than one principal available and given principal is valid => use given principal
+    principal = args.principal.lower()
 else:
-    # Only one project available or given project is invalid => use default project
-    project = availableProjects[0]
+    # Only one principal available or given principal is invalid => use default principal
+    principal = availablePrincipals[0]
 
-logging.info(f'Listing servers for {args.game.lower()} via {project.lower()}')
+logging.info(f'Listing servers for {args.game.lower()} via {principal.lower()}')
 
 # Init GameSpy server lister
-lister = GameSpyServerLister(args.game, project, args.gslist, args.filter, args.super_query,
+lister = GameSpyServerLister(args.game, principal, args.gslist, args.filter, args.super_query,
                              args.timeout, args.expired_ttl, args.list_dir)
 # Init stats dict
 stats = {

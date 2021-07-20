@@ -15,7 +15,7 @@ from gevent.pool import Pool
 from nslookup import Nslookup
 from pyq3serverlist import PrincipalServer, PyQ3SLError, PyQ3SLTimeoutError
 
-from src.constants import ROOT_DIR, BATTLELOG_GAME_BASE_URIS, GSLIST_CONFIGS, QUAKE3_CONFIGS
+from src.constants import ROOT_DIR, BATTLELOG_GAME_BASE_URIS, GSLIST_CONFIGS, QUAKE3_CONFIGS, GAMESPY_PRINCIPALS
 from src.helpers import find_query_port, bfbc2_server_validator, parse_raw_server_info, battlelog_server_validator, \
     guid_from_ip_port, mohwf_server_validator, is_valid_port
 
@@ -97,17 +97,17 @@ class ServerLister:
 
 
 class GameSpyServerLister(ServerLister):
-    project: str
+    principal: str
     gslist_config: dict
     gslist_bin_path: str
     gslist_filter: str
     gslist_super_query: bool
     gslist_timeout: int
 
-    def __init__(self, game: str, project: str, gslist_bin_path: str, gslist_filter: str, gslist_super_query: bool,
+    def __init__(self, game: str, principal: str, gslist_bin_path: str, gslist_filter: str, gslist_super_query: bool,
                  gslist_timeout: int, expired_ttl: int, list_dir: str):
         super().__init__(game, expired_ttl, list_dir)
-        self.project = project.lower()
+        self.principal = principal.lower()
         self.gslist_config = GSLIST_CONFIGS[self.game]
         self.gslist_bin_path = gslist_bin_path
         self.gslist_filter = gslist_filter
@@ -116,7 +116,7 @@ class GameSpyServerLister(ServerLister):
 
     def update_server_list(self):
         # Manually look up hostname to be able to spread retried across servers
-        hostname = self.gslist_config['servers'][self.project]['hostname']
+        hostname = GAMESPY_PRINCIPALS[self.principal]['hostname']
         looker_upper = Nslookup()
         dns_result = looker_upper.dns_lookup(hostname)
 
@@ -135,7 +135,7 @@ class GameSpyServerLister(ServerLister):
             try:
                 logging.info(f'Running gslist command against {server_ip}')
                 command = [self.gslist_bin_path, '-n', self.gslist_config['gameName'], '-x',
-                           f'{server_ip}:{self.gslist_config["servers"][self.project]["port"]}',
+                           f'{server_ip}:{GAMESPY_PRINCIPALS[self.principal]["port"]}',
                            '-Y', self.gslist_config['gameName'], self.gslist_config['gameKey'],
                            '-t', self.gslist_config['encType'], '-f', f'{self.gslist_filter}', '-o', '1']
                 timeout = self.gslist_timeout
