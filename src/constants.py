@@ -43,6 +43,10 @@ GAMESPY_PRINCIPALS = {
         'hostname': 'stella.ms5.openspy.net',
         'port': 28910
     },
+    'phoenixnetwork': {
+        'hostname': 'master.phoenixnetwork.net',
+        'port': 28910
+    },
     'play2142': {
         'hostname': 'stella.ms.play2142.ru',
         'port': 28910
@@ -105,7 +109,7 @@ GSLIST_CONFIGS = {
         'gameKey': 'hW6m9a',
         'encType': '-1',
         'superQueryType': '8',
-        'servers': ['bf2hub', 'playbf2']
+        'servers': ['bf2hub', 'phoenixnetwork', 'playbf2']
     },
     'postal2': {
         'gameName': 'postal2',
