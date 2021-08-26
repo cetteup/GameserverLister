@@ -457,7 +457,7 @@ class BattlelogServerLister(FrostbiteServerLister):
                 found = False
                 try:
                     response = self.session.get(f'https://battlelog.battlefield.com/{self.game}/'
-                                                f'servers/show/pc/{server["guid"]}?json=1')
+                                                f'servers/show/pc/{server["guid"]}?json=1', timeout=10)
                     if response.status_code == 200:
                         # Server was found on Battlelog => make sure it is still public
                         parsed = response.json()
