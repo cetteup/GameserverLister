@@ -561,13 +561,15 @@ class BattlelogServerLister(FrostbiteHttpServerLister):
 class GametoolsServerLister(FrostbiteHttpServerLister):
     # Use gameId as server uid
     server_uid_key: str = 'gameId'
+    include_official: bool
 
-    def __init__(self, game: str, page_limit: int, expired_ttl: int, list_dir: str,
-                 sleep: float, max_attempts: int):
+    def __init__(self, game: str, page_limit: int, expired_ttl: int, list_dir: str, sleep: float, max_attempts: int,
+                 include_official: bool):
         super().__init__(game, page_limit, 50, expired_ttl, list_dir, sleep, max_attempts)
         self.page_limit = page_limit
         self.sleep = sleep
         self.max_attempts = max_attempts
+        self.include_official = include_official
 
         # Init session
         self.session = requests.session()
@@ -583,15 +585,18 @@ class GametoolsServerLister(FrostbiteHttpServerLister):
                 'name': server['prefix'],
                 'lastSeenAt': datetime.now().astimezone().isoformat()
             }
-            # Add any servers that are new
+            # Add/update servers (ignoring official servers unless include_official is set)
             server_game_ids = [s[self.server_uid_key] for s in found_servers]
-            if found_server[self.server_uid_key] not in server_game_ids:
+            if found_server[self.server_uid_key] not in server_game_ids and \
+                    (not server['official'] or self.include_official):
                 logging.debug(f'Got new server {server[self.server_uid_key]}, adding it')
                 found_servers.append(found_server)
-            else:
+            elif not server['official'] or self.include_official:
                 logging.debug(f'Got duplicate server {server[self.server_uid_key]}, updating last seen at')
                 index = server_game_ids.index(found_server[self.server_uid_key])
                 found_servers[index]['lastSeenAt'] = datetime.now().astimezone().isoformat()
+            else:
+                logging.debug(f'Got official server {server[self.server_uid_key]}, ignoring it')
 
         return found_servers
 
@@ -602,8 +607,9 @@ class GametoolsServerLister(FrostbiteHttpServerLister):
             response = self.session.get(f'{GAMETOOLS_BASE_URI}/{self.game}/detailedserver/'
                                         f'?gameid={server[self.server_uid_key]}', timeout=10)
             if response.status_code == 200:
-                # Server was found on gametools
-                found = True
+                # Server was found on gametools => make sure it still not official (or include_official is set)
+                parsed = response.json()
+                found = not parsed['official'] or self.include_official
             elif response.status_code == 404:
                 # gametools responded with, server was not found
                 found = False

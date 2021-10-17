@@ -15,9 +15,12 @@ parser.add_argument('-d', '--list-dir', help='Path to directory in which servers
                     default='.')
 parser.add_argument('--sleep', help='Number of seconds to sleep between requests', type=float, default=0)
 parser.add_argument('--max-attempts', help='Max number of attempts for fetching a page of servers', type=int, default=3)
+parser.add_argument('--include-official', help='Add DICE official servers to the server list '
+                                               '(not recommended due to auto scaling official servers)',
+                    dest='include_official', action='store_true')
 parser.add_argument('--debug', help='Enables logging of lots of debugging information', dest='debug',
                     action='store_true')
-parser.set_defaults(debug=False)
+parser.set_defaults(include_official=False, debug=False)
 args = parser.parse_args()
 
 logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO,
@@ -26,8 +29,8 @@ logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO,
 logging.info(f'Listing servers for {args.game.lower()}')
 
 # Init gametools server lister
-lister = GametoolsServerLister(args.game, args.page_limit, args.expired_ttl, args.list_dir,
-                               args.sleep, args.max_attempts)
+lister = GametoolsServerLister(args.game, args.page_limit, args.expired_ttl, args.list_dir, args.sleep,
+                               args.max_attempts, args.include_official)
 # Init stats dict
 stats = {
     'serverTotalBefore': len(lister.servers),
