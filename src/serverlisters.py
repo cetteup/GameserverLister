@@ -569,7 +569,7 @@ class GametoolsServerLister(FrostbiteHttpServerLister):
 
     def __init__(self, game: str, page_limit: int, expired_ttl: int, list_dir: str, sleep: float, max_attempts: int,
                  include_official: bool):
-        super().__init__(game, page_limit, 50, expired_ttl, list_dir, sleep, max_attempts)
+        super().__init__(game, page_limit, 100, expired_ttl, list_dir, sleep, max_attempts)
         self.page_limit = page_limit
         self.sleep = sleep
         self.max_attempts = max_attempts
