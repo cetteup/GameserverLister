@@ -132,6 +132,7 @@ BATTLELOG_GAME_BASE_URIS = {
     'bfh': 'https://battlelog.battlefield.com/bfh/servers/getServers/pc/',
     'mohwf': 'https://battlelog.battlefield.com/mohw/servers/getAutoBrowseServers/'
 }
+GAMETOOLS_BASE_URI = 'https://api.gametools.network'
 QUAKE3_CONFIGS = {
     'cod': {
         'protocol': 6,
