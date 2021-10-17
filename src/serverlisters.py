@@ -27,6 +27,7 @@ class ServerLister:
     server_list_file_path: str
     expired_ttl: int
     server_uid_key: str = 'guid'
+    ensure_ascii: bool = True
     servers: list = []
 
     def __init__(self, game: str, expired_ttl: int, list_dir: str):
@@ -96,7 +97,7 @@ class ServerLister:
     def write_to_file(self):
         logging.info(f'Writing {len(self.servers)} servers to output file')
         with open(self.server_list_file_path, 'w') as output_file:
-            json.dump(self.servers, output_file, indent=2)
+            json.dump(self.servers, output_file, indent=2, ensure_ascii=self.ensure_ascii)
 
 
 class GameSpyServerLister(ServerLister):
@@ -561,6 +562,9 @@ class BattlelogServerLister(FrostbiteHttpServerLister):
 class GametoolsServerLister(FrostbiteHttpServerLister):
     # Use gameId as server uid
     server_uid_key: str = 'gameId'
+    # Allow non-ascii characters in server list (mostly used by server names for Asia servers)
+    ensure_ascii: bool = False
+
     include_official: bool
 
     def __init__(self, game: str, page_limit: int, expired_ttl: int, list_dir: str, sleep: float, max_attempts: int,
