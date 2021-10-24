@@ -6,7 +6,7 @@ import subprocess
 import sys
 import time
 from datetime import datetime, timedelta
-from random import randint
+from random import randint, choices
 from typing import Callable, List, Tuple
 
 import gevent
@@ -220,6 +220,9 @@ class FrostbiteServerLister(ServerLister):
 
             # Remove any invalid ports
             ports_to_try = [p for p in ports_to_try if is_valid_port(p)]
+
+            # Get default port (first in list) and 5 random ports from selection
+            ports_to_try = [ports_to_try[0], *choices(ports_to_try[1:], k=5)]
 
             jobs.append(
                 pool.spawn(find_query_port, gamedig_bin_path, self.game, server, ports_to_try, self.server_validator)
