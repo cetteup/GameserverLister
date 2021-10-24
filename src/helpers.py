@@ -60,6 +60,7 @@ def mohwf_server_validator(server: dict, used_query_port: int, parsed_result: di
 
 def bfbc2_server_validator(server: dict, used_query_port: int, parsed_result: dict) -> bool:
     return battlelog_server_validator(server, used_query_port, parsed_result) or \
+           parsed_result.get('connect') == f'0.0.0.0:{server["gamePort"]}' or \
            parsed_result.get('name') == server['name']
 
 
