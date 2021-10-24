@@ -329,12 +329,13 @@ class BC2ServerLister(FrostbiteServerLister):
         8. game port + 29233 (i3D.net)
         9. game port + 29000
         10. game port + 29323
-        11. random port between default game port and default query port
-        12. random port between game port and game port + default offset
+        11. random port around default query port
+        12. random port between default game port and default query port
+        13. random port between game port and game port + default offset
         """
         ports_to_try = [48888, game_port + 29321, game_port, game_port + 100, game_port + 10, game_port + 5,
                         game_port + 1, game_port + 29233, game_port + 29000, game_port + 29323,
-                        randint(19567, 48888), randint(game_port, game_port + 29321)]
+                        randint(48880, 48890), randint(19567, 48888), randint(game_port, game_port + 29321)]
 
         return ports_to_try
 
