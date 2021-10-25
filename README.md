@@ -28,6 +28,8 @@ Battlefield: Bad Company 2 | fesl/theater| Electronic Arts
 Battlefield 3 | Battlelog | battlelog.com
 Battlefield 4 | Battlelog | battlelog.com
 Battlefield Hardline | Battlelog | battlelog.com
+Battlefield 1 | Gametools API | api.gametools.network
+Battlefield 5 | Gametools API | api.gametools.network
 Call of Duty | Quake3 | Activision
 Call of Duty: United Offensive | Quake3 | Activision
 Call of Duty 2 | Quake3 | Activision
