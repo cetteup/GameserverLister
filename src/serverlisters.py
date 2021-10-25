@@ -307,7 +307,7 @@ class BC2ServerLister(FrostbiteServerLister):
             raw_server_info = line.strip().split(' ', 1)[1]
             parsed = parse_raw_server_info(raw_server_info)
             found_servers.append({
-                self.server_uid_key: str(abs(int(parsed['B-U-sguid']))),
+                self.server_uid_key: guid_from_ip_port(parsed['hostaddr'], parsed['hostport']),
                 'name': parsed['hostname'],
                 'ip': parsed['hostaddr'],
                 'gamePort': int(parsed['hostport']),
