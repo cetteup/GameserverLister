@@ -339,7 +339,7 @@ class BC2ServerLister(FrostbiteServerLister):
         """
         ports_to_try = [48888, game_port + 29321, game_port, game_port + 100, game_port + 10, game_port + 5,
                         game_port + 1, game_port + 29233, game_port + 29000, game_port + 29323, randint(48880, 48890),
-                        randint(48590, 48610), randint(19567, 48888), randint(game_port, game_port + 29321)]
+                        randint(48601, 48605), randint(19567, 48888), randint(game_port, game_port + 29321)]
 
         return ports_to_try
 
