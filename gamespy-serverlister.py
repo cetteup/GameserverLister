@@ -13,7 +13,7 @@ parser.add_argument('-b', '--game', help='Game to query servers for', type=str,
                     choices=list(GSLIST_CONFIGS.keys()), default=list(GSLIST_CONFIGS.keys())[0])
 parser.add_argument('-p', '--principal', help='Principal server to query',
                     type=str, choices=list(GAMESPY_PRINCIPALS.keys()))
-parser.add_argument('-f', '--filter', help='Filter to apply to server list', type=str, default='')
+parser.add_argument('-f', '--filter', help='Filter to apply to server list', type=str, default=None)
 parser.add_argument('-t', '--timeout', help='Timeout to use for gslist command', type=int, default=10)
 parser.add_argument('-e', '--expired-ttl', help='How long to keep a server in list after it was last seen (in hours)',
                     type=int, default=24)

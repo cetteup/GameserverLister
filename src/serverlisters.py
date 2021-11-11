@@ -7,7 +7,7 @@ import sys
 import time
 from datetime import datetime, timedelta
 from random import randint, choices
-from typing import Callable, List, Tuple
+from typing import Callable, List, Tuple, Optional
 
 import gevent
 import requests
@@ -104,12 +104,13 @@ class GameSpyServerLister(ServerLister):
     principal: str
     gslist_config: dict
     gslist_bin_path: str
-    gslist_filter: str
+    gslist_filter: Optional[str]
     gslist_super_query: bool
     gslist_timeout: int
 
-    def __init__(self, game: str, principal: str, gslist_bin_path: str, gslist_filter: str, gslist_super_query: bool,
-                 gslist_timeout: int, expired_ttl: int, list_dir: str):
+    def __init__(self, game: str, principal: str, gslist_bin_path: str,
+                 gslist_filter: Optional[str] = None, gslist_super_query: bool = False,
+                 gslist_timeout: int = 10, expired_ttl: int = 24, list_dir: str = '.'):
         super().__init__(game, expired_ttl, list_dir)
         self.principal = principal.lower()
         self.gslist_config = GSLIST_CONFIGS[self.game]
@@ -141,7 +142,10 @@ class GameSpyServerLister(ServerLister):
                 command = [self.gslist_bin_path, '-n', self.gslist_config['gameName'], '-x',
                            f'{server_ip}:{GAMESPY_PRINCIPALS[self.principal]["port"]}',
                            '-Y', self.gslist_config['gameName'], self.gslist_config['gameKey'],
-                           '-t', self.gslist_config['encType'], '-f', f'{self.gslist_filter}', '-o', '1']
+                           '-t', self.gslist_config['encType'], '-o', '1']
+                # Add filter if set
+                if self.gslist_filter is not None:
+                    command.extend(['-f', f'{self.gslist_filter}'])
                 timeout = self.gslist_timeout
                 # Add super query argument if requested
                 if self.gslist_super_query:
