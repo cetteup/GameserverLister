@@ -184,7 +184,7 @@ class GameSpyServerLister(ServerLister):
             found_servers.append({
                 self.server_uid_key: guid_from_ip_port(ip, query_port),
                 'ip': ip,
-                'queryPort': query_port,
+                'queryPort': int(query_port),
                 'lastSeenAt': datetime.now().astimezone().isoformat()
             })
 
