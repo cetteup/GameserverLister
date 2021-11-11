@@ -23,7 +23,7 @@ Game         | Source type/protocol | Server list source(s)
 Battlefield 1942 | GameSpy | bf1942.sk, qtracker
 Battlefield Vietnam | GameSpy | qtracker
 Battlefield 2 | GamsSpy | bf2hub, playbf2
-Battlefield 2142 | GameSpy | openspy, play2142
+Battlefield 2142 | GameSpy | novgames, openspy, play2142
 Battlefield: Bad Company 2 | fesl/theater| Electronic Arts 
 Battlefield 3 | Battlelog | battlelog.com
 Battlefield 4 | Battlelog | battlelog.com
