@@ -35,6 +35,10 @@ GAMESPY_PRINCIPALS = {
         'hostname': 'master.newbiesplayground.net',
         'port': 28900
     },
+    'novgames': {
+        'hostname': '2142.novgames.ru',
+        'port': 28910
+    },
     'oldunreal.com': {
         'hostname': 'master2.oldunreal.com',
         'port': 28900
@@ -102,7 +106,7 @@ GSLIST_CONFIGS = {
         'gameKey': 'M8o1Qw',
         'encType': '-1',
         'superQueryType': '8',
-        'servers': ['openspy', 'play2142']
+        'servers': ['novgames', 'openspy', 'play2142']
     },
     'bf2': {
         'gameName': 'battlefield2',
