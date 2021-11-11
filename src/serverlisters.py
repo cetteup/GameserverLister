@@ -18,7 +18,7 @@ from pyq3serverlist import PrincipalServer, PyQ3SLError, PyQ3SLTimeoutError
 from src.constants import BATTLELOG_GAME_BASE_URIS, GSLIST_CONFIGS, QUAKE3_CONFIGS, GAMESPY_PRINCIPALS, \
     GAMETOOLS_BASE_URI
 from src.helpers import find_query_port, bfbc2_server_validator, parse_raw_server_info, battlelog_server_validator, \
-    guid_from_ip_port, mohwf_server_validator, is_valid_port
+    guid_from_ip_port, mohwf_server_validator, is_valid_port, is_valid_public_ip
 
 
 class ServerLister:
@@ -172,15 +172,19 @@ class GameSpyServerLister(ServerLister):
         logging.info('Parsing server list')
         found_servers = []
         for line in raw_server_list.splitlines():
-            elements = line.strip().split(':')
+            ip, query_port = line.strip().split(':', 1)
             # Stop parsing once we reach the first line with query server data
-            if len(elements[1]) > 5:
+            if len(query_port) > 5:
                 break
 
+            if not is_valid_public_ip(ip) or not is_valid_port(int(query_port)):
+                logging.warning(f'Principal returned invalid server entry ({ip}:{query_port}), skipping it')
+                continue
+
             found_servers.append({
-                self.server_uid_key: guid_from_ip_port(elements[0], elements[1]),
-                'ip': elements[0],
-                'queryPort': elements[1],
+                self.server_uid_key: guid_from_ip_port(ip, query_port),
+                'ip': ip,
+                'queryPort': query_port,
                 'lastSeenAt': datetime.now().astimezone().isoformat()
             })
 

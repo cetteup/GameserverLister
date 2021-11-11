@@ -1,3 +1,4 @@
+import ipaddress
 import json
 import logging
 import urllib.parse
@@ -44,6 +45,16 @@ def find_query_port(gamedig_path: str, game: str, server: dict, ports_to_try: li
             break
 
     return query_port
+
+
+def is_valid_public_ip(ip: str) -> bool:
+    try:
+        ip_address = ipaddress.ip_address(ip)
+        valid_public = ip_address.is_global
+    except ValueError:
+        valid_public = False
+
+    return valid_public
 
 
 def is_valid_port(port: int) -> bool:
