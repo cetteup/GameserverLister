@@ -119,8 +119,11 @@ class GameSpyServerLister(ServerLister):
         self.gslist_timeout = gslist_timeout
 
     def update_server_list(self):
+        principal = GAMESPY_PRINCIPALS[self.principal]
+        hostname = principal['hostname']
+        # Combine game port and principal-specific port offset (defaulting to an offset of 0)
+        port = self.gslist_config['port'] + principal.get('portOffset', 0)
         # Manually look up hostname to be able to spread retried across servers
-        hostname = GAMESPY_PRINCIPALS[self.principal]['hostname']
         looker_upper = Nslookup()
         dns_result = looker_upper.dns_lookup(hostname)
 
@@ -139,8 +142,7 @@ class GameSpyServerLister(ServerLister):
             try:
                 logging.info(f'Running gslist command against {server_ip}')
                 command = [self.gslist_bin_path, '-n', self.gslist_config['gameName'], '-x',
-                           f'{server_ip}:{GAMESPY_PRINCIPALS[self.principal]["port"]}',
-                           '-Y', self.gslist_config['gameName'], self.gslist_config['gameKey'],
+                           f'{server_ip}:{port}', '-Y', self.gslist_config['gameName'], self.gslist_config['gameKey'],
                            '-t', self.gslist_config['encType'], '-f', f'{self.gslist_filter}', '-o', '1']
                 timeout = self.gslist_timeout
                 # Add super query argument if requested
