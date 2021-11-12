@@ -35,16 +35,16 @@ GAMESPY_PRINCIPALS = {
         'hostname': 'master2.oldunreal.com'
     },
     'openspy': {
-        'hostname': 'stella.ms5.openspy.net'
+        'hostname': '{0}.master.openspy.net'
     },
     'phoenixnetwork': {
         'hostname': 'master.phoenixnetwork.net'
     },
     'play2142': {
-        'hostname': 'stella.ms.play2142.ru'
+        'hostname': '{0}.ms.play2142.ru'
     },
     'playbf2': {
-        'hostname': 'battlefield2.ms.playbf2.ru'
+        'hostname': '{0}.ms.playbf2.ru'
     },
     'qtracker': {
         'hostname': 'master2.qtracker.com'

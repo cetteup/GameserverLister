@@ -120,7 +120,8 @@ class GameSpyServerLister(ServerLister):
 
     def update_server_list(self):
         principal = GAMESPY_PRINCIPALS[self.principal]
-        hostname = principal['hostname']
+        # Format hostname using game name (following old GameSpy format [game].master.gamespy.com)
+        hostname = principal['hostname'].format(self.gslist_config['gameName'])
         # Combine game port and principal-specific port offset (defaulting to an offset of 0)
         port = self.gslist_config['port'] + principal.get('portOffset', 0)
         # Manually look up hostname to be able to spread retried across servers
