@@ -87,7 +87,7 @@ GSLIST_CONFIGS = {
         'encType': '2',
         'superQueryType': '0',
         'port': 28900,
-        'servers': ['qtracker']
+        'servers': ['openspy', 'qtracker']
     },
     'bf2142': {
         'gameName': 'stella',
