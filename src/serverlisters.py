@@ -48,9 +48,18 @@ class ServerLister:
 
         # Init server list with servers from existing list or empty one
         if os.path.isfile(self.server_list_file_path):
-            with open(self.server_list_file_path, 'r') as serverListFile:
-                logging.info('Reading servers from existing server list')
-                self.servers = json.load(serverListFile)
+            try:
+                with open(self.server_list_file_path, 'r') as serverListFile:
+                    logging.info('Reading servers from existing server list')
+                    self.servers = json.load(serverListFile)
+            except IOError as e:
+                logging.debug(e)
+                logging.error('Failed to read existing server list file')
+                sys.exit(1)
+            except json.decoder.JSONDecodeError as e:
+                logging.debug(e)
+                logging.error('Failed to parse existing server list file contents')
+                sys.exit(1)
 
     def update_server_list(self):
         pass
