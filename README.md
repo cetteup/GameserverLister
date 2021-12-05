@@ -12,7 +12,7 @@ A Python 🐍 script to retrieve game server lists for various games.
 
 ## Required tools
 
-The server list retrieval for both GameSpy-games and Battlefield: Bad Company 2 requires external tools. In order to retrieve GameSpy servers, you need to set up [gslist](http://aluigi.altervista.org/papers.htm#gslist). Retrieval of a list of game servers for Battlefield: Bad Company 2 requires [ealist](http://aluigi.altervista.org/papers.htm#others-net). Both `gslist` and `ealist` were developed by Luigi Auriemma.
+The server list retrieval for GameSpy-games requires an external tool. In order to retrieve GameSpy servers, you need to set up [gslist](http://aluigi.altervista.org/papers.htm#gslist). `gslist` was developed by Luigi Auriemma.
 
 ## Supported games
 
