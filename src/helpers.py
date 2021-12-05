@@ -1,7 +1,6 @@
 import ipaddress
 import json
 import logging
-import urllib.parse
 from typing import Callable
 
 import gevent.subprocess
@@ -73,20 +72,6 @@ def bfbc2_server_validator(server: dict, used_query_port: int, parsed_result: di
     return battlelog_server_validator(server, used_query_port, parsed_result) or \
            parsed_result.get('connect') == f'0.0.0.0:{server["gamePort"]}' or \
            parsed_result.get('name') == server['name']
-
-
-def parse_raw_server_info(raw_server_info: str) -> dict:
-    # Split on "\" and remove first element, since raw info starts with "\"
-    elements = raw_server_info.split('\\')[1:]
-
-    # Parse using elements at an even index as key, uneven index as value
-    keys = [value for (index, value) in enumerate(elements) if index % 2 == 0]
-    values = [value for (index, value) in enumerate(elements) if index % 2 == 1]
-
-    # Build dict
-    server = {key: urllib.parse.unquote(values[index].replace('"', '')).strip() for (index, key) in enumerate(keys)}
-
-    return server
 
 
 def guid_from_ip_port(ip: str, port: str) -> str:

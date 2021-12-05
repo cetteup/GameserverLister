@@ -17,18 +17,9 @@ battlelogParser.add_argument('-g', '--game',
                              type=str, choices=['bf3', 'bf4', 'bfh', 'mohwf'], required=True)
 
 bfbc2Parser = subparsers.add_parser('bfbc2', parents=[commonParser, queryPortParser])
-bfbc2Parser.add_argument('-b', '--ealist',
-                         help='Path to ealist binary',
-                         type=str, required=True)
-bfbc2Parser.add_argument('-u', '--username',
-                         help='Username of EA user to use for ealist',
-                         type=str, required=True)
-bfbc2Parser.add_argument('-p', '--password',
-                         help='Password of EA user to use for ealist',
-                         type=str, required=True)
-bfbc2Parser.add_argument('--use-wine',
-                         help='Run the ealist executable through wine',
-                         dest='use_wine', action='store_true')
+bfbc2Parser.add_argument('-t', '--timeout',
+                         help='Timeout to use for server list retrieval request',
+                         type=int, default=10)
 bfbc2Parser.set_defaults(use_wine=False)
 
 gamespyParser = subparsers.add_parser('gamespy', parents=[commonParser])
@@ -84,7 +75,7 @@ if args.source == 'battlelog':
 elif args.source == 'bfbc2':
     # Init BC2 lister
     game = 'bfbc2'
-    lister = BC2ServerLister(args.ealist, args.username, args.password, args.expired_ttl, args.list_dir, args.use_wine)
+    lister = BC2ServerLister(args.timeout, args.expired_ttl, args.list_dir)
 elif args.source == 'gamespy':
     # Set principal
     principal = None

@@ -17,7 +17,7 @@ from pyq3serverlist import PrincipalServer, PyQ3SLError, PyQ3SLTimeoutError
 
 from src.constants import BATTLELOG_GAME_BASE_URIS, GSLIST_CONFIGS, QUAKE3_CONFIGS, GAMESPY_PRINCIPALS, \
     GAMETOOLS_BASE_URI
-from src.helpers import find_query_port, bfbc2_server_validator, parse_raw_server_info, battlelog_server_validator, \
+from src.helpers import find_query_port, bfbc2_server_validator, battlelog_server_validator, \
     guid_from_ip_port, mohwf_server_validator, is_valid_port, is_valid_public_ip
 
 
@@ -267,70 +267,66 @@ class FrostbiteServerLister(ServerLister):
 
 
 class BC2ServerLister(FrostbiteServerLister):
-    ealist_bin_path: str
-    username: str
-    password: str
-    use_wine: bool
+    timeout: float
 
-    def __init__(self, ealist_bin_path: str, username: str, password: str, expired_ttl: int,
-                 list_dir: str, use_wine: bool):
+    def __init__(self, timeout: float, expired_ttl: int, list_dir: str):
         super().__init__('bfbc2', expired_ttl, list_dir)
-        self.ealist_bin_path = ealist_bin_path
-        self.username = username
-        self.password = password
-        self.use_wine = use_wine
+        self.timeout = timeout
         self.server_validator = bfbc2_server_validator
 
     def update_server_list(self):
-        # Run ealist and capture output
-        command_ok = False
-        tries = 0
-        max_tries = 3
-        ealist_result = None
-        while not command_ok and tries < max_tries:
+        request_ok = False
+        attempt = 0
+        max_attempts = 3
+        servers = None
+        while not request_ok and attempt < max_attempts:
             try:
-                logging.info(f'Running ealist command')
-                command = [self.ealist_bin_path, '-n', 'bfbc2-pc-server', '-a', self.username, self.password,
-                           'mohair-pc', '-X', 'none', '-o', '1']
-                # Prefix command with wine call if requested
-                if self.use_wine:
-                    command.insert(0, '/usr/bin/wine')
+                logging.info(f'Fetching server list from FESL/Theater API')
+                resp = requests.get('https://fesl.cetteup.com/servers/pc', timeout=self.timeout)
 
-                ealist_result = subprocess.run(command, capture_output=True, cwd=self.server_list_dir_path, timeout=10)
-                command_ok = True
-            except subprocess.TimeoutExpired as e:
+                if resp.ok:
+                    servers = resp.json()
+                    request_ok = True
+                else:
+                    attempt += 1
+            except requests.exceptions.RequestException as e:
                 logging.debug(e)
-                logging.error(f'ealist timed out, try {tries + 1}/{max_tries}')
-                tries += 1
+                logging.error(f'Failed to fetch servers from API, attempt {attempt + 1}/{max_attempts}')
+                attempt += 1
 
-        # Make sure any server were found
-        # (ealist sends all output to stderr so check there)
-        if ealist_result is None or 'servers found' not in str(ealist_result.stderr):
-            logging.error('ealist could not retrieve any servers, exiting')
+        # Make sure any servers were found
+        if servers is None:
+            logging.error('Failed to retrieve server list, exiting')
             sys.exit(1)
 
-        # Read ealist output file
-        logging.info('Reading ealist output file')
-        gsl_file_path = os.path.join(self.server_list_dir_path, 'bfbc2-pc-server.gsl')
-        with open(gsl_file_path, 'r') as ealist_file:
-            raw_server_list = ealist_file.read()
-
-        # Parse server list
-        # List format: [ip-address]:[port]
-        logging.info('Parsing server list')
+        # Add servers from list
         found_servers = []
-        for line in raw_server_list.splitlines():
-            raw_server_info = line.strip().split(' ', 1)[1]
-            parsed = parse_raw_server_info(raw_server_info)
+        for server in servers:
             found_servers.append({
-                self.server_uid_key: guid_from_ip_port(parsed['hostaddr'], parsed['hostport']),
-                'name': parsed['hostname'],
-                'ip': parsed['hostaddr'],
-                'gamePort': int(parsed['hostport']),
+                self.server_uid_key: guid_from_ip_port(server['I'], server['P']),
+                'name': server['N'],
+                'ip': server['I'],
+                'gamePort': int(server['P']),
+                'gid': int(server['GID']),
+                'lid': int(server['LID']),
                 'lastSeenAt': datetime.now().astimezone().isoformat()
             })
 
         self.add_update_servers(found_servers)
+
+    def build_server_list_dict(self, server: dict) -> dict:
+        return {
+            self.server_uid_key: server[self.server_uid_key],
+            'name': server['name'],
+            'ip': server['ip'],
+            'gamePort': server['gamePort'],
+            'queryPort': -1,
+            'gid': server['gid'],
+            'lid': server['lid'],
+            'firstSeenAt': server['lastSeenAt'],
+            'lastSeenAt': server['lastSeenAt'],
+            'lastQueriedAt': ''
+        }
 
     def build_port_to_try_list(self, game_port: int) -> list:
         """
