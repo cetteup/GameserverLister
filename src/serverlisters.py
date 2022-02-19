@@ -772,6 +772,6 @@ class Quake3ServerLister(ServerLister):
             found = True
         except PyQ3SLError as e:
             logging.debug(e)
-            logging.error(f'Failed to query server {server[self.server_uid_key]} for expiration check')
+            logging.debug(f'Failed to query server {server[self.server_uid_key]} for expiration check')
 
         return check_ok, found, checks_since_last_ok
