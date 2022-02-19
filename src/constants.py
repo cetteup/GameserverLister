@@ -56,14 +56,15 @@ GAMESPY_PRINCIPALS = {
         'hostname': 'vietcong1.eu'
     }
 }
-GSLIST_CONFIGS = {
+GAMESPY_CONFIGS = {
     'crysis': {
         'gameName': 'crysis',
         'gameKey': 'ZvZDcL',
         'encType': '-1',
         'superQueryType': '8',
         'port': 28910,
-        'servers': ['crymp.net']
+        'servers': ['crymp.net'],
+        'gamedigType': 'crysis'
     },
     'crysiswars': {
         'gameName': 'crysiswars',
@@ -71,7 +72,8 @@ GSLIST_CONFIGS = {
         'encType': '-1',
         'superQueryType': '8',
         'port': 28910,
-        'servers': ['jedi95.us']
+        'servers': ['jedi95.us'],
+        'gamedigType': 'crysiswars'
     },
     'bf1942': {
         'gameName': 'bfield1942',
@@ -79,7 +81,8 @@ GSLIST_CONFIGS = {
         'encType': '2',
         'superQueryType': '0',
         'port': 28900,
-        'servers': ['bf1942.sk', 'qtracker']
+        'servers': ['bf1942.sk', 'qtracker'],
+        'gamedigType': 'bf1942'
     },
     'bfvietnam': {
         'gameName': 'bfvietnam',
@@ -87,7 +90,8 @@ GSLIST_CONFIGS = {
         'encType': '2',
         'superQueryType': '0',
         'port': 28900,
-        'servers': ['openspy', 'qtracker']
+        'servers': ['openspy', 'qtracker'],
+        'gamedigType': 'bfv'
     },
     'bf2142': {
         'gameName': 'stella',
@@ -95,7 +99,8 @@ GSLIST_CONFIGS = {
         'encType': '-1',
         'superQueryType': '8',
         'port': 28910,
-        'servers': ['novgames', 'openspy', 'play2142']
+        'servers': ['novgames', 'openspy', 'play2142'],
+        'gamedigType': 'bf2142'
     },
     'bf2': {
         'gameName': 'battlefield2',
@@ -103,7 +108,8 @@ GSLIST_CONFIGS = {
         'encType': '-1',
         'superQueryType': '8',
         'port': 28910,
-        'servers': ['bf2hub', 'phoenixnetwork', 'playbf2']
+        'servers': ['bf2hub', 'phoenixnetwork', 'playbf2'],
+        'gamedigType': 'bf2'
     },
     'postal2': {
         'gameName': 'postal2',
@@ -111,7 +117,8 @@ GSLIST_CONFIGS = {
         'encType': '0',
         'superQueryType': '0',
         'port': 28900,
-        'servers': ['333networks.com-1']
+        'servers': ['333networks.com-1'],
+        'gamedigType': 'postal2'
     },
     'vietcong': {
         'gameName': 'vietcong',
@@ -119,7 +126,8 @@ GSLIST_CONFIGS = {
         'encType': '2',
         'superQueryType': '0',
         'port': 28900,
-        'servers': ['vietcong.tk', 'vietcong1.eu', 'qtracker']
+        'servers': ['vietcong.tk', 'vietcong1.eu', 'qtracker'],
+        'gamedigType': 'vietcong'
     }
 }
 BATTLELOG_GAME_BASE_URIS = {

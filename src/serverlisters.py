@@ -13,9 +13,9 @@ import gevent
 import requests
 from gevent.pool import Pool
 from nslookup import Nslookup
-from pyq3serverlist import PrincipalServer, PyQ3SLError, PyQ3SLTimeoutError
+from pyq3serverlist import PrincipalServer, Server, PyQ3SLError, PyQ3SLTimeoutError
 
-from src.constants import BATTLELOG_GAME_BASE_URIS, GSLIST_CONFIGS, QUAKE3_CONFIGS, GAMESPY_PRINCIPALS, \
+from src.constants import BATTLELOG_GAME_BASE_URIS, GAMESPY_CONFIGS, QUAKE3_CONFIGS, GAMESPY_PRINCIPALS, \
     GAMETOOLS_BASE_URI
 from src.helpers import find_query_port, bfbc2_server_validator, battlelog_server_validator, \
     guid_from_ip_port, mohwf_server_validator, is_valid_port, is_valid_public_ip
@@ -30,12 +30,19 @@ class ServerLister:
     ensure_ascii: bool = True
     servers: list = []
 
-    def __init__(self, game: str, expired_ttl: int, list_dir: str):
+    session: requests.Session
+    request_timeout: float
+
+    def __init__(self, game: str, expired_ttl: int, list_dir: str, request_timeout: float = 5.0):
         self.game = game.lower()
         self.server_list_dir_path = os.path.realpath(list_dir)
         self.server_list_file_path = os.path.join(self.server_list_dir_path, f'{self.game}-servers.json')
 
         self.expired_ttl = expired_ttl
+
+        # Init session
+        self.session = requests.session()
+        self.request_timeout = request_timeout
 
         # Create list dir if it does not exist
         if not os.path.isdir(self.server_list_dir_path):
@@ -91,17 +98,39 @@ class ServerLister:
     def remove_expired_servers(self) -> tuple:
         # Iterate over copy of server list and remove any expired servers from the (actual) server list
         logging.info(f'Checking server expiration ttl for {len(self.servers)} servers')
+        checks_since_last_ok = 0
         expired_servers_removed = 0
+        expired_servers_recovered = 0
         for index, server in enumerate(self.servers[:]):
             last_seen_at = (datetime.fromisoformat(server['lastSeenAt'])
                             if 'lastSeenAt' in server.keys() else datetime.min).astimezone()
             if datetime.now().astimezone() > last_seen_at + timedelta(hours=self.expired_ttl):
-                logging.debug(f'Server {server[self.server_uid_key]} has not been seen in'
-                              f' {self.expired_ttl} hours, removing it')
-                self.servers.remove(server)
-                expired_servers_removed += 1
+                time.sleep(self.get_backoff_timeout(checks_since_last_ok))
+                # Check if server can be accessed directly
+                check_ok, found, checks_since_last_ok = self.check_if_server_still_exists(
+                    server, checks_since_last_ok
+                )
 
-        return expired_servers_removed,
+                # Remove server if request was sent successfully but server was not found
+                if check_ok and not found:
+                    logging.debug(f'Server {server[self.server_uid_key]} has not been seen in '
+                                  f'{self.expired_ttl} hours, removing it')
+                    self.servers.remove(server)
+                    expired_servers_removed += 1
+                elif check_ok and found:
+                    logging.debug(f'Server {server[self.server_uid_key]} did not appear in list but is still online, '
+                                  f'updating last seen at')
+                    self.servers[self.servers.index(server)]['lastSeenAt'] = datetime.now().astimezone().isoformat()
+                    expired_servers_recovered += 1
+
+        return expired_servers_removed, expired_servers_recovered
+
+    def check_if_server_still_exists(self, server: dict, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
+        pass
+
+    def get_backoff_timeout(self, checks_since_last_ok: int) -> int:
+        # Default to no backoff
+        return 0
 
     def write_to_file(self):
         logging.info(f'Writing {len(self.servers)} servers to output file')
@@ -111,7 +140,7 @@ class ServerLister:
 
 class GameSpyServerLister(ServerLister):
     principal: str
-    gslist_config: dict
+    config: dict
     gslist_bin_path: str
     gslist_filter: str
     gslist_super_query: bool
@@ -121,7 +150,7 @@ class GameSpyServerLister(ServerLister):
                  gslist_timeout: int, expired_ttl: int, list_dir: str):
         super().__init__(game, expired_ttl, list_dir)
         self.principal = principal.lower()
-        self.gslist_config = GSLIST_CONFIGS[self.game]
+        self.config = GAMESPY_CONFIGS[self.game]
         self.gslist_bin_path = gslist_bin_path
         self.gslist_filter = gslist_filter
         self.gslist_super_query = gslist_super_query
@@ -130,9 +159,9 @@ class GameSpyServerLister(ServerLister):
     def update_server_list(self):
         principal = GAMESPY_PRINCIPALS[self.principal]
         # Format hostname using game name (following old GameSpy format [game].master.gamespy.com)
-        hostname = principal['hostname'].format(self.gslist_config['gameName'])
+        hostname = principal['hostname'].format(self.config['gameName'])
         # Combine game port and principal-specific port offset (defaulting to an offset of 0)
-        port = self.gslist_config['port'] + principal.get('portOffset', 0)
+        port = self.config['port'] + principal.get('portOffset', 0)
         # Manually look up hostname to be able to spread retried across servers
         looker_upper = Nslookup()
         dns_result = looker_upper.dns_lookup(hostname)
@@ -151,13 +180,13 @@ class GameSpyServerLister(ServerLister):
             server_ip = dns_result.answer[0] if tries % 2 == 0 else dns_result.answer[-1]
             try:
                 logging.info(f'Running gslist command against {server_ip}')
-                command = [self.gslist_bin_path, '-n', self.gslist_config['gameName'], '-x',
-                           f'{server_ip}:{port}', '-Y', self.gslist_config['gameName'], self.gslist_config['gameKey'],
-                           '-t', self.gslist_config['encType'], '-f', f'{self.gslist_filter}', '-o', '1']
+                command = [self.gslist_bin_path, '-n', self.config['gameName'], '-x',
+                           f'{server_ip}:{port}', '-Y', self.config['gameName'], self.config['gameKey'],
+                           '-t', self.config['encType'], '-f', f'{self.gslist_filter}', '-o', '1']
                 timeout = self.gslist_timeout
                 # Add super query argument if requested
                 if self.gslist_super_query:
-                    command.extend(['-Q', self.gslist_config['superQueryType']])
+                    command.extend(['-Q', self.config['superQueryType']])
                     # Extend timeout to account for server queries
                     timeout += 10
                 gslist_result = subprocess.run(command, capture_output=True,
@@ -176,7 +205,7 @@ class GameSpyServerLister(ServerLister):
 
         # Read gslist output file
         logging.info('Reading gslist output file')
-        with open(os.path.join(self.server_list_dir_path, f'{self.gslist_config["gameName"]}.gsl'), 'r') as gslist_file:
+        with open(os.path.join(self.server_list_dir_path, f'{self.config["gameName"]}.gsl'), 'r') as gslist_file:
             raw_server_list = gslist_file.read()
 
         # Parse server list
@@ -202,12 +231,42 @@ class GameSpyServerLister(ServerLister):
 
         self.add_update_servers(found_servers)
 
+    def check_if_server_still_exists(self, server: dict, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
+        check_ok = True
+        found = False
+        try:
+            response = self.session.get(
+                'https://9fm6u13gii.execute-api.eu-central-1.amazonaws.com/gamedig-query',
+                params={'type': self.config['gamedigType'], 'host': server['ip'], 'port': server['queryPort']},
+                timeout=self.request_timeout
+            )
+
+            parsed = response.json()
+            if response.ok:
+                raw = parsed.get('raw', {})
+                found = raw.get('gamename') == self.config['gameName']
+            else:
+                found = False
+                check_ok = isinstance(parsed, dict) and 'Failed all 1 attempts' in ''.join(parsed.get('errors', []))
+
+            # Reset check counter if server returned info or failed to query the server
+            if check_ok:
+                checks_since_last_ok = 0
+            else:
+                checks_since_last_ok += 1
+        except requests.RequestException as e:
+            logging.debug(e)
+            logging.error(f'Failed to fetch server {server[self.server_uid_key]} for expiration check')
+            check_ok = False
+
+        return check_ok, found, checks_since_last_ok
+
 
 class FrostbiteServerLister(ServerLister):
     server_validator: Callable = lambda: True
 
-    def __init__(self, game: str, expired_ttl: int, list_dir: str):
-        super().__init__(game, expired_ttl, list_dir)
+    def __init__(self, game: str, expired_ttl: int, list_dir: str, request_timeout: float = 5.0):
+        super().__init__(game, expired_ttl, list_dir, request_timeout)
 
     def build_server_list_dict(self, server: dict) -> dict:
         return {
@@ -267,11 +326,8 @@ class FrostbiteServerLister(ServerLister):
 
 
 class BC2ServerLister(FrostbiteServerLister):
-    timeout: float
-
-    def __init__(self, timeout: float, expired_ttl: int, list_dir: str):
-        super().__init__('bfbc2', expired_ttl, list_dir)
-        self.timeout = timeout
+    def __init__(self, expired_ttl: int, list_dir: str, timeout: float):
+        super().__init__('bfbc2', expired_ttl, list_dir, timeout)
         self.server_validator = bfbc2_server_validator
 
     def update_server_list(self):
@@ -282,7 +338,7 @@ class BC2ServerLister(FrostbiteServerLister):
         while not request_ok and attempt < max_attempts:
             try:
                 logging.info(f'Fetching server list from FESL/Theater API')
-                resp = requests.get('https://fesl.cetteup.com/servers/pc', timeout=self.timeout)
+                resp = self.session.get('https://fesl.cetteup.com/servers/pc', timeout=self.request_timeout)
 
                 if resp.ok:
                     servers = resp.json()
@@ -328,6 +384,32 @@ class BC2ServerLister(FrostbiteServerLister):
             'lastQueriedAt': ''
         }
 
+    def check_if_server_still_exists(self, server: dict, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
+        check_ok = True
+        found = False
+        try:
+            response = self.session.get(f'https://fesl.cetteup.com/servers/pc/{server["lid"]}/{server["gid"]}',
+                                        timeout=self.request_timeout)
+
+            if response.ok:
+                found = True
+            elif response.status_code == 404:
+                found = False
+            else:
+                check_ok = False
+            # Reset requests since last ok counter if server returned info/not found,
+            # else increase counter and sleep
+            if check_ok:
+                checks_since_last_ok = 0
+            else:
+                checks_since_last_ok += 1
+        except requests.RequestException as e:
+            logging.debug(e)
+            logging.error(f'Failed to fetch server {server[self.server_uid_key]} for expiration check')
+            check_ok = False
+
+        return check_ok, found, checks_since_last_ok
+
     def build_port_to_try_list(self, game_port: int) -> list:
         """
         Most Bad Company 2 server seem to be hosted directly by members of the community, resulting in pretty random
@@ -361,18 +443,14 @@ class FrostbiteHttpServerLister(FrostbiteServerLister):
     per_page: int
     sleep: float
     max_attempts: int
-    session: requests.Session
 
     def __init__(self, game: str, page_limit: int, per_page: int, expired_ttl: int, list_dir: str, sleep: float,
                  max_attempts: int):
-        super().__init__(game, expired_ttl, list_dir)
+        super().__init__(game, expired_ttl, list_dir, request_timeout=10)
         self.page_limit = page_limit
         self.per_page = per_page
         self.sleep = sleep
         self.max_attempts = max_attempts
-
-        # Init session
-        self.session = requests.session()
 
     def update_server_list(self):
         offset = 0
@@ -397,7 +475,7 @@ class FrostbiteHttpServerLister(FrostbiteServerLister):
             try:
                 response = self.session.get(
                     self.get_server_list_url(self.per_page),
-                    timeout=10
+                    timeout=self.request_timeout
                 )
             except requests.exceptions.RequestException as e:
                 logging.debug(e)
@@ -436,38 +514,8 @@ class FrostbiteHttpServerLister(FrostbiteServerLister):
     def add_page_found_servers(self, found_servers: List[dict], page_response_data: dict) -> List[dict]:
         pass
 
-    def remove_expired_servers(self) -> tuple:
-        # Iterate over copy of server list and remove any expired servers from the (actual) server list
-        logging.info(f'Checking server expiration ttl for {len(self.servers)} servers')
-        requests_since_last_ok = 0
-        expired_servers_removed = 0
-        expired_servers_recovered = 0
-        for index, server in enumerate(self.servers[:]):
-            last_seen_at = (datetime.fromisoformat(server['lastSeenAt'])
-                            if 'lastSeenAt' in server.keys() else datetime.min).astimezone()
-            if datetime.now().astimezone() > last_seen_at + timedelta(hours=self.expired_ttl):
-                time.sleep(1 + pow(self.sleep, requests_since_last_ok % self.max_attempts))
-                # Check if server can be accessed directly
-                request_ok, found, requests_since_last_ok = self.check_if_server_still_exists(
-                    server, requests_since_last_ok
-                )
-
-                # Remove server if request was sent successfully but server was not found
-                if request_ok and not found:
-                    logging.debug(f'Server {server[self.server_uid_key]} has not been seen in '
-                                  f'{self.expired_ttl} hours, removing it')
-                    self.servers.remove(server)
-                    expired_servers_removed += 1
-                elif request_ok and found:
-                    logging.debug(f'Server {server[self.server_uid_key]} did not appear in list but is still online, '
-                                  f'updating last seen at')
-                    self.servers[self.servers.index(server)]['lastSeenAt'] = datetime.now().astimezone().isoformat()
-                    expired_servers_recovered += 1
-
-        return expired_servers_removed, expired_servers_recovered
-
-    def check_if_server_still_exists(self, server: dict, requests_since_last_ok: int) -> Tuple[bool, bool, int]:
-        pass
+    def get_backoff_timeout(self, checks_since_last_ok: int) -> int:
+        return 1 + pow(self.sleep, checks_since_last_ok % self.max_attempts)
 
 
 class BattlelogServerLister(FrostbiteHttpServerLister):
@@ -484,8 +532,6 @@ class BattlelogServerLister(FrostbiteHttpServerLister):
         else:
             self.server_validator = battlelog_server_validator
 
-        # Init session
-        self.session = requests.session()
         # Set up headers
         self.session.headers = {
             'X-Requested-With': 'XMLHttpRequest'
@@ -523,12 +569,13 @@ class BattlelogServerLister(FrostbiteHttpServerLister):
 
         return found_servers
 
-    def check_if_server_still_exists(self, server: dict, requests_since_last_ok: int) -> Tuple[bool, bool, int]:
-        request_ok = True
+    def check_if_server_still_exists(self, server: dict, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
+        check_ok = True
         found = False
         try:
             response = self.session.get(f'https://battlelog.battlefield.com/{self.game}/'
-                                        f'servers/show/pc/{server[self.server_uid_key]}?json=1', timeout=10)
+                                        f'servers/show/pc/{server[self.server_uid_key]}?json=1',
+                                        timeout=self.request_timeout)
             if response.status_code == 200:
                 # Server was found on Battlelog => make sure it is still public
                 parsed = response.json()
@@ -538,20 +585,19 @@ class BattlelogServerLister(FrostbiteHttpServerLister):
                 found = False
             else:
                 # Battlelog responded with some other status code (rate limit 403 for example)
-                # => treat server as found
-                found = True
+                check_ok = False
             # Reset requests since last ok counter if server returned info/not found,
             # else increase counter and sleep
-            if response.status_code in [200, 422]:
-                requests_since_last_ok = 0
+            if check_ok:
+                checks_since_last_ok = 0
             else:
-                requests_since_last_ok += 1
+                checks_since_last_ok += 1
         except requests.exceptions.RequestException as e:
             logging.debug(e)
             logging.error(f'Failed to fetch server {server[self.server_uid_key]} for expiration check')
-            request_ok = False
+            check_ok = False
 
-        return request_ok, found, requests_since_last_ok
+        return check_ok, found, checks_since_last_ok
 
     def build_port_to_try_list(self, game_port: int) -> list:
         """
@@ -592,9 +638,6 @@ class GametoolsServerLister(FrostbiteHttpServerLister):
         self.max_attempts = max_attempts
         self.include_official = include_official
 
-        # Init session
-        self.session = requests.session()
-
     def get_server_list_url(self, per_page: int) -> str:
         return f'{GAMETOOLS_BASE_URI}/{self.game}/servers/?name=&limit={per_page}' \
                f'&nocache={datetime.now().timestamp()}'
@@ -621,12 +664,12 @@ class GametoolsServerLister(FrostbiteHttpServerLister):
 
         return found_servers
 
-    def check_if_server_still_exists(self, server: dict, requests_since_last_ok: int) -> Tuple[bool, bool, int]:
-        request_ok = True
+    def check_if_server_still_exists(self, server: dict, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
+        check_ok = True
         found = False
         try:
             response = self.session.get(f'{GAMETOOLS_BASE_URI}/{self.game}/detailedserver/'
-                                        f'?gameid={server[self.server_uid_key]}', timeout=10)
+                                        f'?gameid={server[self.server_uid_key]}', timeout=self.request_timeout)
             if response.status_code == 200:
                 # Server was found on gametools => make sure it still not official (or include_official is set)
                 parsed = response.json()
@@ -636,20 +679,19 @@ class GametoolsServerLister(FrostbiteHttpServerLister):
                 found = False
             else:
                 # gametools responded with some other status code (504 gateway timeout for example)
-                # => treat server as found
-                found = True
+                check_ok = False
             # Reset requests since last ok counter if server returned info/not found,
             # else increase counter and sleep
-            if response.status_code in [200, 404]:
-                requests_since_last_ok = 0
+            if check_ok:
+                checks_since_last_ok = 0
             else:
-                requests_since_last_ok += 1
+                checks_since_last_ok += 1
         except requests.exceptions.RequestException as e:
             logging.debug(e)
             logging.error(f'Failed to fetch server {server[self.server_uid_key]} for expiration check')
-            request_ok = False
+            check_ok = False
 
-        return request_ok, found, requests_since_last_ok
+        return check_ok, found, checks_since_last_ok
 
     def build_server_list_dict(self, server: dict) -> dict:
         return {
@@ -716,3 +758,20 @@ class Quake3ServerLister(ServerLister):
             })
 
         self.add_update_servers(found_server_dicts)
+
+    def check_if_server_still_exists(self, server: dict, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
+        # Since we query the server directly, there is no way of handling HTTP server errors differently then
+        # actually failed checks, so even if the query fails, we have to treat it as "check ok"
+        check_ok = True
+        found = False
+        try:
+            Server(server['ip'], server['queryPort']).get_status()
+
+            # get_status will raise an exception if the server cannot be contacted,
+            # so this will only be reached if the query succeeds
+            found = True
+        except PyQ3SLError as e:
+            logging.debug(e)
+            logging.error(f'Failed to query server {server[self.server_uid_key]} for expiration check')
+
+        return check_ok, found, checks_since_last_ok

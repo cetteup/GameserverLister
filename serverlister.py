@@ -2,7 +2,7 @@ import argparse
 import logging
 import sys
 
-from src.constants import GSLIST_CONFIGS, GAMESPY_PRINCIPALS, QUAKE3_CONFIGS
+from src.constants import GAMESPY_CONFIGS, GAMESPY_PRINCIPALS, QUAKE3_CONFIGS
 from src.parsers import commonParser, httpParser, queryPortParser
 from src.serverlisters import BattlelogServerLister, BC2ServerLister, GameSpyServerLister, GametoolsServerLister, \
     Quake3ServerLister
@@ -28,7 +28,7 @@ gamespyParser.add_argument('-g', '--gslist',
                            type=str, required=True)
 gamespyParser.add_argument('-b', '--game',
                            help='Game to query servers for',
-                           type=str, choices=list(GSLIST_CONFIGS.keys()), default=list(GSLIST_CONFIGS.keys())[0])
+                           type=str, choices=list(GAMESPY_CONFIGS.keys()), default=list(GAMESPY_CONFIGS.keys())[0])
 gamespyParser.add_argument('-p', '--principal',
                            help='Principal server to query',
                            type=str, choices=list(GAMESPY_PRINCIPALS.keys()))
@@ -75,12 +75,12 @@ if args.source == 'battlelog':
 elif args.source == 'bfbc2':
     # Init BC2 lister
     game = 'bfbc2'
-    lister = BC2ServerLister(args.timeout, args.expired_ttl, args.list_dir)
+    lister = BC2ServerLister(args.expired_ttl, args.list_dir, args.timeout)
 elif args.source == 'gamespy':
     # Set principal
     principal = None
-    availablePrincipals = GSLIST_CONFIGS[args.game]['servers']
-    if len(availablePrincipals) > 1 and str(args.principal).lower() in GSLIST_CONFIGS[args.game]['servers']:
+    availablePrincipals = GAMESPY_CONFIGS[args.game]['servers']
+    if len(availablePrincipals) > 1 and str(args.principal).lower() in GAMESPY_CONFIGS[args.game]['servers']:
         # More than one principal available and given principal is valid => use given principal
         principal = args.principal.lower()
     else:
@@ -123,19 +123,13 @@ logging.info(f'Listing servers for {game} via {serverListSource}')
 stats = {
     'serverTotalBefore': len(lister.servers),
     'serverTotalAfter': -1,
-    'expiredServersRemoved': -1
+    'expiredServersRemoved': -1,
+    'expiredServersRecovered': -1
 }
 # Run list update
 lister.update_server_list()
 # Check for any remove any expired servers
-removed = lister.remove_expired_servers()
-
-# Update stats dict depending on how many tuple values remove_expired_servers returned
-if len(removed) > 1:
-    # Second value in tuple would indicate number of expired servers that have recovered based on a direct check
-    stats['expiredServersRemoved'], stats['expiredServersRecovered'] = removed
-else:
-    stats['expiredServersRemoved'] = removed[0]
+stats['expiredServersRemoved'], stats['expiredServersRecovered'] = lister.remove_expired_servers()
 
 # Search query ports if requested
 if 'find_query_port' in args and args.find_query_port:
