@@ -5,13 +5,20 @@ from typing import Callable
 
 import gevent.subprocess
 
+from src.servers import FrostbiteServer, Bfbc2Server
 
-def find_query_port(gamedig_path: str, game: str, server: dict, ports_to_try: list, validator: Callable) -> int:
+
+class ObjectJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        return obj.dump()
+
+
+def find_query_port(gamedig_path: str, game: str, server: FrostbiteServer, ports_to_try: list, validator: Callable) -> int:
     query_port = -1
 
     # Add current query port add index 0 if valid
-    if server.get('queryPort', -1) != -1:
-        ports_to_try.insert(0, server['queryPort'])
+    if server.query_port != -1:
+        ports_to_try.insert(0, server.query_port)
     # Try all unique ports
     for port_to_try in list(set(ports_to_try)):
         if not is_valid_port(port_to_try):
@@ -19,7 +26,7 @@ def find_query_port(gamedig_path: str, game: str, server: dict, ports_to_try: li
             continue
 
         gamedig_result = gevent.subprocess.run(
-            args=[gamedig_path, '--type', game, f'{server["ip"]}:{port_to_try}',
+            args=[gamedig_path, '--type', game, f'{server.ip}:{port_to_try}',
                   '--maxAttempts 2', '--socketTimeout 2000', '--givenPortOnly'],
             capture_output=True
         )
@@ -60,18 +67,18 @@ def is_valid_port(port: int) -> bool:
     return 0 < port < 65536
 
 
-def battlelog_server_validator(server: dict, used_query_port: int, parsed_result: dict) -> bool:
-    return parsed_result.get('connect') == f'{server["ip"]}:{server["gamePort"]}'
+def battlelog_server_validator(server: FrostbiteServer, used_query_port: int, parsed_result: dict) -> bool:
+    return parsed_result.get('connect') == f'{server.ip}:{server.game_port}'
 
 
-def mohwf_server_validator(server: dict, used_query_port: int, parsed_result: dict) -> bool:
-    return parsed_result.get('connect') == f'{server["ip"]}:{used_query_port}'
+def mohwf_server_validator(server: FrostbiteServer, used_query_port: int, parsed_result: dict) -> bool:
+    return parsed_result.get('connect') == f'{server.ip}:{used_query_port}'
 
 
-def bfbc2_server_validator(server: dict, used_query_port: int, parsed_result: dict) -> bool:
+def bfbc2_server_validator(server: Bfbc2Server, used_query_port: int, parsed_result: dict) -> bool:
     return battlelog_server_validator(server, used_query_port, parsed_result) or \
-           parsed_result.get('connect') == f'0.0.0.0:{server["gamePort"]}' or \
-           parsed_result.get('name') == server['name']
+           parsed_result.get('connect') == f'0.0.0.0:{server.game_port}' or \
+           parsed_result.get('name') == server.name
 
 
 def guid_from_ip_port(ip: str, port: str) -> str:

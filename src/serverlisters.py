@@ -7,18 +7,19 @@ import sys
 import time
 from datetime import datetime, timedelta
 from random import randint, choices
-from typing import Callable, List, Tuple
+from typing import Callable, List, Tuple, Type
 
 import gevent
+import pyq3serverlist
 import requests
 from gevent.pool import Pool
 from nslookup import Nslookup
-from pyq3serverlist import PrincipalServer, Server, PyQ3SLError, PyQ3SLTimeoutError
 
 from src.constants import BATTLELOG_GAME_BASE_URIS, GAMESPY_CONFIGS, QUAKE3_CONFIGS, GAMESPY_PRINCIPALS, \
     GAMETOOLS_BASE_URI
 from src.helpers import find_query_port, bfbc2_server_validator, battlelog_server_validator, \
-    guid_from_ip_port, mohwf_server_validator, is_valid_port, is_valid_public_ip
+    guid_from_ip_port, mohwf_server_validator, is_valid_port, is_valid_public_ip, ObjectJSONEncoder
+from src.servers import Server, ClassicServer, FrostbiteServer, Bfbc2Server, GametoolsServer
 
 
 class ServerLister:
@@ -26,19 +27,23 @@ class ServerLister:
     server_list_dir_path: str
     server_list_file_path: str
     expired_ttl: int
-    server_uid_key: str = 'guid'
-    ensure_ascii: bool = True
-    servers: list = []
+    ensure_ascii: bool
+    server_class: Type[Server]
+    servers: List[Server]
 
     session: requests.Session
     request_timeout: float
 
-    def __init__(self, game: str, expired_ttl: int, list_dir: str, request_timeout: float = 5.0):
+    def __init__(self, game: str, server_class: Type[Server], expired_ttl: int, list_dir: str, request_timeout: float = 5.0):
         self.game = game.lower()
         self.server_list_dir_path = os.path.realpath(list_dir)
         self.server_list_file_path = os.path.join(self.server_list_dir_path, f'{self.game}-servers.json')
 
         self.expired_ttl = expired_ttl
+
+        self.ensure_ascii = True
+        self.server_class = server_class
+        self.servers = []
 
         # Init session
         self.session = requests.session()
@@ -58,7 +63,7 @@ class ServerLister:
             try:
                 with open(self.server_list_file_path, 'r') as serverListFile:
                     logging.info('Reading servers from existing server list')
-                    self.servers = json.load(serverListFile)
+                    self.servers = json.load(serverListFile, object_hook=self.server_class.load)
             except IOError as e:
                 logging.debug(e)
                 logging.error('Failed to read existing server list file')
@@ -71,29 +76,20 @@ class ServerLister:
     def update_server_list(self):
         pass
 
-    def add_update_servers(self, found_servers: list):
+    def add_update_servers(self, found_servers: List[Server]):
         # Add/update found servers to/in known servers
         logging.info('Updating known server list with found servers')
         for found_server in found_servers:
-            known_server_guids = [s[self.server_uid_key] for s in self.servers]
+            known_server_uids = [s.uid for s in self.servers]
             # Update existing server entry or add new one
-            if found_server[self.server_uid_key] in known_server_guids:
-                logging.debug(f'Found server {found_server[self.server_uid_key]} already known, updating')
-                index = known_server_guids.index(found_server[self.server_uid_key])
-                self.servers[index] = {**self.servers[index], **found_server}
+            if found_server.uid in known_server_uids:
+                logging.debug(f'Found server {found_server.uid} already known, updating')
+                index = known_server_uids.index(found_server.uid)
+                self.servers[index].update(found_server)
             else:
-                logging.debug(f'Found server {found_server[self.server_uid_key]} is new, adding')
+                logging.debug(f'Found server {found_server.uid} is new, adding')
                 # Add new server entry
-                self.servers.append(self.build_server_list_dict(found_server))
-
-    def build_server_list_dict(self, server: dict) -> dict:
-        return {
-            self.server_uid_key: server[self.server_uid_key],
-            'ip': server['ip'],
-            'queryPort': server['queryPort'],
-            'firstSeenAt': server['lastSeenAt'],
-            'lastSeenAt': server['lastSeenAt']
-        }
+                self.servers.append(found_server)
 
     def remove_expired_servers(self) -> tuple:
         # Iterate over copy of server list and remove any expired servers from the (actual) server list
@@ -102,9 +98,7 @@ class ServerLister:
         expired_servers_removed = 0
         expired_servers_recovered = 0
         for index, server in enumerate(self.servers[:]):
-            last_seen_at = (datetime.fromisoformat(server['lastSeenAt'])
-                            if 'lastSeenAt' in server.keys() else datetime.min).astimezone()
-            if datetime.now().astimezone() > last_seen_at + timedelta(hours=self.expired_ttl):
+            if datetime.now().astimezone() > server.last_seen_at + timedelta(hours=self.expired_ttl):
                 time.sleep(self.get_backoff_timeout(checks_since_last_ok))
                 # Check if server can be accessed directly
                 check_ok, found, checks_since_last_ok = self.check_if_server_still_exists(
@@ -113,19 +107,19 @@ class ServerLister:
 
                 # Remove server if request was sent successfully but server was not found
                 if check_ok and not found:
-                    logging.debug(f'Server {server[self.server_uid_key]} has not been seen in '
+                    logging.debug(f'Server {server.uid} has not been seen in '
                                   f'{self.expired_ttl} hours, removing it')
                     self.servers.remove(server)
                     expired_servers_removed += 1
                 elif check_ok and found:
-                    logging.debug(f'Server {server[self.server_uid_key]} did not appear in list but is still online, '
+                    logging.debug(f'Server {server.uid} did not appear in list but is still online, '
                                   f'updating last seen at')
-                    self.servers[self.servers.index(server)]['lastSeenAt'] = datetime.now().astimezone().isoformat()
+                    self.servers[self.servers.index(server)].last_seen_at = datetime.now().astimezone()
                     expired_servers_recovered += 1
 
         return expired_servers_removed, expired_servers_recovered
 
-    def check_if_server_still_exists(self, server: dict, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
+    def check_if_server_still_exists(self, server: Server, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
         pass
 
     def get_backoff_timeout(self, checks_since_last_ok: int) -> int:
@@ -135,10 +129,11 @@ class ServerLister:
     def write_to_file(self):
         logging.info(f'Writing {len(self.servers)} servers to output file')
         with open(self.server_list_file_path, 'w') as output_file:
-            json.dump(self.servers, output_file, indent=2, ensure_ascii=self.ensure_ascii)
+            json.dump(self.servers, output_file, indent=2, ensure_ascii=self.ensure_ascii, cls=ObjectJSONEncoder)
 
 
 class GameSpyServerLister(ServerLister):
+    servers: List[ClassicServer]
     principal: str
     config: dict
     gslist_bin_path: str
@@ -148,7 +143,7 @@ class GameSpyServerLister(ServerLister):
 
     def __init__(self, game: str, principal: str, gslist_bin_path: str, gslist_filter: str, gslist_super_query: bool,
                  gslist_timeout: int, expired_ttl: int, list_dir: str):
-        super().__init__(game, expired_ttl, list_dir)
+        super().__init__(game, ClassicServer, expired_ttl, list_dir)
         self.principal = principal.lower()
         self.config = GAMESPY_CONFIGS[self.game]
         self.gslist_bin_path = gslist_bin_path
@@ -222,22 +217,22 @@ class GameSpyServerLister(ServerLister):
                 logging.warning(f'Principal returned invalid server entry ({ip}:{query_port}), skipping it')
                 continue
 
-            found_servers.append({
-                self.server_uid_key: guid_from_ip_port(ip, query_port),
-                'ip': ip,
-                'queryPort': int(query_port),
-                'lastSeenAt': datetime.now().astimezone().isoformat()
-            })
+            found_server = ClassicServer(
+                guid_from_ip_port(ip, query_port),
+                ip,
+                int(query_port)
+            )
+            found_servers.append(found_server)
 
         self.add_update_servers(found_servers)
 
-    def check_if_server_still_exists(self, server: dict, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
+    def check_if_server_still_exists(self, server: ClassicServer, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
         check_ok = True
         found = False
         try:
             response = self.session.get(
                 'https://9fm6u13gii.execute-api.eu-central-1.amazonaws.com/gamedig-query',
-                params={'type': self.config['gamedigType'], 'host': server['ip'], 'port': server['queryPort']},
+                params={'type': self.config['gamedigType'], 'host': server.ip, 'port': server.query_port},
                 timeout=self.request_timeout
             )
 
@@ -256,29 +251,18 @@ class GameSpyServerLister(ServerLister):
                 checks_since_last_ok += 1
         except requests.RequestException as e:
             logging.debug(e)
-            logging.error(f'Failed to fetch server {server[self.server_uid_key]} for expiration check')
+            logging.error(f'Failed to fetch server {server.uid} for expiration check')
             check_ok = False
 
         return check_ok, found, checks_since_last_ok
 
 
 class FrostbiteServerLister(ServerLister):
-    server_validator: Callable = lambda: True
+    servers: List[FrostbiteServer]
+    server_validator: Callable
 
-    def __init__(self, game: str, expired_ttl: int, list_dir: str, request_timeout: float = 5.0):
-        super().__init__(game, expired_ttl, list_dir, request_timeout)
-
-    def build_server_list_dict(self, server: dict) -> dict:
-        return {
-            self.server_uid_key: server[self.server_uid_key],
-            'name': server['name'],
-            'ip': server['ip'],
-            'gamePort': server['gamePort'],
-            'queryPort': -1,
-            'firstSeenAt': server['lastSeenAt'],
-            'lastSeenAt': server['lastSeenAt'],
-            'lastQueriedAt': ''
-        }
+    def __init__(self, game: str, server_class: Type[Server], expired_ttl: int, list_dir: str, request_timeout: float = 5.0):
+        super().__init__(game, server_class, expired_ttl, list_dir, request_timeout)
 
     def find_query_ports(self, gamedig_bin_path: str, gamedig_concurrency: int, expired_ttl: int):
         logging.info(f'Searching query port for {len(self.servers)} servers')
@@ -291,7 +275,7 @@ class FrostbiteServerLister(ServerLister):
         pool = Pool(gamedig_concurrency)
         jobs = []
         for server in self.servers:
-            ports_to_try = self.build_port_to_try_list(server['gamePort'])
+            ports_to_try = self.build_port_to_try_list(server.game_port)
 
             # Remove any invalid ports
             ports_to_try = [p for p in ports_to_try if is_valid_port(p)]
@@ -306,17 +290,18 @@ class FrostbiteServerLister(ServerLister):
         gevent.joinall(jobs)
         for index, job in enumerate(jobs):
             server = self.servers[index]
-            logging.debug(f'Checking query port search result for {server[self.server_uid_key]}')
+            logging.debug(f'Checking query port search result for {server.uid}')
             if job.value != -1:
                 logging.debug(f'Query port found ({job.value}), updating server')
-                server['queryPort'] = job.value
-                server['lastQueriedAt'] = datetime.now().astimezone().isoformat()
+                server.query_port = job.value
+                server.last_queried_at = datetime.now().astimezone()
                 search_stats['queryPortFound'] += 1
-            elif server['queryPort'] != -1 and \
-                    (server.get('lastQueriedAt', '') == '' or
-                     datetime.now().astimezone() > datetime.fromisoformat(server['lastQueriedAt']) + timedelta(hours=expired_ttl)):
-                logging.debug(f'Query port expired, resetting to -1 (was {server["queryPort"]})')
-                server['queryPort'] = -1
+            elif server.query_port != -1 and \
+                    (server.last_queried_at is None or
+                     datetime.now().astimezone() > server.last_queried_at + timedelta(hours=expired_ttl)):
+                logging.debug(f'Query port expired, resetting to -1 (was {server.query_port})')
+                server.query_port = -1
+                # TODO Reset last queried at here?
                 search_stats['queryPortReset'] += 1
         logging.info(f'Query port search stats: {search_stats}')
 
@@ -327,7 +312,7 @@ class FrostbiteServerLister(ServerLister):
 
 class BC2ServerLister(FrostbiteServerLister):
     def __init__(self, expired_ttl: int, list_dir: str, timeout: float):
-        super().__init__('bfbc2', expired_ttl, list_dir, timeout)
+        super().__init__('bfbc2', Bfbc2Server, expired_ttl, list_dir, timeout)
         self.server_validator = bfbc2_server_validator
 
     def update_server_list(self):
@@ -358,37 +343,23 @@ class BC2ServerLister(FrostbiteServerLister):
         # Add servers from list
         found_servers = []
         for server in servers:
-            found_servers.append({
-                self.server_uid_key: guid_from_ip_port(server['I'], server['P']),
-                'name': server['N'],
-                'ip': server['I'],
-                'gamePort': int(server['P']),
-                'gid': int(server['GID']),
-                'lid': int(server['LID']),
-                'lastSeenAt': datetime.now().astimezone().isoformat()
-            })
+            found_server = Bfbc2Server(
+                guid_from_ip_port(server['I'], server['P']),
+                server['N'],
+                int(server['LID']),
+                int(server['GID']),
+                server['I'],
+                int(server['P'])
+            )
+            found_servers.append(found_server)
 
         self.add_update_servers(found_servers)
 
-    def build_server_list_dict(self, server: dict) -> dict:
-        return {
-            self.server_uid_key: server[self.server_uid_key],
-            'name': server['name'],
-            'ip': server['ip'],
-            'gamePort': server['gamePort'],
-            'queryPort': -1,
-            'gid': server['gid'],
-            'lid': server['lid'],
-            'firstSeenAt': server['lastSeenAt'],
-            'lastSeenAt': server['lastSeenAt'],
-            'lastQueriedAt': ''
-        }
-
-    def check_if_server_still_exists(self, server: dict, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
+    def check_if_server_still_exists(self, server: Bfbc2Server, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
         check_ok = True
         found = False
         try:
-            response = self.session.get(f'https://fesl.cetteup.com/servers/pc/{server["lid"]}/{server["gid"]}',
+            response = self.session.get(f'https://fesl.cetteup.com/servers/pc/{server.lid}/{server.gid}',
                                         timeout=self.request_timeout)
 
             if response.ok:
@@ -405,7 +376,7 @@ class BC2ServerLister(FrostbiteServerLister):
                 checks_since_last_ok += 1
         except requests.RequestException as e:
             logging.debug(e)
-            logging.error(f'Failed to fetch server {server[self.server_uid_key]} for expiration check')
+            logging.error(f'Failed to fetch server {server.uid} for expiration check')
             check_ok = False
 
         return check_ok, found, checks_since_last_ok
@@ -438,15 +409,24 @@ class BC2ServerLister(FrostbiteServerLister):
         return ports_to_try
 
 
-class FrostbiteHttpServerLister(FrostbiteServerLister):
+class HttpServerLister(ServerLister):
     page_limit: int
     per_page: int
     sleep: float
     max_attempts: int
 
-    def __init__(self, game: str, page_limit: int, per_page: int, expired_ttl: int, list_dir: str, sleep: float,
-                 max_attempts: int):
-        super().__init__(game, expired_ttl, list_dir, request_timeout=10)
+    def __init__(
+            self,
+            game: str,
+            server_class: Type[Server],
+            page_limit: int,
+            per_page: int,
+            expired_ttl: int,
+            list_dir: str,
+            sleep: float,
+            max_attempts: int
+    ):
+        super().__init__(game, server_class, expired_ttl, list_dir, request_timeout=10)
         self.page_limit = page_limit
         self.per_page = per_page
         self.sleep = sleep
@@ -511,20 +491,17 @@ class FrostbiteHttpServerLister(FrostbiteServerLister):
     def get_server_list_url(self, per_page: int) -> str:
         pass
 
-    def add_page_found_servers(self, found_servers: List[dict], page_response_data: dict) -> List[dict]:
+    def add_page_found_servers(self, found_servers: List[Server], page_response_data: dict) -> List[Server]:
         pass
 
     def get_backoff_timeout(self, checks_since_last_ok: int) -> int:
         return 1 + pow(self.sleep, checks_since_last_ok % self.max_attempts)
 
 
-class BattlelogServerLister(FrostbiteHttpServerLister):
+class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
     def __init__(self, game: str, page_limit: int, expired_ttl: int, list_dir: str,
                  sleep: float, max_attempts: int, proxy: str = None):
-        super().__init__(game, page_limit, 60, expired_ttl, list_dir, sleep, max_attempts)
-        self.page_limit = page_limit
-        self.sleep = sleep
-        self.max_attempts = max_attempts
+        super().__init__(game, FrostbiteServer, page_limit, 60, expired_ttl, list_dir, sleep, max_attempts)
         # Medal of Honor: Warfighter servers return the query port as part of the connect string, not the game port
         # => use different validator
         if self.game == 'mohwf':
@@ -546,35 +523,34 @@ class BattlelogServerLister(FrostbiteHttpServerLister):
     def get_server_list_url(self, per_page: int) -> str:
         return f'{BATTLELOG_GAME_BASE_URIS[self.game]}?count={per_page}&offset=0'
 
-    def add_page_found_servers(self, found_servers: List[dict], page_response_data: dict) -> List[dict]:
+    def add_page_found_servers(self, found_servers: List[FrostbiteServer], page_response_data: dict) -> List[FrostbiteServer]:
         for server in page_response_data['data']:
-            found_server = {
-                self.server_uid_key: server['guid'],
-                'name': server['name'],
-                'ip': server['ip'],
-                'gamePort': server['port'],
-                'lastSeenAt': datetime.now().astimezone().isoformat()
-            }
+            found_server = FrostbiteServer(
+                server['guid'],
+                server['name'],
+                server['ip'],
+                server['port'],
+            )
             # Add non-private servers (servers with an IP) that are new
-            server_guids = [s[self.server_uid_key] for s in found_servers]
-            if len(found_server['ip']) > 0 and found_server[self.server_uid_key] not in server_guids:
-                logging.debug(f'Got new server {server[self.server_uid_key]}, adding it')
+            server_uids = [s.uid for s in found_servers]
+            if len(found_server.ip) > 0 and found_server.uid not in server_uids:
+                logging.debug(f'Got new server {found_server.uid}, adding it')
                 found_servers.append(found_server)
-            elif len(found_server['ip']) > 0:
-                logging.debug(f'Got duplicate server {server[self.server_uid_key]}, updating last seen at')
-                index = server_guids.index(found_server[self.server_uid_key])
-                found_servers[index]['lastSeenAt'] = datetime.now().astimezone().isoformat()
+            elif len(found_server.ip) > 0:
+                logging.debug(f'Got duplicate server {found_server.uid}, updating last seen at')
+                index = server_uids.index(found_server.uid)
+                found_servers[index].last_seen_at = datetime.now().astimezone()
             else:
-                logging.debug(f'Got private server {server[self.server_uid_key]}, ignoring it')
+                logging.debug(f'Got private server {found_server.uid}, ignoring it')
 
         return found_servers
 
-    def check_if_server_still_exists(self, server: dict, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
+    def check_if_server_still_exists(self, server: FrostbiteServer, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
         check_ok = True
         found = False
         try:
             response = self.session.get(f'https://battlelog.battlefield.com/{self.game}/'
-                                        f'servers/show/pc/{server[self.server_uid_key]}?json=1',
+                                        f'servers/show/pc/{server.uid}?json=1',
                                         timeout=self.request_timeout)
             if response.status_code == 200:
                 # Server was found on Battlelog => make sure it is still public
@@ -594,7 +570,7 @@ class BattlelogServerLister(FrostbiteHttpServerLister):
                 checks_since_last_ok += 1
         except requests.exceptions.RequestException as e:
             logging.debug(e)
-            logging.error(f'Failed to fetch server {server[self.server_uid_key]} for expiration check')
+            logging.error(f'Failed to fetch server {server.uid} for expiration check')
             check_ok = False
 
         return check_ok, found, checks_since_last_ok
@@ -622,17 +598,23 @@ class BattlelogServerLister(FrostbiteHttpServerLister):
         return ports_to_try
 
 
-class GametoolsServerLister(FrostbiteHttpServerLister):
-    # Use gameId as server uid
-    server_uid_key: str = 'gameId'
+class GametoolsServerLister(HttpServerLister):
     # Allow non-ascii characters in server list (mostly used by server names for Asia servers)
     ensure_ascii: bool = False
 
     include_official: bool
 
-    def __init__(self, game: str, page_limit: int, expired_ttl: int, list_dir: str, sleep: float, max_attempts: int,
-                 include_official: bool):
-        super().__init__(game, page_limit, 100, expired_ttl, list_dir, sleep, max_attempts)
+    def __init__(
+            self,
+            game: str,
+            page_limit: int,
+            expired_ttl: int,
+            list_dir: str,
+            sleep: float,
+            max_attempts: int,
+            include_official: bool
+    ):
+        super().__init__(game, GametoolsServer, page_limit, 100, expired_ttl, list_dir, sleep, max_attempts)
         self.page_limit = page_limit
         self.sleep = sleep
         self.max_attempts = max_attempts
@@ -642,34 +624,33 @@ class GametoolsServerLister(FrostbiteHttpServerLister):
         return f'{GAMETOOLS_BASE_URI}/{self.game}/servers/?name=&limit={per_page}' \
                f'&nocache={datetime.now().timestamp()}'
 
-    def add_page_found_servers(self, found_servers: List[dict], page_response_data: dict) -> List[dict]:
+    def add_page_found_servers(self, found_servers: List[GametoolsServer], page_response_data: dict) -> List[GametoolsServer]:
         for server in page_response_data['servers']:
-            found_server = {
-                self.server_uid_key: server['gameId'],
-                'name': server['prefix'],
-                'lastSeenAt': datetime.now().astimezone().isoformat()
-            }
+            found_server = GametoolsServer(
+                server['gameId'],
+                server['prefix'],
+            )
             # Add/update servers (ignoring official servers unless include_official is set)
-            server_game_ids = [s[self.server_uid_key] for s in found_servers]
-            if found_server[self.server_uid_key] not in server_game_ids and \
+            server_game_ids = [s.uid for s in found_servers]
+            if found_server.uid not in server_game_ids and \
                     (not server['official'] or self.include_official):
-                logging.debug(f'Got new server {server[self.server_uid_key]}, adding it')
+                logging.debug(f'Got new server {found_server.uid}, adding it')
                 found_servers.append(found_server)
             elif not server['official'] or self.include_official:
-                logging.debug(f'Got duplicate server {server[self.server_uid_key]}, updating last seen at')
-                index = server_game_ids.index(found_server[self.server_uid_key])
-                found_servers[index]['lastSeenAt'] = datetime.now().astimezone().isoformat()
+                logging.debug(f'Got duplicate server {found_server.uid}, updating last seen at')
+                index = server_game_ids.index(found_server.uid)
+                found_servers[index].last_seen_at = datetime.now().astimezone()
             else:
-                logging.debug(f'Got official server {server[self.server_uid_key]}, ignoring it')
+                logging.debug(f'Got official server {found_server.uid}, ignoring it')
 
         return found_servers
 
-    def check_if_server_still_exists(self, server: dict, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
+    def check_if_server_still_exists(self, server: GametoolsServer, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
         check_ok = True
         found = False
         try:
             response = self.session.get(f'{GAMETOOLS_BASE_URI}/{self.game}/detailedserver/'
-                                        f'?gameid={server[self.server_uid_key]}', timeout=self.request_timeout)
+                                        f'?gameid={server.uid}', timeout=self.request_timeout)
             if response.status_code == 200:
                 # Server was found on gametools => make sure it still not official (or include_official is set)
                 parsed = response.json()
@@ -688,29 +669,22 @@ class GametoolsServerLister(FrostbiteHttpServerLister):
                 checks_since_last_ok += 1
         except requests.exceptions.RequestException as e:
             logging.debug(e)
-            logging.error(f'Failed to fetch server {server[self.server_uid_key]} for expiration check')
+            logging.error(f'Failed to fetch server {server.uid} for expiration check')
             check_ok = False
 
         return check_ok, found, checks_since_last_ok
 
-    def build_server_list_dict(self, server: dict) -> dict:
-        return {
-            self.server_uid_key: server[self.server_uid_key],
-            'name': server['name'],
-            'firstSeenAt': server['lastSeenAt'],
-            'lastSeenAt': server['lastSeenAt']
-        }
-
 
 class Quake3ServerLister(ServerLister):
-    principal: PrincipalServer
+    principal: str
     protocol: int
+    network_protocol: int
     game_name: str
     keywords: str
     server_entry_prefix: bytes
 
-    def __init__(self, game: str, principal_server: str, expired_ttl: int, list_dir: str):
-        super().__init__(game, expired_ttl, list_dir)
+    def __init__(self, game: str, principal: str, expired_ttl: int, list_dir: str):
+        super().__init__(game, ClassicServer, expired_ttl, list_dir)
         # Merge default config with given principal config
         default_config = {
             'keywords': 'full empty',
@@ -720,58 +694,58 @@ class Quake3ServerLister(ServerLister):
         }
         principal_config = {key: value for (key, value) in QUAKE3_CONFIGS[self.game].items()
                             if key in default_config.keys()}
-        keywords, game_name, network_protocol, server_entry_prefix = {**default_config, **principal_config}.values()
-        hostname, port = QUAKE3_CONFIGS[self.game]['servers'][principal_server].values()
-        self.principal = PrincipalServer(hostname, port, network_protocol)
+        self.principal = principal
+        self.keywords, self.game_name, \
+            self.network_protocol, self.server_entry_prefix = {**default_config, **principal_config}.values()
         self.protocol = QUAKE3_CONFIGS[self.game]['protocol']
-        self.game_name = game_name
-        self.keywords = keywords
-        self.server_entry_prefix = server_entry_prefix
 
     def update_server_list(self):
+        hostname, port = QUAKE3_CONFIGS[self.game]['servers'][self.principal].values()
+        principal = pyq3serverlist.PrincipalServer(hostname, port, self.network_protocol)
+
         query_ok = False
         attempt = 0
         max_attempts = 3
-        found_servers = []
+        raw_servers = []
         while not query_ok and attempt < max_attempts:
             try:
                 # Get servers
-                found_servers = self.principal.get_servers(self.protocol, self.game_name,
-                                                           self.keywords, self.server_entry_prefix)
+                raw_servers = principal.get_servers(self.protocol, self.game_name,
+                                                    self.keywords, self.server_entry_prefix)
                 query_ok = True
-            except PyQ3SLTimeoutError:
+            except pyq3serverlist.PyQ3SLTimeoutError:
                 logging.error(f'Principal server query timed out, attempt {attempt + 1}/{max_attempts}')
                 attempt += 1
-            except PyQ3SLError as e:
+            except pyq3serverlist.PyQ3SLError as e:
                 logging.debug(e)
                 logging.error(f'Failed to query principal server, attempt {attempt + 1}/{max_attempts}')
                 attempt += 1
 
-        # Create servers dicts, adding required attributes
-        found_server_dicts = []
-        for found_server in found_servers:
-            found_server_dicts.append({
-                self.server_uid_key: guid_from_ip_port(found_server.ip, str(found_server.port)),
-                'ip': found_server.ip,
-                'queryPort': found_server.port,
-                'lastSeenAt': datetime.now().astimezone().isoformat()
-            })
+        # Create servers, adding required attributes
+        found_servers = []
+        for raw_server in raw_servers:
+            found_server = ClassicServer(
+                guid_from_ip_port(raw_server.ip, str(raw_server.port)),
+                raw_server.ip,
+                raw_server.port
+            )
+            found_servers.append(found_server)
 
-        self.add_update_servers(found_server_dicts)
+        self.add_update_servers(found_servers)
 
-    def check_if_server_still_exists(self, server: dict, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
+    def check_if_server_still_exists(self, server: ClassicServer, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
         # Since we query the server directly, there is no way of handling HTTP server errors differently then
         # actually failed checks, so even if the query fails, we have to treat it as "check ok"
         check_ok = True
         found = False
         try:
-            Server(server['ip'], server['queryPort']).get_status()
+            pyq3serverlist.Server(server.ip, server.query_port).get_status()
 
             # get_status will raise an exception if the server cannot be contacted,
             # so this will only be reached if the query succeeds
             found = True
-        except PyQ3SLError as e:
+        except pyq3serverlist.PyQ3SLError as e:
             logging.debug(e)
-            logging.debug(f'Failed to query server {server[self.server_uid_key]} for expiration check')
+            logging.debug(f'Failed to query server {server.uid} for expiration check')
 
         return check_ok, found, checks_since_last_ok
