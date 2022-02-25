@@ -27,6 +27,7 @@ class ServerLister:
     server_list_dir_path: str
     server_list_file_path: str
     expired_ttl: int
+    recover: bool
     ensure_ascii: bool
     server_class: Type[Server]
     servers: List[Server]
@@ -34,12 +35,14 @@ class ServerLister:
     session: requests.Session
     request_timeout: float
 
-    def __init__(self, game: str, server_class: Type[Server], expired_ttl: int, list_dir: str, request_timeout: float = 5.0):
+    def __init__(self, game: str, server_class: Type[Server], expired_ttl: int, recover: bool, list_dir: str,
+                 request_timeout: float = 5.0):
         self.game = game.lower()
         self.server_list_dir_path = os.path.realpath(list_dir)
         self.server_list_file_path = os.path.join(self.server_list_dir_path, f'{self.game}-servers.json')
 
         self.expired_ttl = expired_ttl
+        self.recover = recover
 
         self.ensure_ascii = True
         self.server_class = server_class
@@ -98,7 +101,9 @@ class ServerLister:
         expired_servers_removed = 0
         expired_servers_recovered = 0
         for index, server in enumerate(self.servers[:]):
-            if datetime.now().astimezone() > server.last_seen_at + timedelta(hours=self.expired_ttl):
+            expired = datetime.now().astimezone() > server.last_seen_at + timedelta(hours=self.expired_ttl)
+            if expired and self.recover:
+                # Attempt to recover expired server by contacting/accessing it directly
                 time.sleep(self.get_backoff_timeout(checks_since_last_ok))
                 # Check if server can be accessed directly
                 check_ok, found, checks_since_last_ok = self.check_if_server_still_exists(
@@ -108,7 +113,7 @@ class ServerLister:
                 # Remove server if request was sent successfully but server was not found
                 if check_ok and not found:
                     logging.debug(f'Server {server.uid} has not been seen in '
-                                  f'{self.expired_ttl} hours, removing it')
+                                  f'{self.expired_ttl} hours and could not be recovered, removing it')
                     self.servers.remove(server)
                     expired_servers_removed += 1
                 elif check_ok and found:
@@ -116,6 +121,11 @@ class ServerLister:
                                   f'updating last seen at')
                     self.servers[self.servers.index(server)].last_seen_at = datetime.now().astimezone()
                     expired_servers_recovered += 1
+            elif expired:
+                logging.debug(f'Server {server.uid} has not been seen in '
+                              f'{self.expired_ttl} hours, removing it')
+                self.servers.remove(server)
+                expired_servers_removed += 1
 
         return expired_servers_removed, expired_servers_recovered
 
@@ -142,8 +152,8 @@ class GameSpyServerLister(ServerLister):
     gslist_timeout: int
 
     def __init__(self, game: str, principal: str, gslist_bin_path: str, gslist_filter: str, gslist_super_query: bool,
-                 gslist_timeout: int, expired_ttl: int, list_dir: str):
-        super().__init__(game, ClassicServer, expired_ttl, list_dir)
+                 gslist_timeout: int, expired_ttl: int, recover: bool, list_dir: str):
+        super().__init__(game, ClassicServer, expired_ttl, recover, list_dir)
         self.principal = principal.lower()
         self.config = GAMESPY_CONFIGS[self.game]
         self.gslist_bin_path = gslist_bin_path
@@ -261,8 +271,9 @@ class FrostbiteServerLister(ServerLister):
     servers: List[FrostbiteServer]
     server_validator: Callable
 
-    def __init__(self, game: str, server_class: Type[Server], expired_ttl: int, list_dir: str, request_timeout: float = 5.0):
-        super().__init__(game, server_class, expired_ttl, list_dir, request_timeout)
+    def __init__(self, game: str, server_class: Type[Server], expired_ttl: int, recover: bool, list_dir: str,
+                 request_timeout: float = 5.0):
+        super().__init__(game, server_class, expired_ttl, recover, list_dir, request_timeout)
 
     def find_query_ports(self, gamedig_bin_path: str, gamedig_concurrency: int, expired_ttl: int):
         logging.info(f'Searching query port for {len(self.servers)} servers')
@@ -311,8 +322,8 @@ class FrostbiteServerLister(ServerLister):
 
 
 class BC2ServerLister(FrostbiteServerLister):
-    def __init__(self, expired_ttl: int, list_dir: str, timeout: float):
-        super().__init__('bfbc2', Bfbc2Server, expired_ttl, list_dir, timeout)
+    def __init__(self, expired_ttl: int, recover: bool, list_dir: str, timeout: float):
+        super().__init__('bfbc2', Bfbc2Server, expired_ttl, recover, list_dir, timeout)
         self.server_validator = bfbc2_server_validator
 
     def update_server_list(self):
@@ -415,18 +426,9 @@ class HttpServerLister(ServerLister):
     sleep: float
     max_attempts: int
 
-    def __init__(
-            self,
-            game: str,
-            server_class: Type[Server],
-            page_limit: int,
-            per_page: int,
-            expired_ttl: int,
-            list_dir: str,
-            sleep: float,
-            max_attempts: int
-    ):
-        super().__init__(game, server_class, expired_ttl, list_dir, request_timeout=10)
+    def __init__(self, game: str, server_class: Type[Server], page_limit: int, per_page: int, expired_ttl: int,
+                 recover: bool, list_dir: str, sleep: float, max_attempts: int):
+        super().__init__(game, server_class, expired_ttl, recover, list_dir, request_timeout=10)
         self.page_limit = page_limit
         self.per_page = per_page
         self.sleep = sleep
@@ -499,9 +501,9 @@ class HttpServerLister(ServerLister):
 
 
 class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
-    def __init__(self, game: str, page_limit: int, expired_ttl: int, list_dir: str,
-                 sleep: float, max_attempts: int, proxy: str = None):
-        super().__init__(game, FrostbiteServer, page_limit, 60, expired_ttl, list_dir, sleep, max_attempts)
+    def __init__(self, game: str, page_limit: int, expired_ttl: int, recover: bool, list_dir: str, sleep: float,
+                 max_attempts: int, proxy: str = None):
+        super().__init__(game, FrostbiteServer, page_limit, 60, expired_ttl, recover, list_dir, sleep, max_attempts)
         # Medal of Honor: Warfighter servers return the query port as part of the connect string, not the game port
         # => use different validator
         if self.game == 'mohwf':
@@ -599,25 +601,13 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
 
 
 class GametoolsServerLister(HttpServerLister):
-    # Allow non-ascii characters in server list (mostly used by server names for Asia servers)
-    ensure_ascii: bool = False
-
     include_official: bool
 
-    def __init__(
-            self,
-            game: str,
-            page_limit: int,
-            expired_ttl: int,
-            list_dir: str,
-            sleep: float,
-            max_attempts: int,
-            include_official: bool
-    ):
-        super().__init__(game, GametoolsServer, page_limit, 100, expired_ttl, list_dir, sleep, max_attempts)
-        self.page_limit = page_limit
-        self.sleep = sleep
-        self.max_attempts = max_attempts
+    def __init__(self, game: str, page_limit: int, expired_ttl: int, recover: bool, list_dir: str, sleep: float,
+                 max_attempts: int, include_official: bool):
+        super().__init__(game, GametoolsServer, page_limit, 100, expired_ttl, recover, list_dir, sleep, max_attempts)
+        # Allow non-ascii characters in server list (mostly used by server names for Asia servers)
+        self.ensure_ascii = False
         self.include_official = include_official
 
     def get_server_list_url(self, per_page: int) -> str:
@@ -683,8 +673,8 @@ class Quake3ServerLister(ServerLister):
     keywords: str
     server_entry_prefix: bytes
 
-    def __init__(self, game: str, principal: str, expired_ttl: int, list_dir: str):
-        super().__init__(game, ClassicServer, expired_ttl, list_dir)
+    def __init__(self, game: str, principal: str, expired_ttl: int, recover: bool, list_dir: str):
+        super().__init__(game, ClassicServer, expired_ttl, recover, list_dir)
         # Merge default config with given principal config
         default_config = {
             'keywords': 'full empty',

@@ -8,10 +8,14 @@ commonParser.add_argument('-e', '--expired-ttl',
 commonParser.add_argument('-d', '--list-dir',
                           help='Path to directory in which servers lists will be stored',
                           type=str, default='.')
+commonParser.add_argument('--no-recover',
+                          help='Remove servers that were not returned by the source after they expired, '
+                               'do not attempt to contact/access server directly to check if they are still online',
+                          dest='recover', action='store_false')
 commonParser.add_argument('--debug',
                           help='Enables logging of lots of debugging information',
                           dest='debug', action='store_true')
-commonParser.set_defaults(debug=False)
+commonParser.set_defaults(recover=True, debug=False)
 
 # Parser with arguments common to HTTP serverlisters
 httpParser = argparse.ArgumentParser(add_help=False)
