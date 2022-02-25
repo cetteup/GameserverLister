@@ -18,8 +18,9 @@ from nslookup import Nslookup
 from src.constants import BATTLELOG_GAME_BASE_URIS, GAMESPY_CONFIGS, QUAKE3_CONFIGS, GAMESPY_PRINCIPALS, \
     GAMETOOLS_BASE_URI
 from src.helpers import find_query_port, bfbc2_server_validator, battlelog_server_validator, \
-    guid_from_ip_port, mohwf_server_validator, is_valid_port, is_valid_public_ip, ObjectJSONEncoder
-from src.servers import Server, ClassicServer, FrostbiteServer, Bfbc2Server, GametoolsServer
+    guid_from_ip_port, mohwf_server_validator, is_valid_port, is_valid_public_ip
+from src.servers import Server, ClassicServer, FrostbiteServer, Bfbc2Server, GametoolsServer, ObjectJSONEncoder, \
+    ViaStatus
 
 
 class ServerLister:
@@ -227,10 +228,12 @@ class GameSpyServerLister(ServerLister):
                 logging.warning(f'Principal returned invalid server entry ({ip}:{query_port}), skipping it')
                 continue
 
+            via = ViaStatus(self.principal)
             found_server = ClassicServer(
                 guid_from_ip_port(ip, query_port),
                 ip,
-                int(query_port)
+                int(query_port),
+                via
             )
             found_servers.append(found_server)
 
@@ -714,10 +717,12 @@ class Quake3ServerLister(ServerLister):
         # Create servers, adding required attributes
         found_servers = []
         for raw_server in raw_servers:
+            via = ViaStatus(self.principal)
             found_server = ClassicServer(
                 guid_from_ip_port(raw_server.ip, str(raw_server.port)),
                 raw_server.ip,
-                raw_server.port
+                raw_server.port,
+                via
             )
             found_servers.append(found_server)
 

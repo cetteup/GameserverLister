@@ -1,8 +1,13 @@
 import json
 from datetime import datetime
-from typing import Union, Optional, Any
+from typing import Union, Optional, Any, List
 
 from src.constants import UNIX_EPOCH_START
+
+
+class ObjectJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        return obj.dump()
 
 
 class Server:
@@ -42,7 +47,7 @@ class Server:
         yield from self.dump().items()
 
     def __str__(self):
-        return json.dumps(dict(self))
+        return json.dumps(dict(self), cls=ObjectJSONEncoder)
 
     def __repr__(self):
         return self.__str__()
@@ -83,20 +88,87 @@ class QueryableServer(Server):
         return Server.__eq__(self, other) and other.ip == self.ip and other.query_port == self.query_port
 
 
+class ViaStatus:
+    principal: str
+    first_seen_at: datetime
+    last_seen_at: datetime
+
+    def __init__(self, principal: str, first_seen_at: datetime = datetime.now().astimezone(),
+                 last_seen_at: datetime = datetime.now().astimezone()):
+        self.principal = principal
+        self.first_seen_at = first_seen_at
+        self.last_seen_at = last_seen_at
+
+    def update(self, updated: 'ViaStatus') -> None:
+        self.last_seen_at = updated.last_seen_at
+
+    @staticmethod
+    def load(parsed: dict) -> 'ViaStatus':
+        first_seen_at = datetime.fromisoformat(parsed['firstSeenAt'])
+        last_seen_at = datetime.fromisoformat(parsed['lastSeenAt'])
+
+        return ViaStatus(
+            parsed['principal'],
+            first_seen_at,
+            last_seen_at
+        )
+
+    @staticmethod
+    def is_json_repr(parsed: dict) -> bool:
+        return 'principal' in parsed and 'firstSeenAt' in parsed and 'lastSeenAt' in parsed
+
+    def dump(self) -> dict:
+        return {
+            'principal': self.principal,
+            'firstSeenAt': self.first_seen_at.isoformat(),
+            'lastSeenAt': self.last_seen_at.isoformat()
+        }
+
+    def __eq__(self, other):
+        return isinstance(other, ViaStatus) and \
+               other.principal == self.principal and \
+               other.first_seen_at == self.first_seen_at and \
+               other.last_seen_at == self.last_seen_at
+
+    def __iter__(self):
+        yield from self.dump().items()
+
+    def __str__(self):
+        return json.dumps(dict(self))
+
+    def __repr__(self):
+        return self.__str__()
+
+
 class ClassicServer(QueryableServer):
     """
     Server for "classic" games whose principals which return a server list
     containing ips and query ports of game servers (GameSpy, Quake3)
     """
+    via: List[ViaStatus]
+
     def __init__(
             self,
             guid: str,
             ip: str,
             query_port: int,
+            via: Union[List[ViaStatus], ViaStatus],
             first_seen_at: Optional[datetime] = datetime.now().astimezone(),
             last_seen_at: datetime = datetime.now().astimezone()
     ):
         super().__init__(guid, ip, query_port, first_seen_at, last_seen_at)
+        self.via = via if isinstance(via, list) else [via]
+
+    def update(self, updated: 'ClassicServer') -> None:
+        QueryableServer.update(self, updated)
+        # Merge via statuses "manually"
+        for via_status in updated.via:
+            via_principals_self = [via_status.principal for via_status in self.via]
+            if via_status.principal not in via_principals_self:
+                self.via.append(via_status)
+            else:
+                index = via_principals_self.index(via_status.principal)
+                self.via[index].update(via_status)
 
     @staticmethod
     def load(parsed: dict) -> Union['ClassicServer', dict]:
@@ -108,11 +180,13 @@ class ClassicServer(QueryableServer):
             if parsed.get('firstSeenAt') is not None else None
         last_seen_at = datetime.fromisoformat(parsed['lastSeenAt']) \
             if parsed.get('lastSeenAt') is not None else UNIX_EPOCH_START
+        via = [ViaStatus.load(via_parsed) for via_parsed in parsed.get('via', []) if ViaStatus.is_json_repr(via_parsed)]
 
         return ClassicServer(
             parsed['guid'],
             parsed['ip'],
             parsed['queryPort'],
+            via,
             first_seen_at,
             last_seen_at
         )
@@ -123,8 +197,12 @@ class ClassicServer(QueryableServer):
             'ip': self.ip,
             'queryPort': self.query_port,
             'firstSeenAt': self.first_seen_at.isoformat() if self.first_seen_at is not None else self.first_seen_at,
-            'lastSeenAt': self.last_seen_at.isoformat()
+            'lastSeenAt': self.last_seen_at.isoformat(),
+            'via': [via_status.dump() for via_status in self.via]
         }
+
+    def __eq__(self, other):
+        return QueryableServer.__eq__(self, other) and all(via_status in self.via for via_status in other.via)
 
 
 class FrostbiteServer(QueryableServer):

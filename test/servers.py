@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime, timedelta
 
 from src.constants import UNIX_EPOCH_START
-from src.servers import Server, QueryableServer, ClassicServer, FrostbiteServer, Bfbc2Server, GametoolsServer
+from src.servers import Server, QueryableServer, ClassicServer, FrostbiteServer, Bfbc2Server, GametoolsServer, ViaStatus
 
 
 class ServerTest(unittest.TestCase):
@@ -45,49 +45,144 @@ class QueryableServerTest(unittest.TestCase):
 
 
 class ClassicServerTest(unittest.TestCase):
+    def test_update_via_status_add_new(self):
+        a = ClassicServer('a-guid', '1.1.1.1', 29900, [])
+        via = ViaStatus('a-principal')
+        b = ClassicServer('b-guid', '1.0.0.1', 47200, via)
+        a.update(b)
+        self.assertEqual(1, len(a.via))
+        self.assertEqual(via, a.via[0])
+
+    def test_update_via_status_update_existing(self):
+        principal, first_seen_at = 'a-principal', datetime(1990, 1, 1, 19, 30, 30, 30)
+        a_via = ViaStatus(principal, first_seen_at, datetime(2000, 2, 2, 15, 15, 15, 30))
+        a = ClassicServer('a-guid', '1.1.1.1', 29900, a_via)
+        b_via = ViaStatus(principal)
+        b = ClassicServer('b-guid', '1.0.0.1', 47200, b_via)
+        a.update(b)
+        self.assertEqual(1, len(a.via))
+        self.assertEqual(principal, a.via[0].principal)
+        self.assertEqual(first_seen_at, a.via[0].first_seen_at)
+        self.assertEqual(b_via.last_seen_at, a.via[0].last_seen_at)
+
     def test_load(self):
         guid, ip, query_port = 'a-guid', '1.1.1.1', 47200
         now = datetime.now().astimezone()
         first_seen_at, last_seen_at = now, now + timedelta(minutes=10)
-        parsed = {'guid': guid, 'ip': ip, 'queryPort': query_port,
-                  'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at.isoformat()}
-        expect = ClassicServer(guid, ip, query_port, first_seen_at, last_seen_at)
+        via = ViaStatus('openspy', first_seen_at, last_seen_at)
+        parsed = {
+            'guid': guid,
+            'ip': ip,
+            'queryPort': query_port,
+            'firstSeenAt': first_seen_at.isoformat(),
+            'lastSeenAt': last_seen_at.isoformat(),
+            'via': [via.dump()]
+        }
+        expect = ClassicServer(guid, ip, query_port, via, first_seen_at, last_seen_at)
         actual = ClassicServer.load(parsed)
         self.assertEqual(expect, actual)
 
     def test_load_first_seen_at_none(self):
         guid, ip, query_port = 'a-guid', '1.1.1.1', 47200
         now = datetime.now().astimezone()
+        via = ViaStatus('openspy', now, now)
         parsed = {'guid': guid, 'ip': ip, 'queryPort': query_port,
-                  'firstSeenAt': None, 'lastSeenAt': now.isoformat()}
-        expect = ClassicServer(guid, ip, query_port, None, now)
+                  'firstSeenAt': None, 'lastSeenAt': now.isoformat(), 'via': [via.dump()]}
+        expect = ClassicServer(guid, ip, query_port, via, None, now)
         actual = ClassicServer.load(parsed)
         self.assertEqual(expect, actual)
 
     def test_load_last_seen_at_none(self):
         guid, ip, query_port = 'a-guid', '1.1.1.1', 47200
         now = datetime.now().astimezone()
+        via = ViaStatus('openspy', now, now)
         parsed = {'guid': guid, 'ip': ip, 'queryPort': query_port,
-                  'firstSeenAt': now.isoformat(), 'lastSeenAt': None}
-        expect = ClassicServer(guid, ip, query_port, now, UNIX_EPOCH_START)
+                  'firstSeenAt': now.isoformat(), 'lastSeenAt': None, 'via': [via.dump()]}
+        expect = ClassicServer(guid, ip, query_port, via, now, UNIX_EPOCH_START)
         actual = ClassicServer.load(parsed)
         self.assertEqual(expect, actual)
 
     def test_dump(self):
         guid, ip, query_port = 'a-guid', '1.1.1.1', 47200
         now = datetime.now().astimezone()
-        server = ClassicServer(guid, ip, query_port, now, now)
+        via = ViaStatus('openspy', now, now)
+        server = ClassicServer(guid, ip, query_port, via, now, now)
         expect = {'guid': guid, 'ip': ip, 'queryPort': query_port,
-                  'firstSeenAt': now.isoformat(), 'lastSeenAt': now.isoformat()}
+                  'firstSeenAt': now.isoformat(), 'lastSeenAt': now.isoformat(), 'via': [via.dump()]}
         actual = server.dump()
+        self.assertEqual(expect, actual)
+
+    def test_load_via_missing(self):
+        guid, ip, query_port = 'a-guid', '1.1.1.1', 47200
+        now = datetime.now().astimezone()
+        first_seen_at, last_seen_at = now, now + timedelta(minutes=10)
+        parsed = {
+            'guid': guid,
+            'ip': ip,
+            'queryPort': query_port,
+            'firstSeenAt': first_seen_at.isoformat(),
+            'lastSeenAt': last_seen_at.isoformat()
+        }
+        expect = ClassicServer(guid, ip, query_port, [], first_seen_at, last_seen_at)
+        actual = ClassicServer.load(parsed)
         self.assertEqual(expect, actual)
 
     def test_dump_first_seen_at_none(self):
         guid, ip, query_port = 'a-guid', '1.1.1.1', 47200
         now = datetime.now().astimezone()
-        server = ClassicServer(guid, ip, query_port, None, now)
+        via = ViaStatus('openspy', now, now)
+        server = ClassicServer(guid, ip, query_port, via, None, now)
         expect = {'guid': guid, 'ip': ip, 'queryPort': query_port,
-                  'firstSeenAt': None, 'lastSeenAt': now.isoformat()}
+                  'firstSeenAt': None, 'lastSeenAt': now.isoformat(), 'via': [via.dump()]}
+        actual = server.dump()
+        self.assertEqual(expect, actual)
+
+
+class ViaStatusTest(unittest.TestCase):
+    def test_update(self):
+        principal, first_seen_at = 'a-principal', datetime(1990, 1, 1, 19, 30, 30, 30)
+        a = ViaStatus(principal, first_seen_at)
+        b = ViaStatus('b-principal')
+        a.update(b)
+        self.assertEqual(principal, a.principal)
+        self.assertEqual(first_seen_at, a.first_seen_at)
+        self.assertEqual(b.last_seen_at, a.last_seen_at)
+
+    def test_load(self):
+        principal, first_seen_at, last_seen_at = 'a-principal', datetime(1990, 1, 1, 19, 30, 30, 30), \
+                                                 datetime(2010, 10, 10, 20, 0, 1, 1)
+        parsed = {'principal': principal, 'firstSeenAt': first_seen_at.isoformat(),
+                  'lastSeenAt': last_seen_at.isoformat()}
+        expect = ViaStatus(principal, first_seen_at, last_seen_at)
+        actual = ViaStatus.load(parsed)
+        self.assertEqual(expect, actual)
+
+    def test_is_json_repr_valid(self):
+        now = datetime.now().astimezone()
+        parsed = {'principal': 'a-principal', 'firstSeenAt': now.isoformat(), 'lastSeenAt': now.isoformat()}
+        self.assertTrue(ViaStatus.is_json_repr(parsed))
+
+    def test_is_json_repr_principal_missing(self):
+        now = datetime.now().astimezone()
+        parsed = {'firstSeenAt': now.isoformat(), 'lastSeenAt': now.isoformat()}
+        self.assertFalse(ViaStatus.is_json_repr(parsed))
+
+    def test_is_json_repr_first_seen_at_missing(self):
+        now = datetime.now().astimezone()
+        parsed = {'principal': 'a-principal', 'lastSeenAt': now.isoformat()}
+        self.assertFalse(ViaStatus.is_json_repr(parsed))
+
+    def test_is_json_repr_last_seen_at_missing(self):
+        now = datetime.now().astimezone()
+        parsed = {'principal': 'a-principal', 'lastSeenAt': now.isoformat()}
+        self.assertFalse(ViaStatus.is_json_repr(parsed))
+
+    def test_dump(self):
+        principal, first_seen_at, last_seen_at = 'a-principal', datetime(1990, 1, 1, 19, 30, 30, 30), \
+                                                 datetime(2010, 10, 10, 20, 0, 1, 1)
+        server = ViaStatus(principal, first_seen_at, last_seen_at)
+        expect = {'principal': principal, 'firstSeenAt': first_seen_at.isoformat(),
+                  'lastSeenAt': last_seen_at.isoformat()}
         actual = server.dump()
         self.assertEqual(expect, actual)
 

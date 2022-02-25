@@ -8,11 +8,6 @@ import gevent.subprocess
 from src.servers import FrostbiteServer, Bfbc2Server
 
 
-class ObjectJSONEncoder(json.JSONEncoder):
-    def default(self, obj):
-        return obj.dump()
-
-
 def find_query_port(gamedig_path: str, game: str, server: FrostbiteServer, ports_to_try: list, validator: Callable) -> int:
     query_port = -1
 
