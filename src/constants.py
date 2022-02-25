@@ -84,7 +84,7 @@ GAMESPY_CONFIGS = {
         'encType': '2',
         'superQueryType': '0',
         'port': 28900,
-        'servers': ['bf1942.sk', 'bf1942.org', 'openspy', 'qtracker'],
+        'servers': ['bf1942.org', 'bf1942.sk', 'openspy', 'qtracker'],
         'gamedigType': 'bf1942'
     },
     'bfvietnam': {
