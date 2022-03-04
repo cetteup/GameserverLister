@@ -18,7 +18,7 @@ from nslookup import Nslookup
 from src.constants import BATTLELOG_GAME_BASE_URIS, GAMESPY_CONFIGS, QUAKE3_CONFIGS, GAMESPY_PRINCIPALS, \
     GAMETOOLS_BASE_URI
 from src.helpers import find_query_port, bfbc2_server_validator, battlelog_server_validator, \
-    guid_from_ip_port, mohwf_server_validator, is_valid_port, is_valid_public_ip
+    guid_from_ip_port, mohwf_server_validator, is_valid_port, is_valid_public_ip, is_server_for_gamespy_game
 from src.servers import Server, ClassicServer, FrostbiteServer, Bfbc2Server, GametoolsServer, ObjectJSONEncoder, \
     ViaStatus
 
@@ -251,8 +251,7 @@ class GameSpyServerLister(ServerLister):
 
             parsed = response.json()
             if response.ok:
-                raw = parsed.get('raw', {})
-                found = raw.get('gamename') == self.config['gameName']
+                found = is_server_for_gamespy_game(self.config['gameName'], parsed)
             else:
                 found = False
                 check_ok = isinstance(parsed, dict) and 'Failed all 1 attempts' in ''.join(parsed.get('errors', []))

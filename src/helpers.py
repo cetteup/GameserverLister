@@ -5,6 +5,7 @@ from typing import Callable
 
 import gevent.subprocess
 
+from src.constants import GAMESPY_CONFIGS
 from src.servers import FrostbiteServer, Bfbc2Server
 
 
@@ -74,6 +75,28 @@ def bfbc2_server_validator(server: Bfbc2Server, used_query_port: int, parsed_res
     return battlelog_server_validator(server, used_query_port, parsed_result) or \
            parsed_result.get('connect') == f'0.0.0.0:{server.game_port}' or \
            parsed_result.get('name') == server.name
+
+
+def is_server_for_gamespy_game(game_name: str, parsed_result: dict) -> bool:
+    """
+    Check if a GameSpy query result matches key contents/structure we expect for a server of the given game
+    :param game_name: Name of the game as referenced by gslist
+    :param parsed_result: Parsed result of a gamedig query against the server
+    :return: True, if the results matches expected key content/structure, else false
+    """
+    raw = parsed_result.get('raw', {})
+    if game_name == GAMESPY_CONFIGS['bfvietnam']['gameName']:
+        # Battlefield Vietnam uses a "game_id" instead of the "gamename",
+        # but some modded servers only contain a reference to "bfvietnam" in their "active mods" list
+        return raw.get('game_id', '').lower() == game_name or game_name in raw.get('all_active_mods', '').lower()
+    elif game_name == GAMESPY_CONFIGS['crysis']['gameName']:
+        # Crysis uses the same keys as Crysiswars, but the "gamename" key is missing
+        return 'voicecomm' in raw and 'dx10' in raw and 'gamepadsonly' in raw and 'gamename' not in raw
+    elif game_name == GAMESPY_CONFIGS['vietcong']['gameName']:
+        # Vietcong uses many of the same keys as Vietcong 2, but the "extinfo" key is missing (amongst others)
+        return 'uver' in raw and 'dedic' in raw and 'extinfo' not in raw
+    else:
+        return raw.get('gamename') == game_name
 
 
 def guid_from_ip_port(ip: str, port: str) -> str:
