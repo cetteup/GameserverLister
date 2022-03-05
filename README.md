@@ -37,6 +37,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | CoD4x Mod                                               | Quake3               | cod4x.me, doszgep.cloud                                                                                           |
 | Crysis                                                  | GameSpy              | crymp.net                                                                                                         |
 | Crysis Wars                                             | GameSpy              | jedi95.us                                                                                                         |
+| James Bond 007: Nightfire                               | GameSpy              | openspy, nightfirepc.com                                                                                          |
 | Medal of Honor Warfighter                               | Battlelog            | battlelog.com                                                                                                     |
 | Nexuiz                                                  | Quake3               | deathmask.net                                                                                                     |
 | OpenArena                                               | Quake3               | deathmask.net                                                                                                     |
