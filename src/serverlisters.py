@@ -192,7 +192,7 @@ class GameSpyServerLister(ServerLister):
                 timeout = self.gslist_timeout
                 # Add super query argument if requested
                 if self.gslist_super_query:
-                    command.extend(['-Q', self.config['superQueryType']])
+                    command.extend(['-Q', self.config['queryType']])
                     # Extend timeout to account for server queries
                     timeout += 10
                 gslist_result = subprocess.run(command, capture_output=True,
@@ -240,30 +240,30 @@ class GameSpyServerLister(ServerLister):
         self.add_update_servers(found_servers)
 
     def check_if_server_still_exists(self, server: ClassicServer, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
+        # Since we query the server directly, there is no way of handling HTTP server errors differently then
+        # actually failed checks, so even if the query fails, we have to treat it as "check ok"
         check_ok = True
         found = False
         try:
-            response = self.session.get(
-                'https://9fm6u13gii.execute-api.eu-central-1.amazonaws.com/gamedig-query',
-                params={'type': self.config['gamedigType'], 'host': server.ip, 'port': server.query_port},
-                timeout=self.request_timeout
-            )
+            command = [self.gslist_bin_path, '-d', self.config['queryType'], server.ip, str(server.query_port), '-0']
+            # Timeout should never fire since gslist uses about a three-second timeout for the query
+            gslist_result = subprocess.run(command, capture_output=True, timeout=self.gslist_timeout)
 
-            parsed = response.json()
-            if response.ok:
-                found = is_server_for_gamespy_game(self.config['gameName'], parsed)
-            else:
-                found = False
-                check_ok = isinstance(parsed, dict) and 'Failed all 1 attempts' in ''.join(parsed.get('errors', []))
-
-            # Reset check counter if server returned info or failed to query the server
-            if check_ok:
-                checks_since_last_ok = 0
-            else:
-                checks_since_last_ok += 1
-        except requests.RequestException as e:
+            # gslist will simply return an empty byte string (b'') if the server could not be queried,
+            # but we can safely parse that to an empty dict and check found as we always do
+            parsed = {}
+            for line in gslist_result.stdout.decode('latin1').strip('\n').split('\n'):
+                elements = line.lstrip().split(' ', 1)
+                if len(elements) != 2:
+                    continue
+                key, value = elements
+                parsed[key.lower()] = value
+            found = is_server_for_gamespy_game(self.config['gameName'], parsed)
+            if parsed != {} and not found:
+                logging.warning(f'Server {server.uid} does not seem to be a {self.game} server, treating as not found')
+        except subprocess.TimeoutExpired as e:
             logging.debug(e)
-            logging.error(f'Failed to fetch server {server.uid} for expiration check')
+            logging.error(f'Failed to query server {server.uid} for expiration check')
             check_ok = False
 
         return check_ok, found, checks_since_last_ok
