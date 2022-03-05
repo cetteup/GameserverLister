@@ -151,9 +151,10 @@ class GameSpyServerLister(ServerLister):
     gslist_filter: str
     gslist_super_query: bool
     gslist_timeout: int
+    verify: bool
 
     def __init__(self, game: str, principal: str, gslist_bin_path: str, gslist_filter: str, gslist_super_query: bool,
-                 gslist_timeout: int, expired_ttl: int, recover: bool, list_dir: str):
+                 gslist_timeout: int, verify: bool, expired_ttl: int, recover: bool, list_dir: str):
         super().__init__(game, ClassicServer, expired_ttl, recover, list_dir)
         self.principal = principal.lower()
         self.config = GAMESPY_CONFIGS[self.game]
@@ -161,6 +162,7 @@ class GameSpyServerLister(ServerLister):
         self.gslist_filter = gslist_filter
         self.gslist_super_query = gslist_super_query
         self.gslist_timeout = gslist_timeout
+        self.verify = verify
 
     def update_server_list(self):
         principal = GAMESPY_PRINCIPALS[self.principal]
@@ -216,7 +218,7 @@ class GameSpyServerLister(ServerLister):
 
         # Parse server list
         # List format: [ip-address]:[port]
-        logging.info('Parsing server list')
+        logging.info(f'Parsing server list{" and verifying servers" if self.verify else ""}')
         found_servers = []
         for line in raw_server_list.splitlines():
             ip, query_port = line.strip().split(':', 1)
@@ -235,6 +237,20 @@ class GameSpyServerLister(ServerLister):
                 int(query_port),
                 via
             )
+
+            if self.verify:
+                # Attempt to query server in order to verify is a server for the current game
+                # (some principals return servers for other games than what we queried)
+                logging.debug(f'Querying server {found_server.uid}/{found_server.ip}:{found_server.query_port} '
+                              f'for game verification')
+                query_ok, server_for_game = self.query_server(found_server)
+
+                logging.debug(f'Verification query for {found_server.uid} {"was successful" if query_ok else "failed"}')
+                if query_ok and not server_for_game:
+                    logging.warning(f'Server does not seem to be a {self.game} server, ignoring it '
+                                    f'({found_server.ip}:{found_server.query_port})')
+                    continue
+
             found_servers.append(found_server)
 
         self.add_update_servers(found_servers)
@@ -242,31 +258,39 @@ class GameSpyServerLister(ServerLister):
     def check_if_server_still_exists(self, server: ClassicServer, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
         # Since we query the server directly, there is no way of handling HTTP server errors differently then
         # actually failed checks, so even if the query fails, we have to treat it as "check ok"
-        check_ok = True
-        found = False
+        check_ok, server_for_game = self.query_server(server)
+        found = check_ok and server_for_game
+        if check_ok and not server_for_game:
+            logging.warning(f'Server {server.uid} does not seem to be a {self.game} server, treating as not found')
+
+        return check_ok, found, checks_since_last_ok
+
+    def query_server(self, server: ClassicServer) -> Tuple[bool, bool]:
+        query_ok = True
+        server_for_game = False
         try:
             command = [self.gslist_bin_path, '-d', self.config['queryType'], server.ip, str(server.query_port), '-0']
             # Timeout should never fire since gslist uses about a three-second timeout for the query
             gslist_result = subprocess.run(command, capture_output=True, timeout=self.gslist_timeout)
 
-            # gslist will simply return an empty byte string (b'') if the server could not be queried,
-            # but we can safely parse that to an empty dict and check found as we always do
-            parsed = {}
-            for line in gslist_result.stdout.decode('latin1').strip('\n').split('\n'):
-                elements = line.lstrip().split(' ', 1)
-                if len(elements) != 2:
-                    continue
-                key, value = elements
-                parsed[key.lower()] = value
-            found = is_server_for_gamespy_game(self.config['gameName'], parsed)
-            if parsed != {} and not found:
-                logging.warning(f'Server {server.uid} does not seem to be a {self.game} server, treating as not found')
+            # gslist will simply return an empty byte string (b'') if the server could not be queried
+            if gslist_result.stdout != b'' and b'error' not in gslist_result.stderr.lower():
+                parsed = {}
+                for line in gslist_result.stdout.decode('latin1').strip('\n').split('\n'):
+                    elements = line.lstrip().split(' ', 1)
+                    if len(elements) != 2:
+                        continue
+                    key, value = elements
+                    parsed[key.lower()] = value
+                server_for_game = is_server_for_gamespy_game(self.config['gameName'], parsed)
+            else:
+                query_ok = False
         except subprocess.TimeoutExpired as e:
             logging.debug(e)
             logging.error(f'Failed to query server {server.uid} for expiration check')
-            check_ok = False
+            query_ok = False
 
-        return check_ok, found, checks_since_last_ok
+        return query_ok, server_for_game
 
 
 class FrostbiteServerLister(ServerLister):

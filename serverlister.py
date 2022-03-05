@@ -41,7 +41,11 @@ gamespyParser.add_argument('-t', '--timeout',
 gamespyParser.add_argument('-s', '--super-query',
                            help='Query each server in the list for it\'s status',
                            dest='super_query', action='store_true')
-gamespyParser.set_defaults(super_query=False)
+gamespyParser.add_argument('-v', '--verify',
+                           help='(Attempt to) verify game servers returned by principal are game servers '
+                                'for the current game',
+                           dest='verify', action='store_true')
+gamespyParser.set_defaults(super_query=False, verify=False)
 
 gametoolsParser = subparsers.add_parser('gametools', parents=[commonParser, httpParser])
 gametoolsParser.add_argument('-g', '--game', help='Game to retrieve server list for (BF1/BFV)', type=str,
@@ -92,7 +96,7 @@ elif args.source == 'gamespy':
 
     # Init GameSpy server lister
     game = args.game
-    lister = GameSpyServerLister(game, principal, args.gslist, args.filter, args.super_query, args.timeout,
+    lister = GameSpyServerLister(game, principal, args.gslist, args.filter, args.super_query, args.timeout, args.verify,
                                  args.expired_ttl, args.recover, args.list_dir)
 elif args.source == 'gametools':
     # Init gametools server lister
