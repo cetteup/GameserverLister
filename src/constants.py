@@ -133,6 +133,15 @@ GAMESPY_CONFIGS = {
         'port': 28900,
         'servers': ['vietcong.tk', 'vietcong1.eu', 'qtracker'],
         'gamedigType': 'vietcong'
+    },
+    'vietcong2': {
+        'gameName': 'vietcong2',
+        'gameKey': 'zX2pq6',
+        'encType': '-1',
+        'queryType': '8',
+        'port': 28910,
+        'servers': ['openspy'],
+        'gamedigType': 'vietcong2'
     }
 }
 BATTLELOG_GAME_BASE_URIS = {

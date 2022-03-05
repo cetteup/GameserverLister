@@ -52,6 +52,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Tremulous                                               | Quake3               | tremulous.net                                                                                                     |
 | UrbanTerror                                             | Quake3               | FrozenSand                                                                                                        |
 | Vietcong                                                | GameSpy              | vietcong.tk, vietcong1.eu, qtracker                                                                               |
+| Vietcong 2                                              | GameSpy              | openspy                                                                                                           |
 | Warfork                                                 | Quake3               | deathmask.net                                                                                                     |
 | Warsow                                                  | Quake3               | deathmask.net                                                                                                     |
 | Wolfenstein: Enemy Territory                            | Quake3               | id Software, etlegacy.com                                                                                         |

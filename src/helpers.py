@@ -96,6 +96,8 @@ def is_server_for_gamespy_game(game_name: str, parsed_result: dict) -> bool:
     elif game_name == GAMESPY_CONFIGS['vietcong']['gameName']:
         # Vietcong uses many of the same keys as Vietcong 2, but the "extinfo" key is missing (amongst others)
         return 'uver' in parsed_result and 'dedic' in parsed_result and 'extinfo' not in parsed_result
+    elif game_name == GAMESPY_CONFIGS['vietcong2']['gameName']:
+        return 'uver' in parsed_result and 'dedic' in parsed_result and 'extinfo' in parsed_result
     else:
         return parsed_result.get('gamename') == game_name
 
