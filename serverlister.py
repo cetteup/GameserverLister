@@ -5,7 +5,7 @@ import sys
 from src.constants import GAMESPY_CONFIGS, GAMESPY_PRINCIPALS, QUAKE3_CONFIGS
 from src.parsers import commonParser, httpParser, queryPortParser
 from src.serverlisters import BattlelogServerLister, BC2ServerLister, GameSpyServerLister, GametoolsServerLister, \
-    Quake3ServerLister
+    Quake3ServerLister, MedalOfHonorServerLister
 
 parser = argparse.ArgumentParser(description='Retrieve a list of game servers from a given source and '
                                              'write it to a json file')
@@ -64,6 +64,11 @@ quake3Parser.add_argument('-p', '--principal',
                           help='Principal server to query',
                           type=str, choices=[p for g in QUAKE3_CONFIGS for p in QUAKE3_CONFIGS[g]['servers'].keys()])
 
+medalOfHonorParser = subparsers.add_parser('medalofhonor', parents=[commonParser])
+medalOfHonorParser.add_argument('-b', '--game',
+                                help='Game to query servers for',
+                                type=str, choices=['mohaa', 'mohbt', 'mohpa', 'mohsh'], default='mohaa')
+
 args = parser.parse_args()
 
 logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO, stream=sys.stdout,
@@ -103,7 +108,7 @@ elif args.source == 'gametools':
     game = args.game
     lister = GametoolsServerLister(game, args.page_limit, args.expired_ttl, args.recover, args.list_dir, args.sleep,
                                    args.max_attempts, args.include_official)
-else:
+elif args.source == 'quake3':
     # Set principal
     principal = None
     availablePrincipals = list(QUAKE3_CONFIGS[args.game.lower()]['servers'].keys())
@@ -120,6 +125,10 @@ else:
     # Init GameSpy server lister
     game = args.game
     lister = Quake3ServerLister(game, principal, args.expired_ttl, args.recover, args.list_dir)
+else:
+    serverListSource = 'mohaaservers.tk'
+    game = args.game
+    lister = MedalOfHonorServerLister(game, args.expired_ttl, args.recover, args.list_dir)
 
 logging.info(f'Listing servers for {game} via {serverListSource}')
 
