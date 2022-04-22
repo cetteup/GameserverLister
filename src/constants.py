@@ -129,6 +129,15 @@ GAMESPY_CONFIGS = {
         'servers': ['openspy', 'nightfirepc.com'],
         'gamedigType': 'jamesbondnightfire'
     },
+    'paraworld': {
+        'gameName': 'paraworld',
+        'gameKey': 'EUZpQF',
+        'encType': '-1',
+        'queryType': '8',
+        'port': 28910,
+        'servers': ['openspy'],
+        'gamedigType': 'bf2'
+    },
     'postal2': {
         'gameName': 'postal2',
         'gameKey': 'yw3R9c',
