@@ -136,7 +136,7 @@ GAMESPY_CONFIGS = {
         'queryType': '8',
         'port': 28910,
         'servers': ['openspy'],
-        'gamedigType': 'bf2'
+        'gamedigType': 'protocol-gamespy2'
     },
     'postal2': {
         'gameName': 'postal2',
