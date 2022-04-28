@@ -41,6 +41,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Medal of Honor Warfighter                               | Battlelog            | battlelog.com                                                                                                     |
 | Nexuiz                                                  | Quake3               | deathmask.net                                                                                                     |
 | OpenArena                                               | Quake3               | deathmask.net                                                                                                     |
+| ParaWorld                                               | GameSpy              | openspy                                                                                                           |
 | Postal 2                                                | GameSpy              | 333networks.com                                                                                                   |
 | Q3Rally                                                 | Quake3               | deathmask.net                                                                                                     |
 | Quake                                                   | Quake3               | deathmask.net                                                                                                     |
