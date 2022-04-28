@@ -243,10 +243,11 @@ class GameSpyServerLister(ServerLister):
                 # (some principals return servers for other games than what we queried)
                 logging.debug(f'Querying server {found_server.uid}/{found_server.ip}:{found_server.query_port} '
                               f'for game verification')
-                query_ok, server_for_game = self.query_server(found_server)
+                responded, server_for_game = self.query_server(found_server)
 
-                logging.debug(f'Verification query for {found_server.uid} {"was successful" if query_ok else "failed"}')
-                if query_ok and not server_for_game:
+                logging.debug(f'Verification query for {found_server.uid} '
+                              f'{"was successful" if responded else "did not receive a response"}')
+                if responded and not server_for_game:
                     logging.warning(f'Server does not seem to be a {self.game} server, ignoring it '
                                     f'({found_server.ip}:{found_server.query_port})')
                     continue
@@ -258,15 +259,16 @@ class GameSpyServerLister(ServerLister):
     def check_if_server_still_exists(self, server: ClassicServer, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
         # Since we query the server directly, there is no way of handling HTTP server errors differently then
         # actually failed checks, so even if the query fails, we have to treat it as "check ok"
-        check_ok, server_for_game = self.query_server(server)
-        found = check_ok and server_for_game
-        if check_ok and not server_for_game:
+        check_ok = True
+        responded, server_for_game = self.query_server(server)
+        found = responded and server_for_game
+        if responded and not server_for_game:
             logging.warning(f'Server {server.uid} does not seem to be a {self.game} server, treating as not found')
 
         return check_ok, found, checks_since_last_ok
 
     def query_server(self, server: ClassicServer) -> Tuple[bool, bool]:
-        query_ok = True
+        responded = False
         server_for_game = False
         try:
             command = [self.gslist_bin_path, '-d', self.config['queryType'], server.ip, str(server.query_port), '-0']
@@ -282,15 +284,13 @@ class GameSpyServerLister(ServerLister):
                         continue
                     key, value = elements
                     parsed[key.lower()] = value
+                responded = True
                 server_for_game = is_server_for_gamespy_game(self.config['gameName'], parsed)
-            else:
-                query_ok = False
         except subprocess.TimeoutExpired as e:
             logging.debug(e)
             logging.error(f'Failed to query server {server.uid} for expiration check')
-            query_ok = False
 
-        return query_ok, server_for_game
+        return responded, server_for_game
 
 
 class FrostbiteServerLister(ServerLister):
