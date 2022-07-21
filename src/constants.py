@@ -118,7 +118,11 @@ GAMESPY_CONFIGS = {
         'queryType': '8',
         'port': 28910,
         'servers': ['bf2hub', 'openspy', 'phoenixnetwork', 'playbf2'],
-        'gamedigType': 'bf2'
+        'gamedigType': 'bf2',
+        'linkTemplateRefs': {
+            '_any': ['bf2.tv'],
+            'bf2hub': ['bf2hub']
+        }
     },
     'jbnightfire': {
         'gameName': 'jbnightfire',
@@ -413,4 +417,13 @@ QUAKE3_CONFIGS = {
             }
         }
     }
+}
+GAMETRACKER_GAME_KEYS = {
+    'bfvietnam': 'bfv',
+    'bfbc2': 'bc2',
+    'bfh': 'bfhl',
+    'crysiswars': 'warhead',
+    'mohbt': 'bt',
+    'mohsh': 'sh',
+    'mohwf': 'mohw'
 }

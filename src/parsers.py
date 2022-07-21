@@ -12,10 +12,14 @@ commonParser.add_argument('--no-recover',
                           help='Remove servers that were not returned by the source after they expired, '
                                'do not attempt to contact/access server directly to check if they are still online',
                           dest='recover', action='store_false')
+commonParser.add_argument('--add-links',
+                          help='Enrich server list entries with links to websites '
+                               'showing more details about the server',
+                          dest='add_links', action='store_true')
 commonParser.add_argument('--debug',
                           help='Enables logging of lots of debugging information',
                           dest='debug', action='store_true')
-commonParser.set_defaults(recover=True, debug=False)
+commonParser.set_defaults(recover=True, add_links=False, debug=False)
 
 # Parser with arguments common to HTTP serverlisters
 httpParser = argparse.ArgumentParser(add_help=False)

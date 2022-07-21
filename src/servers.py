@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Union, Optional, Any, List
 
 from src.constants import UNIX_EPOCH_START
+from src.weblinks import WebLink
 
 
 class ObjectJSONEncoder(json.JSONEncoder):
@@ -15,19 +16,34 @@ class Server:
     # Only optional because lists may still contain entries without this attribute
     first_seen_at: Optional[datetime]
     last_seen_at: datetime
+    links: List[WebLink]
 
     def __init__(
             self,
             guid: str,
+            links: Union[List[WebLink], WebLink],
             first_seen_at: Optional[datetime] = datetime.now().astimezone(),
-            last_seen_at: datetime = datetime.now().astimezone()
+            last_seen_at: datetime = datetime.now().astimezone(),
     ):
         self.uid = guid
         self.first_seen_at = first_seen_at
         self.last_seen_at = last_seen_at
+        self.links = links if isinstance(links, list) else [links]
+
+    def add_links(self, links: Union[List[WebLink], WebLink]) -> None:
+        link_list = links if isinstance(links, list) else [links]
+        for web_link in link_list:
+            web_sites_self = [web_link.site for web_link in self.links]
+            if web_link.site not in web_sites_self:
+                self.links.append(web_link)
+            else:
+                index = web_sites_self.index(web_link.site)
+                self.links[index].update(web_link)
 
     def update(self, updated: 'Server') -> None:
         self.last_seen_at = updated.last_seen_at
+        # Merge links "manually"
+        self.add_links(updated.links)
 
     @staticmethod
     def load(parsed: dict) -> Union['Server', dict]:
@@ -68,10 +84,11 @@ class QueryableServer(Server):
             guid: str,
             ip: str,
             query_port: int,
+            links: Union[List[WebLink], WebLink],
             first_seen_at: Optional[datetime] = datetime.now().astimezone(),
             last_seen_at: datetime = datetime.now().astimezone()
     ):
-        super().__init__(guid, first_seen_at, last_seen_at)
+        super().__init__(guid, links, first_seen_at, last_seen_at)
         self.ip = ip
         self.query_port = query_port
 
@@ -156,7 +173,8 @@ class ClassicServer(QueryableServer):
             first_seen_at: Optional[datetime] = datetime.now().astimezone(),
             last_seen_at: datetime = datetime.now().astimezone()
     ):
-        super().__init__(guid, ip, query_port, first_seen_at, last_seen_at)
+        # Leave link list empty for now (query port is usually not sufficient to build any links)
+        super().__init__(guid, ip, query_port, [], first_seen_at, last_seen_at)
         self.via = via if isinstance(via, list) else [via]
 
     def update(self, updated: 'ClassicServer') -> None:
@@ -180,16 +198,18 @@ class ClassicServer(QueryableServer):
             if parsed.get('firstSeenAt') is not None else None
         last_seen_at = datetime.fromisoformat(parsed['lastSeenAt']) \
             if parsed.get('lastSeenAt') is not None else UNIX_EPOCH_START
-        via = [ViaStatus.load(via_parsed) for via_parsed in parsed.get('via', []) if ViaStatus.is_json_repr(via_parsed)]
+        via = [
+            ViaStatus.load(via_parsed) for via_parsed in parsed.get('via', []) if
+            ViaStatus.is_json_repr(via_parsed)
+        ]
 
-        return ClassicServer(
-            parsed['guid'],
-            parsed['ip'],
-            parsed['queryPort'],
-            via,
-            first_seen_at,
-            last_seen_at
-        )
+        server = ClassicServer(parsed['guid'], parsed['ip'], parsed['queryPort'], via, first_seen_at, last_seen_at)
+        server.links = [
+            WebLink.load(link_parsed) for link_parsed in parsed.get('links', [])
+            if WebLink.is_json_repr(link_parsed)
+        ]
+
+        return server
 
     def dump(self) -> dict:
         return {
@@ -198,7 +218,8 @@ class ClassicServer(QueryableServer):
             'queryPort': self.query_port,
             'firstSeenAt': self.first_seen_at.isoformat() if self.first_seen_at is not None else self.first_seen_at,
             'lastSeenAt': self.last_seen_at.isoformat(),
-            'via': [via_status.dump() for via_status in self.via]
+            'via': [via_status.dump() for via_status in self.via],
+            'links': [link.dump() for link in self.links]
         }
 
     def __eq__(self, other):
@@ -225,7 +246,8 @@ class FrostbiteServer(QueryableServer):
             last_seen_at: datetime = datetime.now().astimezone(),
             last_queried_at: Optional[datetime] = None
     ):
-        super().__init__(guid, ip, query_port, first_seen_at, last_seen_at)
+        # Leave link list empty for now (adding links is optional after all)
+        super().__init__(guid, ip, query_port, [], first_seen_at, last_seen_at)
         self.name = name
         self.game_port = game_port
         self.last_queried_at = last_queried_at
@@ -255,7 +277,7 @@ class FrostbiteServer(QueryableServer):
         last_queried_at = datetime.fromisoformat(parsed['lastQueriedAt']) \
             if parsed.get('lastQueriedAt') not in [None, ''] else None
 
-        return FrostbiteServer(
+        server = FrostbiteServer(
             parsed['guid'],
             parsed['name'],
             parsed['ip'],
@@ -265,6 +287,12 @@ class FrostbiteServer(QueryableServer):
             last_seen_at,
             last_queried_at
         )
+        server.links = [
+            WebLink.load(link_parsed) for link_parsed in parsed.get('links', [])
+            if WebLink.is_json_repr(link_parsed)
+        ]
+
+        return server
 
     @staticmethod
     def is_json_repr(parsed: dict) -> bool:
@@ -280,6 +308,7 @@ class FrostbiteServer(QueryableServer):
             'firstSeenAt': self.first_seen_at.isoformat() if self.first_seen_at is not None else self.first_seen_at,
             'lastSeenAt': self.last_seen_at.isoformat(),
             'lastQueriedAt': self.last_queried_at.isoformat() if self.last_queried_at is not None else self.last_queried_at,
+            'links': [link.dump() for link in self.links]
         }
 
 
@@ -300,6 +329,7 @@ class Bfbc2Server(FrostbiteServer):
             last_seen_at: datetime = datetime.now().astimezone(),
             last_queried_at: Optional[datetime] = None
     ):
+        # Leave link list empty for now (adding links is optional after all)
         super().__init__(guid, name, ip, game_port, query_port, first_seen_at, last_seen_at, last_queried_at)
         self.lid = lid
         self.gid = gid
@@ -317,7 +347,7 @@ class Bfbc2Server(FrostbiteServer):
         last_queried_at = datetime.fromisoformat(parsed['lastQueriedAt']) \
             if parsed.get('lastQueriedAt') not in [None, ''] else None
 
-        return Bfbc2Server(
+        server = Bfbc2Server(
             parsed['guid'],
             parsed['name'],
             parsed.get('lid', -1),
@@ -329,6 +359,12 @@ class Bfbc2Server(FrostbiteServer):
             last_seen_at,
             last_queried_at
         )
+        server.links = [
+            WebLink.load(link_parsed) for link_parsed in parsed.get('links', [])
+            if WebLink.is_json_repr(link_parsed)
+        ]
+
+        return server
 
     def dump(self) -> dict:
         return {
@@ -341,7 +377,8 @@ class Bfbc2Server(FrostbiteServer):
             'gid': self.gid,
             'firstSeenAt': self.first_seen_at.isoformat() if self.first_seen_at is not None else self.first_seen_at,
             'lastSeenAt': self.last_seen_at.isoformat(),
-            'lastQueriedAt': self.last_queried_at.isoformat() if self.last_queried_at is not None else self.last_queried_at
+            'lastQueriedAt': self.last_queried_at.isoformat() if self.last_queried_at is not None else self.last_queried_at,
+            'links': [link.dump() for link in self.links]
         }
 
 
@@ -355,7 +392,8 @@ class GametoolsServer(Server):
             first_seen_at: Optional[datetime] = datetime.now().astimezone(),
             last_seen_at: datetime = datetime.now().astimezone(),
     ):
-        super().__init__(game_id, first_seen_at, last_seen_at)
+        # Leave link list empty for now (adding links is optional after all)
+        super().__init__(game_id, [], first_seen_at, last_seen_at)
         self.name = name
 
     def update(self, updated: 'GametoolsServer') -> None:
@@ -372,12 +410,13 @@ class GametoolsServer(Server):
         last_seen_at = datetime.fromisoformat(parsed['lastSeenAt']) \
             if parsed.get('lastSeenAt') is not None else UNIX_EPOCH_START
 
-        return GametoolsServer(
-            parsed['gameId'],
-            parsed['name'],
-            first_seen_at,
-            last_seen_at
-        )
+        server = GametoolsServer(parsed['gameId'], parsed['name'], first_seen_at, last_seen_at)
+        server.links = [
+            WebLink.load(link_parsed) for link_parsed in parsed.get('links', [])
+            if WebLink.is_json_repr(link_parsed)
+        ]
+
+        return server
 
     @staticmethod
     def is_json_repr(parsed: dict) -> bool:
@@ -388,5 +427,6 @@ class GametoolsServer(Server):
             'gameId': self.uid,
             'name': self.name,
             'firstSeenAt': self.first_seen_at.isoformat() if self.first_seen_at is not None else self.first_seen_at,
-            'lastSeenAt': self.last_seen_at.isoformat()
+            'lastSeenAt': self.last_seen_at.isoformat(),
+            'links': [link.dump() for link in self.links]
         }

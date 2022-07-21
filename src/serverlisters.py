@@ -7,7 +7,7 @@ import sys
 import time
 from datetime import datetime, timedelta
 from random import randint, choices
-from typing import Callable, List, Tuple, Type
+from typing import Callable, List, Tuple, Type, Optional, Union
 
 import gevent
 import pyq3serverlist
@@ -18,9 +18,11 @@ from nslookup import Nslookup
 from src.constants import BATTLELOG_GAME_BASE_URIS, GAMESPY_CONFIGS, QUAKE3_CONFIGS, GAMESPY_PRINCIPALS, \
     GAMETOOLS_BASE_URI
 from src.helpers import find_query_port, bfbc2_server_validator, battlelog_server_validator, \
-    guid_from_ip_port, mohwf_server_validator, is_valid_port, is_valid_public_ip, is_server_for_gamespy_game
+    guid_from_ip_port, mohwf_server_validator, is_valid_port, is_valid_public_ip, is_server_for_gamespy_game, \
+    is_server_listed_on_gametracker
 from src.servers import Server, ClassicServer, FrostbiteServer, Bfbc2Server, GametoolsServer, ObjectJSONEncoder, \
-    ViaStatus
+    ViaStatus, WebLink
+from src.weblinks import WEB_LINK_TEMPLATES
 
 
 class ServerLister:
@@ -29,6 +31,7 @@ class ServerLister:
     server_list_file_path: str
     expired_ttl: int
     recover: bool
+    add_links: bool
     ensure_ascii: bool
     server_class: Type[Server]
     servers: List[Server]
@@ -36,14 +39,23 @@ class ServerLister:
     session: requests.Session
     request_timeout: float
 
-    def __init__(self, game: str, server_class: Type[Server], expired_ttl: int, recover: bool, list_dir: str,
-                 request_timeout: float = 5.0):
+    def __init__(
+            self,
+            game: str,
+            server_class: Type[Server],
+            expired_ttl: int,
+            recover: bool,
+            add_links: bool,
+            list_dir: str,
+            request_timeout: float = 5.0
+    ):
         self.game = game.lower()
         self.server_list_dir_path = os.path.realpath(list_dir)
         self.server_list_file_path = os.path.join(self.server_list_dir_path, f'{self.game}-servers.json')
 
         self.expired_ttl = expired_ttl
         self.recover = recover
+        self.add_links = add_links
 
         self.ensure_ascii = True
         self.server_class = server_class
@@ -133,6 +145,9 @@ class ServerLister:
     def check_if_server_still_exists(self, server: Server, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
         pass
 
+    def build_server_links(self, uid: str, ip: Optional[str] = None, port: Optional[int] = None) -> Union[List[WebLink], WebLink]:
+        pass
+
     def get_backoff_timeout(self, checks_since_last_ok: int) -> int:
         # Default to no backoff
         return 0
@@ -153,9 +168,21 @@ class GameSpyServerLister(ServerLister):
     gslist_timeout: int
     verify: bool
 
-    def __init__(self, game: str, principal: str, gslist_bin_path: str, gslist_filter: str, gslist_super_query: bool,
-                 gslist_timeout: int, verify: bool, expired_ttl: int, recover: bool, list_dir: str):
-        super().__init__(game, ClassicServer, expired_ttl, recover, list_dir)
+    def __init__(
+            self,
+            game: str,
+            principal: str,
+            gslist_bin_path: str,
+            gslist_filter: str,
+            gslist_super_query: bool,
+            gslist_timeout: int,
+            verify: bool,
+            expired_ttl: int,
+            recover: bool,
+            add_links: bool,
+            list_dir: str
+    ):
+        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, list_dir)
         self.principal = principal.lower()
         self.config = GAMESPY_CONFIGS[self.game]
         self.gslist_bin_path = gslist_bin_path
@@ -238,19 +265,24 @@ class GameSpyServerLister(ServerLister):
                 via
             )
 
-            if self.verify:
+            if self.verify or self.add_links:
                 # Attempt to query server in order to verify is a server for the current game
                 # (some principals return servers for other games than what we queried)
-                logging.debug(f'Querying server {found_server.uid}/{found_server.ip}:{found_server.query_port} '
-                              f'for game verification')
-                responded, server_for_game = self.query_server(found_server)
+                logging.debug(f'Querying server {found_server.uid}/{found_server.ip}:{found_server.query_port}')
+                responded, query_response = self.query_server(found_server)
+                logging.debug(f'Query {"was successful" if responded else "did not receive a response"}')
 
-                logging.debug(f'Verification query for {found_server.uid} '
-                              f'{"was successful" if responded else "did not receive a response"}')
-                if responded and not server_for_game:
+                if responded and self.verify and not is_server_for_gamespy_game(self.config['gameName'], query_response):
                     logging.warning(f'Server does not seem to be a {self.game} server, ignoring it '
                                     f'({found_server.ip}:{found_server.query_port})')
                     continue
+
+                if responded and 'hostport' in query_response and self.add_links:
+                    found_server.add_links(self.build_server_links(
+                        found_server.uid,
+                        found_server.ip,
+                        int(query_response['hostport'])
+                    ))
 
             found_servers.append(found_server)
 
@@ -267,9 +299,25 @@ class GameSpyServerLister(ServerLister):
 
         return check_ok, found, checks_since_last_ok
 
-    def query_server(self, server: ClassicServer) -> Tuple[bool, bool]:
-        responded = False
-        server_for_game = False
+    def build_server_links(self, uid: str, ip: Optional[str] = None, port: Optional[int] = None) -> Union[List[WebLink], WebLink]:
+        template_refs = self.config.get('linkTemplateRefs', {})
+        # Add principal-scoped links first, then add game-scoped links
+        templates = [
+            *[WEB_LINK_TEMPLATES.get(ref) for ref in template_refs.get(self.principal, [])],
+            *[WEB_LINK_TEMPLATES.get(ref) for ref in template_refs.get('_any', [])]
+        ]
+
+        # Add GameTracker link if server is listed there
+        if is_server_listed_on_gametracker(self.game, ip, port):
+            templates.append(WEB_LINK_TEMPLATES['gametracker'])
+
+        links = []
+        for template in templates:
+            links.append(template.render(self.game, uid, ip=ip, port=port))
+
+        return links
+
+    def query_server(self, server: ClassicServer) -> Tuple[bool, dict]:
         try:
             command = [self.gslist_bin_path, '-d', self.config['queryType'], server.ip, str(server.query_port), '-0']
             # Timeout should never fire since gslist uses about a three-second timeout for the query
@@ -284,22 +332,29 @@ class GameSpyServerLister(ServerLister):
                         continue
                     key, value = elements
                     parsed[key.lower()] = value
-                responded = True
-                server_for_game = is_server_for_gamespy_game(self.config['gameName'], parsed)
+                return True, parsed
         except subprocess.TimeoutExpired as e:
             logging.debug(e)
             logging.error(f'Failed to query server {server.uid} for expiration check')
 
-        return responded, server_for_game
+        return False, {}
 
 
 class FrostbiteServerLister(ServerLister):
     servers: List[FrostbiteServer]
     server_validator: Callable
 
-    def __init__(self, game: str, server_class: Type[Server], expired_ttl: int, recover: bool, list_dir: str,
-                 request_timeout: float = 5.0):
-        super().__init__(game, server_class, expired_ttl, recover, list_dir, request_timeout)
+    def __init__(
+            self,
+            game: str,
+            server_class: Type[Server],
+            expired_ttl: int,
+            recover: bool,
+            add_links: bool,
+            list_dir: str,
+            request_timeout: float = 5.0
+    ):
+        super().__init__(game, server_class, expired_ttl, recover, add_links, list_dir, request_timeout)
 
     def find_query_ports(self, gamedig_bin_path: str, gamedig_concurrency: int, expired_ttl: int):
         logging.info(f'Searching query port for {len(self.servers)} servers')
@@ -348,8 +403,8 @@ class FrostbiteServerLister(ServerLister):
 
 
 class BC2ServerLister(FrostbiteServerLister):
-    def __init__(self, expired_ttl: int, recover: bool, list_dir: str, timeout: float):
-        super().__init__('bfbc2', Bfbc2Server, expired_ttl, recover, list_dir, timeout)
+    def __init__(self, expired_ttl: int, recover: bool, add_links: bool, list_dir: str, timeout: float):
+        super().__init__('bfbc2', Bfbc2Server, expired_ttl, recover, add_links, list_dir, timeout)
         self.server_validator = bfbc2_server_validator
 
     def update_server_list(self):
@@ -388,6 +443,14 @@ class BC2ServerLister(FrostbiteServerLister):
                 server['I'],
                 int(server['P'])
             )
+
+            if self.add_links:
+                found_server.add_links(self.build_server_links(
+                    found_server.uid,
+                    found_server.ip,
+                    found_server.game_port
+                ))
+
             found_servers.append(found_server)
 
         self.add_update_servers(found_servers)
@@ -417,6 +480,13 @@ class BC2ServerLister(FrostbiteServerLister):
             check_ok = False
 
         return check_ok, found, checks_since_last_ok
+
+    def build_server_links(self, uid: str, ip: Optional[str] = None, port: Optional[int] = None) -> Union[List[WebLink], WebLink]:
+        links = []
+        if is_server_listed_on_gametracker(self.game, ip, port):
+            links.append(WEB_LINK_TEMPLATES['gametracker'].render(self.game, uid, ip=ip, port=port))
+
+        return links
 
     def build_port_to_try_list(self, game_port: int) -> list:
         """
@@ -452,9 +522,20 @@ class HttpServerLister(ServerLister):
     sleep: float
     max_attempts: int
 
-    def __init__(self, game: str, server_class: Type[Server], page_limit: int, per_page: int, expired_ttl: int,
-                 recover: bool, list_dir: str, sleep: float, max_attempts: int):
-        super().__init__(game, server_class, expired_ttl, recover, list_dir, request_timeout=10)
+    def __init__(
+            self,
+            game: str,
+            server_class: Type[Server],
+            page_limit: int,
+            per_page: int,
+            expired_ttl: int,
+            recover: bool,
+            add_links: bool,
+            list_dir: str,
+            sleep: float,
+            max_attempts: int
+    ):
+        super().__init__(game, server_class, expired_ttl, recover, add_links, list_dir, request_timeout=10)
         self.page_limit = page_limit
         self.per_page = per_page
         self.sleep = sleep
@@ -527,9 +608,19 @@ class HttpServerLister(ServerLister):
 
 
 class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
-    def __init__(self, game: str, page_limit: int, expired_ttl: int, recover: bool, list_dir: str, sleep: float,
-                 max_attempts: int, proxy: str = None):
-        super().__init__(game, FrostbiteServer, page_limit, 60, expired_ttl, recover, list_dir, sleep, max_attempts)
+    def __init__(
+            self,
+            game: str,
+            page_limit: int,
+            expired_ttl: int,
+            recover: bool,
+            add_links: bool,
+            list_dir: str,
+            sleep: float,
+            max_attempts: int,
+            proxy: str = None
+    ):
+        super().__init__(game, FrostbiteServer, page_limit, 60, expired_ttl, recover, add_links, list_dir, sleep, max_attempts)
         # Medal of Honor: Warfighter servers return the query port as part of the connect string, not the game port
         # => use different validator
         if self.game == 'mohwf':
@@ -559,6 +650,13 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
                 server['ip'],
                 server['port'],
             )
+
+            if self.add_links:
+                found_server.add_links(self.build_server_links(found_server.uid))
+                # Gametools uses the gameid for BF4 server URLs, so add that separately
+                if self.game == 'bf4':
+                    found_server.add_links(WEB_LINK_TEMPLATES['gametools'].render(self.game, server['gameId']))
+
             # Add non-private servers (servers with an IP) that are new
             server_uids = [s.uid for s in found_servers]
             if len(found_server.ip) > 0 and found_server.uid not in server_uids:
@@ -603,6 +701,18 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
 
         return check_ok, found, checks_since_last_ok
 
+    def build_server_links(self, uid: str, ip: Optional[str] = None, port: Optional[int] = None) -> Union[List[WebLink], WebLink]:
+        # Medal of Honor: Warfighter (mohwf) is just called "mohw" on Battlelog
+        game = 'mohw' if self.game == 'mohwf' else self.game
+        links = [WEB_LINK_TEMPLATES['battlelog'].render(game, uid)]
+
+        # Gametools uses the guid as the "gameid" for BF3 and BFH, so we can add links for those
+        # (BF4 uses the real gameid, so we need to handle those links separately)
+        if self.game in ['bf3', 'bfh']:
+            links.append(WEB_LINK_TEMPLATES['gametools'].render(self.game, uid))
+
+        return links
+
     def build_port_to_try_list(self, game_port: int) -> list:
         """
                 Order of ports to try:
@@ -629,9 +739,20 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
 class GametoolsServerLister(HttpServerLister):
     include_official: bool
 
-    def __init__(self, game: str, page_limit: int, expired_ttl: int, recover: bool, list_dir: str, sleep: float,
-                 max_attempts: int, include_official: bool):
-        super().__init__(game, GametoolsServer, page_limit, 100, expired_ttl, recover, list_dir, sleep, max_attempts)
+    def __init__(
+            self,
+            game: str,
+            page_limit: int,
+            expired_ttl: int,
+            recover: bool,
+            add_links: bool,
+            list_dir: str,
+            sleep: float,
+            max_attempts: int,
+            include_official: bool
+    ):
+        super().__init__(game, GametoolsServer, page_limit, 100, expired_ttl, recover, add_links, list_dir, sleep,
+                         max_attempts)
         # Allow non-ascii characters in server list (mostly used by server names for Asia servers)
         self.ensure_ascii = False
         self.include_official = include_official
@@ -646,6 +767,10 @@ class GametoolsServerLister(HttpServerLister):
                 server['gameId'],
                 server['prefix'],
             )
+
+            if self.add_links:
+                found_server.add_links(self.build_server_links(found_server.uid))
+
             # Add/update servers (ignoring official servers unless include_official is set)
             server_game_ids = [s.uid for s in found_servers]
             if found_server.uid not in server_game_ids and \
@@ -690,6 +815,14 @@ class GametoolsServerLister(HttpServerLister):
 
         return check_ok, found, checks_since_last_ok
 
+    def build_server_links(self, uid: str, ip: Optional[str] = None, port: Optional[int] = None) -> Union[List[WebLink], WebLink]:
+        links = [WEB_LINK_TEMPLATES['gametools'].render(self.game, uid)]
+        # BF1 servers are also listed on battlefieldtracker.com
+        if self.game == 'bf1':
+            links.append(WEB_LINK_TEMPLATES['battlefieldtracker'].render(self.game, uid))
+
+        return links
+
 
 class Quake3ServerLister(ServerLister):
     principal: str
@@ -699,8 +832,8 @@ class Quake3ServerLister(ServerLister):
     keywords: str
     server_entry_prefix: bytes
 
-    def __init__(self, game: str, principal: str, expired_ttl: int, recover: bool, list_dir: str):
-        super().__init__(game, ClassicServer, expired_ttl, recover, list_dir)
+    def __init__(self, game: str, principal: str, expired_ttl: int, recover: bool, add_links: bool, list_dir: str):
+        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, list_dir)
         # Merge default config with given principal config
         default_config = {
             'keywords': 'full empty',
@@ -747,6 +880,10 @@ class Quake3ServerLister(ServerLister):
                 raw_server.port,
                 via
             )
+
+            if self.add_links:
+                found_server.add_links(self.build_server_links(found_server.uid, found_server.ip, found_server.query_port))
+
             found_servers.append(found_server)
 
         self.add_update_servers(found_servers)
@@ -768,6 +905,13 @@ class Quake3ServerLister(ServerLister):
 
         return check_ok, found, checks_since_last_ok
 
+    def build_server_links(self, uid: str, ip: Optional[str] = None, port: Optional[int] = None) -> Union[List[WebLink], WebLink]:
+        links = []
+        if is_server_listed_on_gametracker(self.game, ip, port):
+            links.append(WEB_LINK_TEMPLATES['gametracker'].render(self.game, uid, ip=ip, port=port))
+
+        return links
+
 
 class MedalOfHonorServerLister(ServerLister):
     """
@@ -778,9 +922,8 @@ class MedalOfHonorServerLister(ServerLister):
     that to query servers with the information we have.
     """
 
-    def __init__(self, game: str, expired_ttl: int, recover: bool, list_dir: str):
-
-        super().__init__(game, ClassicServer, expired_ttl, recover, list_dir)
+    def __init__(self, game: str, expired_ttl: int, recover: bool, add_links: bool, list_dir: str):
+        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, list_dir)
 
     def update_server_list(self):
         request_ok = False
@@ -833,6 +976,14 @@ class MedalOfHonorServerLister(ServerLister):
                 via
             )
 
+            if self.add_links:
+                # query port = game port for MOH games, so we can use that here to build links
+                found_server.add_links(self.build_server_links(
+                    found_server.uid,
+                    found_server.ip,
+                    found_server.query_port
+                ))
+
             found_servers.append(found_server)
 
         self.add_update_servers(found_servers)
@@ -857,3 +1008,10 @@ class MedalOfHonorServerLister(ServerLister):
             logging.debug(f'Failed to query server {server.uid} for expiration check')
 
         return check_ok, found, checks_since_last_ok
+
+    def build_server_links(self, uid: str, ip: Optional[str] = None, port: Optional[int] = None) -> Union[List[WebLink], WebLink]:
+        links = []
+        if is_server_listed_on_gametracker(self.game, ip, port):
+            links.append(WEB_LINK_TEMPLATES['gametracker'].render(self.game, uid, ip=ip, port=port))
+
+        return links

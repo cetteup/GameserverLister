@@ -79,12 +79,12 @@ serverListSource = args.source
 if args.source == 'battlelog':
     # Init Battelog server lister
     game = args.game
-    lister = BattlelogServerLister(game, args.page_limit, args.expired_ttl, args.recover, args.list_dir, args.sleep,
-                                   args.max_attempts, args.proxy)
+    lister = BattlelogServerLister(game, args.page_limit, args.expired_ttl, args.recover, args.add_links, args.list_dir,
+                                   args.sleep, args.max_attempts, args.proxy)
 elif args.source == 'bfbc2':
     # Init BC2 lister
     game = 'bfbc2'
-    lister = BC2ServerLister(args.expired_ttl, args.recover, args.list_dir, args.timeout)
+    lister = BC2ServerLister(args.expired_ttl, args.recover, args.add_links, args.list_dir, args.timeout)
 elif args.source == 'gamespy':
     # Set principal
     principal = None
@@ -102,12 +102,12 @@ elif args.source == 'gamespy':
     # Init GameSpy server lister
     game = args.game
     lister = GameSpyServerLister(game, principal, args.gslist, args.filter, args.super_query, args.timeout, args.verify,
-                                 args.expired_ttl, args.recover, args.list_dir)
+                                 args.expired_ttl, args.recover, args.add_links, args.list_dir)
 elif args.source == 'gametools':
     # Init gametools server lister
     game = args.game
-    lister = GametoolsServerLister(game, args.page_limit, args.expired_ttl, args.recover, args.list_dir, args.sleep,
-                                   args.max_attempts, args.include_official)
+    lister = GametoolsServerLister(game, args.page_limit, args.expired_ttl, args.recover, args.add_links, args.list_dir,
+                                   args.sleep, args.max_attempts, args.include_official)
 elif args.source == 'quake3':
     # Set principal
     principal = None
@@ -124,11 +124,11 @@ elif args.source == 'quake3':
 
     # Init GameSpy server lister
     game = args.game
-    lister = Quake3ServerLister(game, principal, args.expired_ttl, args.recover, args.list_dir)
+    lister = Quake3ServerLister(game, principal, args.expired_ttl, args.recover, args.add_links, args.list_dir)
 else:
     serverListSource = 'mohaaservers.tk'
     game = args.game
-    lister = MedalOfHonorServerLister(game, args.expired_ttl, args.recover, args.list_dir)
+    lister = MedalOfHonorServerLister(game, args.expired_ttl, args.recover, args.add_links, args.list_dir)
 
 logging.info(f'Listing servers for {game} via {serverListSource}')
 

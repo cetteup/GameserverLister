@@ -2,24 +2,65 @@ import unittest
 from datetime import datetime, timedelta
 
 from src.constants import UNIX_EPOCH_START
-from src.servers import Server, QueryableServer, ClassicServer, FrostbiteServer, Bfbc2Server, GametoolsServer, ViaStatus
+from src.servers import Server, QueryableServer, ClassicServer, FrostbiteServer, Bfbc2Server, GametoolsServer, \
+    ViaStatus, WebLink
 
 
 class ServerTest(unittest.TestCase):
     def test_update(self):
+        # GIVEN two different servers
         guid, first_seen_at = 'a-guid', datetime(1990, 1, 1, 19, 30, 30, 30)
-        a = Server(guid, first_seen_at)
-        b = Server('b-guid', None, datetime(2000, 1, 1, 20, 0, 1, 1))
+        a = Server(guid, [], first_seen_at)
+        b = Server('b-guid', [], datetime(2000, 1, 1, 20, 0, 1, 1))
+
+        # WHEN server a is updated with server b
         a.update(b)
+
+        # THEN
+        # Server a's uid remains unchanged
         self.assertEqual(a.uid, a.uid)
+        # Server a's first seen at time remains unchanged
         self.assertEqual(a.first_seen_at, a.first_seen_at)
+        # Server a's last seen at time is updated
         self.assertEqual(b.last_seen_at, a.last_seen_at)
+
+    def test_update_links_add_new(self):
+        # GIVEN two different servers
+        a = Server('a-guid', [])
+        link = WebLink('a-site', 'a-url', True)
+        b = Server('b-guid', link)
+
+        # WHEN server a is updated with server b
+        a.update(b)
+
+        # THEN
+        # Server b's link is added to server a
+        self.assertEqual(1, len(a.links))
+        self.assertEqual(link, a.links[0])
+
+    def test_update_links_update_existing(self):
+        # GIVEN two different servers
+        site = 'a-site'
+        a_link = WebLink(site, 'a-url', True)
+        a = Server('a-guid', a_link)
+        b_link = WebLink(site, 'b-url', False)
+        b = Server('b-guid', b_link)
+
+        # WHEN server a is updated with server b
+        a.update(b)
+
+        # THEN
+        # Server a's link is updated with server b's link
+        self.assertEqual(1, len(a.links))
+        self.assertEqual(site, a.links[0].site)
+        self.assertEqual(b_link.url, a.links[0].url)
+        self.assertEqual(b_link.official, a.links[0].official)
 
 
 class QueryableServerTest(unittest.TestCase):
     def test_update(self):
-        a = QueryableServer('a-guid', '1.1.1.1', 19567, datetime(1990, 1, 1, 19, 30, 30, 30))
-        b = QueryableServer('b-guid', '1.0.0.1', 25200, None, datetime(2000, 1, 1, 20, 0, 1, 1))
+        a = QueryableServer('a-guid', '1.1.1.1', 19567, [], datetime(1990, 1, 1, 19, 30, 30, 30))
+        b = QueryableServer('b-guid', '1.0.0.1', 25200, [], None, datetime(2000, 1, 1, 20, 0, 1, 1))
         a.update(b)
         self.assertEqual(a.uid, a.uid)
         self.assertEqual(b.ip, a.ip)
@@ -76,7 +117,8 @@ class ClassicServerTest(unittest.TestCase):
             'queryPort': query_port,
             'firstSeenAt': first_seen_at.isoformat(),
             'lastSeenAt': last_seen_at.isoformat(),
-            'via': [via.dump()]
+            'via': [via.dump()],
+            'links': [],
         }
         expect = ClassicServer(guid, ip, query_port, via, first_seen_at, last_seen_at)
         actual = ClassicServer.load(parsed)
@@ -87,7 +129,7 @@ class ClassicServerTest(unittest.TestCase):
         now = datetime.now().astimezone()
         via = ViaStatus('openspy', now, now)
         parsed = {'guid': guid, 'ip': ip, 'queryPort': query_port,
-                  'firstSeenAt': None, 'lastSeenAt': now.isoformat(), 'via': [via.dump()]}
+                  'firstSeenAt': None, 'lastSeenAt': now.isoformat(), 'via': [via.dump()], 'links': []}
         expect = ClassicServer(guid, ip, query_port, via, None, now)
         actual = ClassicServer.load(parsed)
         self.assertEqual(expect, actual)
@@ -97,7 +139,7 @@ class ClassicServerTest(unittest.TestCase):
         now = datetime.now().astimezone()
         via = ViaStatus('openspy', now, now)
         parsed = {'guid': guid, 'ip': ip, 'queryPort': query_port,
-                  'firstSeenAt': now.isoformat(), 'lastSeenAt': None, 'via': [via.dump()]}
+                  'firstSeenAt': now.isoformat(), 'lastSeenAt': None, 'via': [via.dump()], 'links': []}
         expect = ClassicServer(guid, ip, query_port, via, now, UNIX_EPOCH_START)
         actual = ClassicServer.load(parsed)
         self.assertEqual(expect, actual)
@@ -107,7 +149,7 @@ class ClassicServerTest(unittest.TestCase):
         now = datetime.now().astimezone()
         via = ViaStatus('openspy', now, now)
         server = ClassicServer(guid, ip, query_port, via, now, now)
-        expect = {'guid': guid, 'ip': ip, 'queryPort': query_port,
+        expect = {'guid': guid, 'ip': ip, 'queryPort': query_port, 'links': [],
                   'firstSeenAt': now.isoformat(), 'lastSeenAt': now.isoformat(), 'via': [via.dump()]}
         actual = server.dump()
         self.assertEqual(expect, actual)
@@ -132,7 +174,7 @@ class ClassicServerTest(unittest.TestCase):
         now = datetime.now().astimezone()
         via = ViaStatus('openspy', now, now)
         server = ClassicServer(guid, ip, query_port, via, None, now)
-        expect = {'guid': guid, 'ip': ip, 'queryPort': query_port,
+        expect = {'guid': guid, 'ip': ip, 'queryPort': query_port, 'links': [],
                   'firstSeenAt': None, 'lastSeenAt': now.isoformat(), 'via': [via.dump()]}
         actual = server.dump()
         self.assertEqual(expect, actual)
@@ -191,8 +233,8 @@ class FrostbiteServerTest(unittest.TestCase):
     def test_update(self):
         guid, first_seen_at = 'a-guid', datetime(1990, 1, 1, 19, 30, 30, 30)
         a = FrostbiteServer(guid, 'a-server-name', '1.1.1.1', 19567, 48888, first_seen_at)
-        b = FrostbiteServer('b-guid', 'b-server-name', '1.0.0.1', 25200, 47200, None,
-                            datetime(2000, 1, 1, 20, 0, 1, 1), datetime(2010, 10, 10, 20, 0, 1, 1))
+        b = FrostbiteServer('b-guid', 'b-server-name', '1.0.0.1', 25200, 47200, None, datetime(2000, 1, 1, 20, 0, 1, 1),
+                            datetime(2010, 10, 10, 20, 0, 1, 1))
         a.update(b)
         self.assertEqual(guid, a.uid)
         self.assertEqual(b.name, a.name)
@@ -206,8 +248,8 @@ class FrostbiteServerTest(unittest.TestCase):
     def test_update_last_queried_at_none(self):
         guid, first_seen_at, last_queried_at = 'a-guid', datetime(1990, 1, 1, 19, 30, 30, 30), \
                                                datetime(1994, 1, 1, 19, 30, 30, 30)
-        a = FrostbiteServer(guid, 'a-server-name', '1.1.1.1', 19567, 48888,
-                            first_seen_at, datetime(1990, 1, 1, 19, 30, 30, 30), last_queried_at)
+        a = FrostbiteServer(guid, 'a-server-name', '1.1.1.1', 19567, 48888, first_seen_at,
+                            datetime(1990, 1, 1, 19, 30, 30, 30), last_queried_at)
         b = FrostbiteServer('b-guid', 'b-server-name', '1.0.0.1', 25200, 47200, None, datetime(2000, 1, 1, 20, 0, 1, 1))
         a.update(b)
         self.assertEqual(guid, a.uid)
@@ -223,8 +265,8 @@ class FrostbiteServerTest(unittest.TestCase):
     def test_update_query_port_dummy(self):
         guid, query_port, first_seen_at = 'a-guid', 48888, datetime(1990, 1, 1, 19, 30, 30, 30)
         a = FrostbiteServer(guid, 'a-server-name', '1.1.1.1', 19567, query_port, first_seen_at)
-        b = FrostbiteServer('b-guid', 'b-server-name', '1.0.0.1', 25200, -1, None,
-                            datetime(2000, 1, 1, 20, 0, 1, 1), datetime(2010, 10, 10, 20, 0, 1, 1))
+        b = FrostbiteServer('b-guid', 'b-server-name', '1.0.0.1', 25200, -1, None, datetime(2000, 1, 1, 20, 0, 1, 1),
+                            datetime(2010, 10, 10, 20, 0, 1, 1))
         a.update(b)
         self.assertEqual(guid, a.uid)
         self.assertEqual(b.name, a.name)
@@ -265,7 +307,8 @@ class FrostbiteServerTest(unittest.TestCase):
         parsed = {'guid': guid, 'name': name, 'ip': ip, 'gamePort': game_port, 'queryPort': query_port,
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at,
                   'lastQueriedAt': last_queried_at.isoformat()}
-        expect = FrostbiteServer(guid, name, ip, game_port, query_port, first_seen_at, UNIX_EPOCH_START, last_queried_at)
+        expect = FrostbiteServer(guid, name, ip, game_port, query_port, first_seen_at, UNIX_EPOCH_START,
+                                 last_queried_at)
         actual = FrostbiteServer.load(parsed)
         self.assertEqual(expect, actual)
 
@@ -320,7 +363,7 @@ class FrostbiteServerTest(unittest.TestCase):
         now = datetime.now().astimezone()
         first_seen_at, last_seen_at, last_queried_at = now, now + timedelta(minutes=10), now + timedelta(minutes=5)
         server = FrostbiteServer(guid, name, ip, game_port, query_port, first_seen_at, last_seen_at, last_queried_at)
-        expect = {'guid': guid, 'name': name, 'ip': ip, 'gamePort': game_port, 'queryPort': query_port,
+        expect = {'guid': guid, 'name': name, 'ip': ip, 'gamePort': game_port, 'queryPort': query_port, 'links': [],
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at.isoformat(),
                   'lastQueriedAt': last_queried_at.isoformat()}
         actual = server.dump()
@@ -331,7 +374,7 @@ class FrostbiteServerTest(unittest.TestCase):
         now = datetime.now().astimezone()
         first_seen_at, last_seen_at, last_queried_at = None, now + timedelta(minutes=10), now + timedelta(minutes=5)
         server = FrostbiteServer(guid, name, ip, game_port, query_port, first_seen_at, last_seen_at, last_queried_at)
-        expect = {'guid': guid, 'name': name, 'ip': ip, 'gamePort': game_port, 'queryPort': query_port,
+        expect = {'guid': guid, 'name': name, 'ip': ip, 'gamePort': game_port, 'queryPort': query_port, 'links': [],
                   'firstSeenAt': first_seen_at, 'lastSeenAt': last_seen_at.isoformat(),
                   'lastQueriedAt': last_queried_at.isoformat()}
         actual = server.dump()
@@ -342,7 +385,7 @@ class FrostbiteServerTest(unittest.TestCase):
         now = datetime.now().astimezone()
         first_seen_at, last_seen_at, last_queried_at = now, now + timedelta(minutes=10), None
         server = FrostbiteServer(guid, name, ip, game_port, query_port, first_seen_at, last_seen_at, last_queried_at)
-        expect = {'guid': guid, 'name': name, 'ip': ip, 'gamePort': game_port, 'queryPort': query_port,
+        expect = {'guid': guid, 'name': name, 'ip': ip, 'gamePort': game_port, 'queryPort': query_port, 'links': [],
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at.isoformat(),
                   'lastQueriedAt': last_queried_at}
         actual = server.dump()
@@ -358,7 +401,8 @@ class Bfbc2ServerTest(unittest.TestCase):
                   'gamePort': game_port, 'queryPort': query_port,
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at.isoformat(),
                   'lastQueriedAt': last_queried_at.isoformat()}
-        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at, last_queried_at)
+        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
+                             last_queried_at)
         actual = Bfbc2Server.load(parsed)
         self.assertEqual(expect, actual)
 
@@ -370,7 +414,8 @@ class Bfbc2ServerTest(unittest.TestCase):
                   'gamePort': game_port, 'queryPort': query_port,
                   'firstSeenAt': first_seen_at, 'lastSeenAt': last_seen_at.isoformat(),
                   'lastQueriedAt': last_queried_at.isoformat()}
-        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at, last_queried_at)
+        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
+                             last_queried_at)
         actual = Bfbc2Server.load(parsed)
         self.assertEqual(expect, actual)
 
@@ -382,7 +427,8 @@ class Bfbc2ServerTest(unittest.TestCase):
                   'gamePort': game_port, 'queryPort': query_port,
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at,
                   'lastQueriedAt': last_queried_at.isoformat()}
-        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, UNIX_EPOCH_START, last_queried_at)
+        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, UNIX_EPOCH_START,
+                             last_queried_at)
         actual = Bfbc2Server.load(parsed)
         self.assertEqual(expect, actual)
 
@@ -394,7 +440,8 @@ class Bfbc2ServerTest(unittest.TestCase):
                   'gamePort': game_port, 'queryPort': query_port,
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at.isoformat(),
                   'lastQueriedAt': last_queried_at}
-        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at, last_queried_at)
+        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
+                             last_queried_at)
         actual = Bfbc2Server.load(parsed)
         self.assertEqual(expect, actual)
 
@@ -406,7 +453,8 @@ class Bfbc2ServerTest(unittest.TestCase):
                   'gamePort': game_port, 'queryPort': query_port,
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at.isoformat(),
                   'lastQueriedAt': last_queried_at.isoformat()}
-        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at, last_queried_at)
+        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
+                             last_queried_at)
         actual = Bfbc2Server.load(parsed)
         self.assertEqual(expect, actual)
 
@@ -418,7 +466,8 @@ class Bfbc2ServerTest(unittest.TestCase):
                   'gamePort': game_port, 'queryPort': query_port,
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at.isoformat(),
                   'lastQueriedAt': last_queried_at.isoformat()}
-        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at, last_queried_at)
+        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
+                             last_queried_at)
         actual = Bfbc2Server.load(parsed)
         self.assertEqual(expect, actual)
 
@@ -426,9 +475,10 @@ class Bfbc2ServerTest(unittest.TestCase):
         guid, name, lid, gid, ip, game_port, query_port = 'a-guid', 'a-server-name', 257, 123456, '1.1.1.1', 25200, 47200
         now = datetime.now().astimezone()
         first_seen_at, last_seen_at, last_queried_at = now, now + timedelta(minutes=10), now + timedelta(minutes=5)
-        server = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at, last_queried_at)
+        server = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
+                             last_queried_at)
         expect = {'guid': guid, 'name': name, 'lid': lid, 'gid': gid, 'ip': ip,
-                  'gamePort': game_port, 'queryPort': query_port,
+                  'gamePort': game_port, 'queryPort': query_port, 'links': [],
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at.isoformat(),
                   'lastQueriedAt': last_queried_at.isoformat()}
         actual = server.dump()
@@ -441,7 +491,7 @@ class Bfbc2ServerTest(unittest.TestCase):
         server = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
                              last_queried_at)
         expect = {'guid': guid, 'name': name, 'lid': lid, 'gid': gid, 'ip': ip,
-                  'gamePort': game_port, 'queryPort': query_port,
+                  'gamePort': game_port, 'queryPort': query_port, 'links': [],
                   'firstSeenAt': first_seen_at, 'lastSeenAt': last_seen_at.isoformat(),
                   'lastQueriedAt': last_queried_at.isoformat()}
         actual = server.dump()
@@ -454,7 +504,7 @@ class Bfbc2ServerTest(unittest.TestCase):
         server = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
                              last_queried_at)
         expect = {'guid': guid, 'name': name, 'lid': lid, 'gid': gid, 'ip': ip,
-                  'gamePort': game_port, 'queryPort': query_port,
+                  'gamePort': game_port, 'queryPort': query_port, 'links': [],
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at.isoformat(),
                   'lastQueriedAt': last_queried_at}
         actual = server.dump()

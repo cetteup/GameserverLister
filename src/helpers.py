@@ -1,11 +1,13 @@
 import ipaddress
 import json
 import logging
-from typing import Callable
+from typing import Callable, List, Dict
 
 import gevent.subprocess
+import requests
+from nslookup import Nslookup
 
-from src.constants import GAMESPY_CONFIGS
+from src.constants import GAMESPY_CONFIGS, GAMETRACKER_GAME_KEYS
 from src.servers import FrostbiteServer, Bfbc2Server
 
 
@@ -108,3 +110,47 @@ def guid_from_ip_port(ip: str, port: str) -> str:
                      (index, octet) in enumerate(ip.split('.'))])
 
     return guid
+
+
+def is_server_listed_on_gametracker(game: str, ip: str, port: int) -> bool:
+    try:
+        resp = requests.get(
+            'https://gametracker-check.cetteup.com/',
+            params={
+                # GameTracker uses different game names/keys for some game
+                # => get from constant with internal name as fallback
+                'game': GAMETRACKER_GAME_KEYS.get(game, game),
+                'query': f'{ip}:{port}'
+            }
+        )
+
+        if resp.ok:
+            parsed = resp.json()
+            return is_server_in_search_results(ip, port, parsed['results'])
+        else:
+            return False
+    except requests.RequestException as e:
+        logging.debug(e)
+        logging.error(f'Failed to check if server is listed on gametracker ({ip}:{port})')
+        return False
+
+
+def is_server_in_search_results(ip: str, port: int, search_results: List[Dict]) -> bool:
+    for result in search_results:
+        if port == result['port'] and ip == result['host']:
+            return True
+
+        # If port matches but host value is not a valid public ip, try to resolve it as a hostname
+        if port == result['port'] and not is_valid_public_ip(result['host']):
+            looker_upper = Nslookup()
+            dns_result = looker_upper.dns_lookup(result['host'])
+
+            if len(dns_result.answer) == 0:
+                logging.warning(f'DNS lookup failed for server hostname received from GameTracker ({result["host"]}')
+                continue
+
+            # We already compared the port => return true if resolved IP matches
+            if ip == dns_result.answer[0]:
+                return True
+
+    return False
