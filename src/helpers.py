@@ -87,10 +87,9 @@ def is_server_for_gamespy_game(game_name: str, parsed_result: dict) -> bool:
     :return: True, if the results matches expected key content/structure, else false
     """
     if game_name == GAMESPY_CONFIGS['bfvietnam']['gameName']:
-        # Battlefield Vietnam uses a "game_id" instead of the "gamename",
-        # but some modded servers only contain a reference to "bfvietnam" in their "active mods" list
-        return parsed_result.get('game_id', '').lower() == game_name or \
-               game_name in parsed_result.get('all_active_mods', '').lower()
+        # Battlefield Vietnam does not reliably contain the gamename anywhere, but as some quite unique keys
+        return 'allow_nose_cam' in parsed_result and 'name_tag_distance_scope' in parsed_result and \
+               'soldier_friendly_fire_on_splash' in parsed_result and 'all_active_mods' in parsed_result
     elif game_name == GAMESPY_CONFIGS['crysis']['gameName']:
         # Crysis uses the same keys as Crysiswars, but the "gamename" key is missing
         return 'voicecomm' in parsed_result and 'dx10' in parsed_result and \
