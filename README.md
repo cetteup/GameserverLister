@@ -20,7 +20,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 
 | Game                                                    | Source type/protocol | Server list source(s)                                                                                             |
 |---------------------------------------------------------|----------------------|-------------------------------------------------------------------------------------------------------------------|
-| Battlefield 1942                                        | GameSpy              | bf1942.sk, bf1942.org, openspy, qtracker                                                                          |
+| Battlefield 1942                                        | GameSpy              | bf1942.org, openspy, qtracker                                                                                     |
 | Battlefield Vietnam                                     | GameSpy              | openspy, qtracker                                                                                                 |
 | Battlefield 2                                           | GamsSpy              | bf2hub, playbf2                                                                                                   |
 | Battlefield 2142                                        | GameSpy              | novgames, openspy, play2142                                                                                       |

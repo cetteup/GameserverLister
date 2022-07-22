@@ -11,9 +11,6 @@ GAMESPY_PRINCIPALS = {
     '333networks.com-2': {
         'hostname': 'rhea.333networks.com'
     },
-    'bf1942.sk': {
-        'hostname': 'master.bf1942.sk'
-    },
     'bf1942.org': {
         'hostname': 'master.bf1942.org'
     },
@@ -90,7 +87,7 @@ GAMESPY_CONFIGS = {
         'encType': '2',
         'queryType': '0',
         'port': 28900,
-        'servers': ['bf1942.org', 'bf1942.sk', 'openspy', 'qtracker'],
+        'servers': ['bf1942.org', 'openspy', 'qtracker'],
         'gamedigType': 'bf1942'
     },
     'bfvietnam': {
