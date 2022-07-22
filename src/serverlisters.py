@@ -826,7 +826,7 @@ class GametoolsServerLister(HttpServerLister):
 
 class Quake3ServerLister(ServerLister):
     principal: str
-    protocol: int
+    protocols: List[int]
     network_protocol: int
     game_name: str
     keywords: str
@@ -846,47 +846,57 @@ class Quake3ServerLister(ServerLister):
         self.principal = principal
         self.keywords, self.game_name, \
             self.network_protocol, self.server_entry_prefix = {**default_config, **principal_config}.values()
-        self.protocol = QUAKE3_CONFIGS[self.game]['protocol']
+        self.protocols = QUAKE3_CONFIGS[self.game]['protocols']
 
     def update_server_list(self):
+        # Use same connection to principal for all queries
         hostname, port = QUAKE3_CONFIGS[self.game]['servers'][self.principal].values()
         principal = pyq3serverlist.PrincipalServer(hostname, port, self.network_protocol)
 
+        # Fetch servers for all protocols
+        found_servers = []
+        for protocol in self.protocols:
+            raw_servers = self.get_servers(principal, protocol)
+            for raw_server in raw_servers:
+                via = ViaStatus(self.principal)
+                found_server = ClassicServer(
+                    guid_from_ip_port(raw_server.ip, str(raw_server.port)),
+                    raw_server.ip,
+                    raw_server.port,
+                    via
+                )
+
+                if self.add_links:
+                    found_server.add_links(self.build_server_links(
+                        found_server.uid,
+                        found_server.ip,
+                        found_server.query_port
+                    ))
+
+                found_servers.append(found_server)
+
+        self.add_update_servers(found_servers)
+
+    def get_servers(self, principal: pyq3serverlist.PrincipalServer, protocol: int) -> List[pyq3serverlist.Server]:
         query_ok = False
         attempt = 0
         max_attempts = 3
-        raw_servers = []
+        servers = []
         while not query_ok and attempt < max_attempts:
             try:
-                # Get servers
-                raw_servers = principal.get_servers(self.protocol, self.game_name,
-                                                    self.keywords, self.server_entry_prefix)
+                servers = principal.get_servers(protocol, self.game_name, self.keywords, self.server_entry_prefix)
                 query_ok = True
             except pyq3serverlist.PyQ3SLTimeoutError:
-                logging.error(f'Principal server query timed out, attempt {attempt + 1}/{max_attempts}')
+                logging.error(f'Principal server query timed out using protocol {protocol}, '
+                              f'attempt {attempt + 1}/{max_attempts}')
                 attempt += 1
             except pyq3serverlist.PyQ3SLError as e:
                 logging.debug(e)
-                logging.error(f'Failed to query principal server, attempt {attempt + 1}/{max_attempts}')
+                logging.error(f'Failed to query principal server using protocol {protocol}, '
+                              f'attempt {attempt + 1}/{max_attempts}')
                 attempt += 1
 
-        # Create servers, adding required attributes
-        found_servers = []
-        for raw_server in raw_servers:
-            via = ViaStatus(self.principal)
-            found_server = ClassicServer(
-                guid_from_ip_port(raw_server.ip, str(raw_server.port)),
-                raw_server.ip,
-                raw_server.port,
-                via
-            )
-
-            if self.add_links:
-                found_server.add_links(self.build_server_links(found_server.uid, found_server.ip, found_server.query_port))
-
-            found_servers.append(found_server)
-
-        self.add_update_servers(found_servers)
+        return servers
 
     def check_if_server_still_exists(self, server: ClassicServer, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
         # Since we query the server directly, there is no way of handling HTTP server errors differently then

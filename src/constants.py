@@ -176,7 +176,13 @@ BATTLELOG_GAME_BASE_URIS = {
 GAMETOOLS_BASE_URI = 'https://api.gametools.network'
 QUAKE3_CONFIGS = {
     'cod': {
-        'protocol': 6,
+        'protocols': [
+            1,  # version 1.1
+            2,  # version 1.2
+            4,  # version 1.3
+            5,  # version 1.4
+            6,  # version 1.5
+        ],
         'servers': {
             'activision': {
                 'hostname': 'codmaster.activision.com',
@@ -188,7 +194,10 @@ QUAKE3_CONFIGS = {
         }
     },
     'coduo': {
-        'protocol': 22,
+        'protocols': [
+            21,  # version 1.41
+            22,  # version 1.51
+        ],
         'servers': {
             'activision': {
                 'hostname': 'coduomaster.activision.com',
@@ -200,7 +209,11 @@ QUAKE3_CONFIGS = {
         }
     },
     'cod2': {
-        'protocol': 118,
+        'protocols': [
+            115,  # version 1.0
+            117,  # version 1.2
+            118,  # version 1.3
+        ],
         'servers': {
             'activision': {
                 'hostname': 'cod2master.activision.com',
@@ -212,7 +225,11 @@ QUAKE3_CONFIGS = {
         }
     },
     'cod4': {
-        'protocol': 6,
+        'protocols': [
+            1,  # version 1.0
+            6,  # version 1.7
+            7,  # version 1.8
+        ],
         'servers': {
             'activision': {
                 'hostname': 'cod4master.activision.com',
@@ -224,7 +241,9 @@ QUAKE3_CONFIGS = {
         }
     },
     'cod4x': {
-        'protocol': 6,
+        'protocols': [
+            6  # cod4 does not support different protocols, you seem to get the same servers regardless
+        ],
         'keywords': 'full empty \x00',
         'network_protocol': socket.SOCK_STREAM,
         'server_entry_prefix': b'\x00\x00\x00\x00\x04',
@@ -240,7 +259,9 @@ QUAKE3_CONFIGS = {
         }
     },
     'nexuiz': {
-        'protocol': 3,
+        'protocols': [
+            3
+        ],
         'game_name': 'Nexuiz',
         'servers': {
             'deathmask.net': {
@@ -250,7 +271,9 @@ QUAKE3_CONFIGS = {
         }
     },
     'openarena': {
-        'protocol': 71,
+        'protocols': [
+            71
+        ],
         'servers': {
             'deathmask.net': {
                 'hostname': 'dpmaster.deathmask.net',
@@ -259,7 +282,9 @@ QUAKE3_CONFIGS = {
         }
     },
     'q3rally': {
-        'protocol': 71,
+        'protocols': [
+            71
+        ],
         'game_name': 'Q3Rally',
         'servers': {
             'deathmask.net': {
@@ -269,7 +294,9 @@ QUAKE3_CONFIGS = {
         }
     },
     'quake': {
-        'protocol': 3,
+        'protocols': [
+            3
+        ],
         'game_name': 'DarkPlaces-Quake',
         'servers': {
             'deathmask.net': {
@@ -279,7 +306,9 @@ QUAKE3_CONFIGS = {
         }
     },
     'quake3arena': {
-        'protocol': 68,
+        'protocols': [
+            68
+        ],
         'servers': {
             'quake3arena.com': {
                 'hostname': 'master.quake3arena.com',
@@ -317,7 +346,9 @@ QUAKE3_CONFIGS = {
         }
     },
     'rtcw': {
-        'protocol': 57,
+        'protocols': [
+            57
+        ],
         'servers': {
             'idsoftware': {
                 'hostname': 'wolfmaster.idsoftware.com',
@@ -326,7 +357,9 @@ QUAKE3_CONFIGS = {
         }
     },
     'sof2-demo': {
-        'protocol': 2001,
+        'protocols': [
+            2001
+        ],
         'servers': {
             'ravensoft': {
                 'hostname': 'master.sof2.ravensoft.com',
@@ -335,7 +368,9 @@ QUAKE3_CONFIGS = {
         }
     },
     'sof2-full': {
-        'protocol': 2002,
+        'protocols': [
+            2002
+        ],
         'servers': {
             'ravensoft': {
                 'hostname': 'master.sof2.ravensoft.com',
@@ -344,7 +379,9 @@ QUAKE3_CONFIGS = {
         }
     },
     'sof2-gold': {
-        'protocol': 2004,
+        'protocols': [
+            2004
+        ],
         'servers': {
             'ravensoft': {
                 'hostname': 'master.sof2.ravensoft.com',
@@ -353,7 +390,9 @@ QUAKE3_CONFIGS = {
         }
     },
     'swjk': {
-        'protocol': 26,
+        'protocols': [
+            26
+        ],
         'servers': {
             'ravensoft': {
                 'hostname': 'masterjk3.ravensoft.com',
@@ -362,7 +401,9 @@ QUAKE3_CONFIGS = {
         }
     },
     'tremulous': {
-        'protocol': 69,
+        'protocols': [
+            69
+        ],
         'servers': {
             'tremulous.net': {
                 'hostname': 'master.tremulous.net',
@@ -371,7 +412,9 @@ QUAKE3_CONFIGS = {
         }
     },
     'urbanterror': {
-        'protocol': 68,
+        'protocols': [
+            68
+        ],
         'servers': {
             'urbanterror.info': {
                 'hostname': 'master.urbanterror.info',
@@ -380,7 +423,9 @@ QUAKE3_CONFIGS = {
         }
     },
     'warfork': {
-        'protocol': 23,
+        'protocols': [
+            23
+        ],
         'game_name': 'Warfork',
         'servers': {
             'deathmask.net': {
@@ -390,7 +435,9 @@ QUAKE3_CONFIGS = {
         }
     },
     'warsow': {
-        'protocol': 22,
+        'protocols': [
+            22
+        ],
         'game_name': 'Warsow',
         'servers': {
             'deathmask.net': {
@@ -400,7 +447,9 @@ QUAKE3_CONFIGS = {
         }
     },
     'wolfensteinet': {
-        'protocol': 84,
+        'protocols': [
+            84
+        ],
         'servers': {
             'idsoftware': {
                 'hostname': 'etmaster.idsoftware.com',
@@ -413,7 +462,9 @@ QUAKE3_CONFIGS = {
         }
     },
     'xonotic': {
-        'protocol': 3,
+        'protocols': [
+            3
+        ],
         'game_name': 'Xonotic',
         'servers': {
             'deathmask.net': {
