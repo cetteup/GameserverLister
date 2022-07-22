@@ -182,6 +182,9 @@ QUAKE3_CONFIGS = {
                 'hostname': 'codmaster.activision.com',
                 'port': 20510
             }
+        },
+        'linkTemplateRefs': {
+            'activision': ['cod.pm']
         }
     },
     'coduo': {
@@ -191,6 +194,9 @@ QUAKE3_CONFIGS = {
                 'hostname': 'coduomaster.activision.com',
                 'port': 20610
             }
+        },
+        'linkTemplateRefs': {
+            'activision': ['cod.pm']
         }
     },
     'cod2': {
@@ -200,6 +206,9 @@ QUAKE3_CONFIGS = {
                 'hostname': 'cod2master.activision.com',
                 'port': 20710
             }
+        },
+        'linkTemplateRefs': {
+            'activision': ['cod.pm']
         }
     },
     'cod4': {
@@ -209,6 +218,9 @@ QUAKE3_CONFIGS = {
                 'hostname': 'cod4master.activision.com',
                 'port': 20810
             }
+        },
+        'linkTemplateRefs': {
+            'activision': ['cod.pm']
         }
     },
     'cod4x': {

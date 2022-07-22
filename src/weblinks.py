@@ -96,6 +96,11 @@ WEB_LINK_TEMPLATES: Dict[str, WebLinkTemplate] = {
         'https://www.bf2hub.com/server/{2}:{3}/',
         True
     ),
+    'cod.pm': WebLinkTemplate(
+      'cod.pm',
+      'https://cod.pm/server/{2}/{3}',
+      False
+    ),
     'gametools': WebLinkTemplate(
         'gametools.network',
         'https://gametools.network/servers/{0}/gameid/{1}/pc',

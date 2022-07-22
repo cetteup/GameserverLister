@@ -906,9 +906,20 @@ class Quake3ServerLister(ServerLister):
         return check_ok, found, checks_since_last_ok
 
     def build_server_links(self, uid: str, ip: Optional[str] = None, port: Optional[int] = None) -> Union[List[WebLink], WebLink]:
-        links = []
+        template_refs = QUAKE3_CONFIGS[self.game].get('linkTemplateRefs', {})
+        # Add principal-scoped links first, then add game-scoped links
+        templates = [
+            *[WEB_LINK_TEMPLATES.get(ref) for ref in template_refs.get(self.principal, [])],
+            *[WEB_LINK_TEMPLATES.get(ref) for ref in template_refs.get('_any', [])]
+        ]
+
+        # Add GameTracker link if server is listed there
         if is_server_listed_on_gametracker(self.game, ip, port):
-            links.append(WEB_LINK_TEMPLATES['gametracker'].render(self.game, uid, ip=ip, port=port))
+            templates.append(WEB_LINK_TEMPLATES['gametracker'])
+
+        links = []
+        for template in templates:
+            links.append(template.render(self.game, uid, ip=ip, port=port))
 
         return links
 
