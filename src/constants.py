@@ -271,6 +271,7 @@ QUAKE3_CONFIGS = {
         'protocols': [
             71
         ],
+        'game_name': 'Quake3Arena',
         'servers': {
             'deathmask.net': {
                 'hostname': 'dpmaster.deathmask.net',
