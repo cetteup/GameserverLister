@@ -353,31 +353,11 @@ QUAKE3_CONFIGS = {
             }
         }
     },
-    'sof2-demo': {
+    'sof2': {
         'protocols': [
-            2001
-        ],
-        'servers': {
-            'ravensoft': {
-                'hostname': 'master.sof2.ravensoft.com',
-                'port': 20110
-            }
-        }
-    },
-    'sof2-full': {
-        'protocols': [
-            2002
-        ],
-        'servers': {
-            'ravensoft': {
-                'hostname': 'master.sof2.ravensoft.com',
-                'port': 20110
-            }
-        }
-    },
-    'sof2-gold': {
-        'protocols': [
-            2004
+            2001,  # version sof2mp-1.02t (demo)
+            2002,  # version sof2mp-1.00 (full)
+            2004,  # version sof2mp-1.02 ("gold")
         ],
         'servers': {
             'ravensoft': {
