@@ -245,15 +245,12 @@ QUAKE3_CONFIGS = {
             6  # cod4 does not support different protocols, you seem to get the same servers regardless
         ],
         'keywords': 'full empty \x00',
+        'game_name': 'cod4x',
         'network_protocol': socket.SOCK_STREAM,
         'server_entry_prefix': b'\x00\x00\x00\x00\x04',
         'servers': {
-            'cod4x.me': {
-                'hostname': 'cod4master.cod4x.me',
-                'port': 20810
-            },
-            'doszgep.cloud': {
-                'hostname': 'cod4master.doszgep.cloud',
+            'cod4x.ovh': {
+                'hostname': 'cod4master.cod4x.ovh',
                 'port': 20810
             }
         }
