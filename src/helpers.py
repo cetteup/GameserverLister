@@ -119,25 +119,33 @@ def is_server_listed_on_gametracker(game: str, ip: str, port: int) -> bool:
     if game_key is None:
         return False
 
-    try:
-        resp = requests.get(
-            'https://gametracker-check.cetteup.com/',
-            params={
-                'game': game_key,
-                'query': f'{ip}:{port}'
-            },
-            timeout=2
-        )
+    page = 1
+    has_more = False
+    found = False
+    while not found and (page == 1 or has_more):
+        try:
+            # Fetch servers by ip only to improve cache hit rate
+            resp = requests.get(
+                'https://gametracker-check.cetteup.com/',
+                params={
+                    'game': game_key,
+                    'query': ip,
+                    'searchpge': page
+                },
+                timeout=2
+            )
 
-        if resp.ok:
-            parsed = resp.json()
-            return is_server_in_search_results(ip, port, parsed['results'])
-        else:
-            return False
-    except requests.RequestException as e:
-        logging.debug(e)
-        logging.error(f'Failed to check if server is listed on gametracker ({ip}:{port})')
-        return False
+            if resp.ok:
+                parsed = resp.json()
+                found = is_server_in_search_results(ip, port, parsed['results'])
+                has_more = parsed['hasMore']
+        except requests.RequestException as e:
+            logging.debug(e)
+            logging.error(f'Failed to check if server is listed on gametracker ({ip}:{port})')
+
+        page += 1
+
+    return found
 
 
 def is_server_in_search_results(ip: str, port: int, search_results: List[Dict]) -> bool:
