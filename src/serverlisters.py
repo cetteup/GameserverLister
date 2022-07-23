@@ -29,7 +29,7 @@ class ServerLister:
     game: str
     server_list_dir_path: str
     server_list_file_path: str
-    expired_ttl: int
+    expired_ttl: float
     recover: bool
     add_links: bool
     ensure_ascii: bool
@@ -43,7 +43,7 @@ class ServerLister:
             self,
             game: str,
             server_class: Type[Server],
-            expired_ttl: int,
+            expired_ttl: float,
             recover: bool,
             add_links: bool,
             list_dir: str,
@@ -177,7 +177,7 @@ class GameSpyServerLister(ServerLister):
             gslist_super_query: bool,
             gslist_timeout: int,
             verify: bool,
-            expired_ttl: int,
+            expired_ttl: float,
             recover: bool,
             add_links: bool,
             list_dir: str
@@ -348,7 +348,7 @@ class FrostbiteServerLister(ServerLister):
             self,
             game: str,
             server_class: Type[Server],
-            expired_ttl: int,
+            expired_ttl: float,
             recover: bool,
             add_links: bool,
             list_dir: str,
@@ -356,7 +356,7 @@ class FrostbiteServerLister(ServerLister):
     ):
         super().__init__(game, server_class, expired_ttl, recover, add_links, list_dir, request_timeout)
 
-    def find_query_ports(self, gamedig_bin_path: str, gamedig_concurrency: int, expired_ttl: int):
+    def find_query_ports(self, gamedig_bin_path: str, gamedig_concurrency: int, expired_ttl: float):
         logging.info(f'Searching query port for {len(self.servers)} servers')
 
         search_stats = {
@@ -403,7 +403,7 @@ class FrostbiteServerLister(ServerLister):
 
 
 class BC2ServerLister(FrostbiteServerLister):
-    def __init__(self, expired_ttl: int, recover: bool, add_links: bool, list_dir: str, timeout: float):
+    def __init__(self, expired_ttl: float, recover: bool, add_links: bool, list_dir: str, timeout: float):
         super().__init__('bfbc2', Bfbc2Server, expired_ttl, recover, add_links, list_dir, timeout)
         self.server_validator = bfbc2_server_validator
 
@@ -528,7 +528,7 @@ class HttpServerLister(ServerLister):
             server_class: Type[Server],
             page_limit: int,
             per_page: int,
-            expired_ttl: int,
+            expired_ttl: float,
             recover: bool,
             add_links: bool,
             list_dir: str,
@@ -612,7 +612,7 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
             self,
             game: str,
             page_limit: int,
-            expired_ttl: int,
+            expired_ttl: float,
             recover: bool,
             add_links: bool,
             list_dir: str,
@@ -743,7 +743,7 @@ class GametoolsServerLister(HttpServerLister):
             self,
             game: str,
             page_limit: int,
-            expired_ttl: int,
+            expired_ttl: float,
             recover: bool,
             add_links: bool,
             list_dir: str,
@@ -832,7 +832,7 @@ class Quake3ServerLister(ServerLister):
     keywords: str
     server_entry_prefix: bytes
 
-    def __init__(self, game: str, principal: str, expired_ttl: int, recover: bool, add_links: bool, list_dir: str):
+    def __init__(self, game: str, principal: str, expired_ttl: float, recover: bool, add_links: bool, list_dir: str):
         super().__init__(game, ClassicServer, expired_ttl, recover, add_links, list_dir)
         # Merge default config with given principal config
         default_config = {
@@ -943,7 +943,7 @@ class MedalOfHonorServerLister(ServerLister):
     that to query servers with the information we have.
     """
 
-    def __init__(self, game: str, expired_ttl: int, recover: bool, add_links: bool, list_dir: str):
+    def __init__(self, game: str, expired_ttl: float, recover: bool, add_links: bool, list_dir: str):
         super().__init__(game, ClassicServer, expired_ttl, recover, add_links, list_dir)
 
     def update_server_list(self):
