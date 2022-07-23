@@ -456,6 +456,9 @@ QUAKE3_CONFIGS = {
                 'hostname': 'dpmaster.tchr.no',
                 'port': 27950
             }
+        },
+        'linkTemplateRefs': {
+            'deathmask.net': ['deathmask.net', 'arena.sh']
         }
     }
 }
