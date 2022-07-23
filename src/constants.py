@@ -463,11 +463,27 @@ QUAKE3_CONFIGS = {
     }
 }
 GAMETRACKER_GAME_KEYS = {
+    'bf1942': 'bf1942',
     'bfvietnam': 'bfv',
+    'bf2': 'bf2',
+    'bf2142': 'bf2',  # GameTracker does not support 2142, so some servers are added as BF2 servers
     'bfbc2': 'bc2',
+    'bf3': 'bf3',
+    'bf4': 'bf4',
     'bfh': 'bfhl',
+    'cod': 'cod',
+    'coduo': 'uo',
+    'cod2': 'cod2',
+    'cod4': 'cod4',
+    'crysis': 'crysis',
     'crysiswars': 'warhead',
+    'mohaa': 'mohaa',
     'mohbt': 'bt',
     'mohsh': 'sh',
-    'mohwf': 'mohw'
+    'mohwf': 'mohw',
+    'openarena': 'q3',  # GameTracker does not support OpenArena, so some servers are added as Quake 3 servers
+    'quake3arena': 'q3',  # Quake3Arena servers are listed as Quake 3 servers
+    'sof2': 'sof2',
+    'urbanterror': 'urbanterror',
+    'wolfensteinet': 'et',
 }

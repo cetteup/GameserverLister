@@ -112,13 +112,18 @@ def guid_from_ip_port(ip: str, port: str) -> str:
 
 
 def is_server_listed_on_gametracker(game: str, ip: str, port: int) -> bool:
+    # GameTracker uses different game names/keys for some game
+    game_key = GAMETRACKER_GAME_KEYS.get(game)
+
+    # If game is not tracked by GameTracker, there's no point in running the query
+    if game_key is None:
+        return False
+
     try:
         resp = requests.get(
             'https://gametracker-check.cetteup.com/',
             params={
-                # GameTracker uses different game names/keys for some game
-                # => get from constant with internal name as fallback
-                'game': GAMETRACKER_GAME_KEYS.get(game, game),
+                'game': game_key,
                 'query': f'{ip}:{port}'
             },
             timeout=2
