@@ -378,6 +378,10 @@ QUAKE3_CONFIGS = {
             'ravensoft': {
                 'hostname': 'masterjk3.ravensoft.com',
                 'port': 29060
+            },
+            'jkhub.org': {
+                'hostname': 'master.jkhub.org',
+                'port': 29060
             }
         }
     },
