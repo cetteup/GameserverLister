@@ -277,6 +277,9 @@ QUAKE3_CONFIGS = {
                 'hostname': 'dpmaster.deathmask.net',
                 'port': 27950
             }
+        },
+        'linkTemplateRefs': {
+            'deathmask.net': ['deathmask.net', 'arena.sh']
         }
     },
     'q3rally': {

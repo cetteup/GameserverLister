@@ -76,6 +76,11 @@ For URL templates:
 3: server port
 """
 WEB_LINK_TEMPLATES: Dict[str, WebLinkTemplate] = {
+    'arena.sh': WebLinkTemplate(
+        'arena.sh',
+        'https://arena.sh/game/{2}:{3}/',
+        False
+    ),
     'battlefieldtracker': WebLinkTemplate(
         'battlefieldtracker.com',
         'https://battlefieldtracker.com/bf1/servers/pc/{1}',
@@ -100,6 +105,11 @@ WEB_LINK_TEMPLATES: Dict[str, WebLinkTemplate] = {
       'cod.pm',
       'https://cod.pm/server/{2}/{3}',
       False
+    ),
+    'deathmask.net': WebLinkTemplate(
+        'deathmask.net',
+        'https://dpmaster.deathmask.net/?game={0}&server={2}:{3}',
+        True
     ),
     'gametools': WebLinkTemplate(
         'gametools.network',
