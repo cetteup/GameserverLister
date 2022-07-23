@@ -505,6 +505,8 @@ GAMETRACKER_GAME_KEYS = {
     'openarena': 'q3',  # GameTracker does not support OpenArena, so some servers are added as Quake 3 servers
     'quake3arena': 'q3',  # Quake3Arena servers are listed as Quake 3 servers
     'sof2': 'sof2',
+    'swjkja': 'swjk',  # GameTracker seems to track all Jedi Knight servers in a single category
+    'swjkjo': 'swjk',
     'urbanterror': 'urbanterror',
     'wolfensteinet': 'et',
 }
