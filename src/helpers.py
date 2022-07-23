@@ -120,7 +120,8 @@ def is_server_listed_on_gametracker(game: str, ip: str, port: int) -> bool:
                 # => get from constant with internal name as fallback
                 'game': GAMETRACKER_GAME_KEYS.get(game, game),
                 'query': f'{ip}:{port}'
-            }
+            },
+            timeout=2
         )
 
         if resp.ok:
