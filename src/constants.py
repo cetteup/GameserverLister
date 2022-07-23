@@ -372,7 +372,8 @@ QUAKE3_CONFIGS = {
     },
     'swjk': {
         'protocols': [
-            26
+            25,  # version 1.00
+            26,  # version 1.01
         ],
         'servers': {
             'ravensoft': {
