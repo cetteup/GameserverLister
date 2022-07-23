@@ -386,6 +386,22 @@ QUAKE3_CONFIGS = {
             }
         }
     },
+    'swjkjo': {
+        'protocols': [
+            15,  # version 1.02
+            16,  # version 1.04
+        ],
+        'servers': {
+            'ravensoft': {
+                'hostname': 'masterjk2.ravensoft.com',
+                'port': 28060
+            },
+            'jkhub.org': {
+                'hostname': 'master.jkhub.org',
+                'port': 28060
+            }
+        }
+    },
     'tremulous': {
         'protocols': [
             69
