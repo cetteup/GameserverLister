@@ -265,6 +265,9 @@ QUAKE3_CONFIGS = {
                 'hostname': 'dpmaster.deathmask.net',
                 'port': 27950
             }
+        },
+        'linkTemplateRefs': {
+            'deathmask.net': ['deathmask.net-official']
         }
     },
     'openarena': {
@@ -279,7 +282,7 @@ QUAKE3_CONFIGS = {
             }
         },
         'linkTemplateRefs': {
-            'deathmask.net': ['deathmask.net', 'arena.sh']
+            'deathmask.net': ['deathmask.net-official', 'arena.sh']
         }
     },
     'q3rally': {
@@ -292,6 +295,9 @@ QUAKE3_CONFIGS = {
                 'hostname': 'dpmaster.deathmask.net',
                 'port': 27950
             }
+        },
+        'linkTemplateRefs': {
+            'deathmask.net': ['deathmask.net-official']
         }
     },
     'quake': {
@@ -304,6 +310,9 @@ QUAKE3_CONFIGS = {
                 'hostname': 'dpmaster.deathmask.net',
                 'port': 27950
             }
+        },
+        'linkTemplateRefs': {
+            'deathmask.net': ['deathmask.net-official']
         }
     },
     'quake3arena': {
@@ -343,7 +352,6 @@ QUAKE3_CONFIGS = {
                 'hostname': 'dpmaster.deathmask.net',
                 'port': 27950
             }
-
         }
     },
     'rtcw': {
@@ -411,6 +419,9 @@ QUAKE3_CONFIGS = {
                 'hostname': 'master.tremulous.net',
                 'port': 30710
             }
+        },
+        'linkTemplateRefs': {
+            'tremulous.net': ['deathmask.net-unofficial']
         }
     },
     'urbanterror': {
@@ -422,6 +433,9 @@ QUAKE3_CONFIGS = {
                 'hostname': 'master.urbanterror.info',
                 'port': 27900
             }
+        },
+        'linkTemplateRefs': {
+            'urbanterror.info': ['deathmask.net-unofficial']
         }
     },
     'warfork': {
@@ -434,6 +448,9 @@ QUAKE3_CONFIGS = {
                 'hostname': 'dpmaster.deathmask.net',
                 'port': 27950
             }
+        },
+        'linkTemplateRefs': {
+            'deathmask.net': ['deathmask.net-official']
         }
     },
     'warsow': {
@@ -448,7 +465,7 @@ QUAKE3_CONFIGS = {
             }
         },
         'linkTemplateRefs': {
-            'deathmask.net': ['deathmask.net', 'arena.sh']
+            'deathmask.net': ['deathmask.net-official', 'arena.sh']
         }
     },
     'wolfensteinet': {
@@ -482,7 +499,7 @@ QUAKE3_CONFIGS = {
             }
         },
         'linkTemplateRefs': {
-            'deathmask.net': ['deathmask.net', 'arena.sh']
+            'deathmask.net': ['deathmask.net-official', 'arena.sh']
         }
     }
 }

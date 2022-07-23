@@ -106,10 +106,17 @@ WEB_LINK_TEMPLATES: Dict[str, WebLinkTemplate] = {
       'https://cod.pm/server/{2}/{3}',
       False
     ),
-    'deathmask.net': WebLinkTemplate(
+    # deathmask.net shows servers from their own as well as other masters,
+    # so they are not the official source for all servers
+    'deathmask.net-official': WebLinkTemplate(
         'deathmask.net',
         'https://dpmaster.deathmask.net/?game={0}&server={2}:{3}',
         True
+    ),
+    'deathmask.net-unofficial': WebLinkTemplate(
+        'deathmask.net',
+        'https://dpmaster.deathmask.net/?game={0}&server={2}:{3}',
+        False
     ),
     'gametools': WebLinkTemplate(
         'gametools.network',
