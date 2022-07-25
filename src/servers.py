@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Union, Optional, Any, List
 
 from src.constants import UNIX_EPOCH_START
@@ -39,6 +39,14 @@ class Server:
             else:
                 index = web_sites_self.index(web_link.site)
                 self.links[index].update(web_link)
+
+    def trim(self, expired_ttl: float) -> None:
+        """
+        "Trim"/remove expired attributes (no longer valid, old via status)
+        :param expired_ttl: Number of hours attributes remain valid after being last updated
+        :return:
+        """
+        pass
 
     def update(self, updated: 'Server') -> None:
         self.last_seen_at = updated.last_seen_at
@@ -116,6 +124,9 @@ class ViaStatus:
         self.first_seen_at = first_seen_at
         self.last_seen_at = last_seen_at
 
+    def is_expired(self, expired_ttl: float) -> bool:
+        return datetime.now().astimezone() > self.last_seen_at + timedelta(hours=expired_ttl)
+
     def update(self, updated: 'ViaStatus') -> None:
         self.last_seen_at = updated.last_seen_at
 
@@ -176,6 +187,9 @@ class ClassicServer(QueryableServer):
         # Leave link list empty for now (query port is usually not sufficient to build any links)
         super().__init__(guid, ip, query_port, [], first_seen_at, last_seen_at)
         self.via = via if isinstance(via, list) else [via]
+
+    def trim(self, expired_ttl: float) -> None:
+        self.via = [via for via in self.via if not via.is_expired(expired_ttl)]
 
     def update(self, updated: 'ClassicServer') -> None:
         QueryableServer.update(self, updated)

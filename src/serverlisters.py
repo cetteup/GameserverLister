@@ -102,6 +102,7 @@ class ServerLister:
                 logging.debug(f'Found server {found_server.uid} already known, updating')
                 index = known_server_uids.index(found_server.uid)
                 self.servers[index].update(found_server)
+                self.servers[index].trim(self.expired_ttl)
             else:
                 logging.debug(f'Found server {found_server.uid} is new, adding')
                 # Add new server entry
@@ -113,7 +114,7 @@ class ServerLister:
         checks_since_last_ok = 0
         expired_servers_removed = 0
         expired_servers_recovered = 0
-        for index, server in enumerate(self.servers[:]):
+        for server in self.servers[:]:
             expired = datetime.now().astimezone() > server.last_seen_at + timedelta(hours=self.expired_ttl)
             if expired and self.recover:
                 # Attempt to recover expired server by contacting/accessing it directly
@@ -132,7 +133,10 @@ class ServerLister:
                 elif check_ok and found:
                     logging.debug(f'Server {server.uid} did not appear in list but is still online, '
                                   f'updating last seen at')
-                    self.servers[self.servers.index(server)].last_seen_at = datetime.now().astimezone()
+                    index = self.servers.index(server)
+                    self.servers[index].last_seen_at = datetime.now().astimezone()
+                    self.servers[index].trim(self.expired_ttl)
+
                     expired_servers_recovered += 1
             elif expired:
                 logging.debug(f'Server {server.uid} has not been seen in '
@@ -680,6 +684,7 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
                                         timeout=self.request_timeout)
             if response.status_code == 200:
                 # Server was found on Battlelog => make sure it is still public
+                # TODO use server validator here
                 parsed = response.json()
                 found = parsed['message']['SERVER_INFO']['ip'] != ''
             elif response.status_code == 422:
