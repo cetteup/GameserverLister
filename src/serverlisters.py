@@ -727,12 +727,13 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
                 4. game port + 100 (nitrado)
                 5. game port + 5 (several hosters)
                 6. 48888 (gamed)
-                7. game port + 6 (i3D)
-                8. game port + 8 (i3D)
-                9. game port + 15 (i3D)
-                10. game port - 5 (i3D)
-                11. game port - 15 (i3D)
-                12. game port - 23000 (G4G.pl)
+                7. game port + 50
+                8. game port + 6 (i3D)
+                9. game port + 8 (i3D)
+                10. game port + 15 (i3D)
+                11. game port - 5 (i3D)
+                12. game port - 15 (i3D)
+                13. game port - 23000 (G4G.pl)
                 """
         ports_to_try = [47200, game_port + 22000, game_port, game_port + 100, game_port + 5, game_port + 1,
                         48888, game_port + 6, game_port + 8, game_port + 15, game_port - 5, game_port - 15,
