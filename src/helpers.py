@@ -86,18 +86,18 @@ def is_server_for_gamespy_game(game_name: str, parsed_result: dict) -> bool:
     :param parsed_result: Parsed result of a gslist GameSpy query against the server
     :return: True, if the results matches expected key content/structure, else false
     """
-    if game_name == GAMESPY_CONFIGS['bfvietnam']['gameName']:
+    if game_name == GAMESPY_CONFIGS['bfvietnam'].game_name:
         # Battlefield Vietnam does not reliably contain the gamename anywhere, but as some quite unique keys
         return 'allow_nose_cam' in parsed_result and 'name_tag_distance_scope' in parsed_result and \
                'soldier_friendly_fire_on_splash' in parsed_result and 'all_active_mods' in parsed_result
-    elif game_name == GAMESPY_CONFIGS['crysis']['gameName']:
+    elif game_name == GAMESPY_CONFIGS['crysis'].game_name:
         # Crysis uses the same keys as Crysiswars, but the "gamename" key is missing
         return 'voicecomm' in parsed_result and 'dx10' in parsed_result and \
                'gamepadsonly' in parsed_result and 'gamename' not in parsed_result
-    elif game_name == GAMESPY_CONFIGS['vietcong']['gameName']:
+    elif game_name == GAMESPY_CONFIGS['vietcong'].game_name:
         # Vietcong uses many of the same keys as Vietcong 2, but the "extinfo" key is missing (amongst others)
         return 'uver' in parsed_result and 'dedic' in parsed_result and 'extinfo' not in parsed_result
-    elif game_name == GAMESPY_CONFIGS['vietcong2']['gameName']:
+    elif game_name == GAMESPY_CONFIGS['vietcong2'].game_name:
         return 'uver' in parsed_result and 'dedic' in parsed_result and 'extinfo' in parsed_result
     else:
         return parsed_result.get('gamename') == game_name
