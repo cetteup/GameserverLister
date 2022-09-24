@@ -1,6 +1,9 @@
 import os
 import socket
 from datetime import datetime, timezone
+from typing import Dict
+
+from src.types import GamespyConfig
 
 ROOT_DIR = rootDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 UNIX_EPOCH_START = datetime(1970, 1, 1, tzinfo=timezone.utc)
@@ -62,110 +65,112 @@ GAMESPY_PRINCIPALS = {
         'hostname': 'vietcong1.eu'
     }
 }
-GAMESPY_CONFIGS = {
-    'crysis': {
-        'gameName': 'crysis',
-        'gameKey': 'ZvZDcL',
-        'encType': '-1',
-        'queryType': '8',
-        'port': 28910,
-        'servers': ['crymp.net'],
-        'gamedigType': 'crysis'
-    },
-    'crysiswars': {
-        'gameName': 'crysiswars',
-        'gameKey': 'zKbZiM',
-        'encType': '-1',
-        'queryType': '8',
-        'port': 28910,
-        'servers': ['jedi95.us'],
-        'gamedigType': 'crysiswars'
-    },
-    'bf1942': {
-        'gameName': 'bfield1942',
-        'gameKey': 'HpWx9z',
-        'encType': '2',
-        'queryType': '0',
-        'port': 28900,
-        'servers': ['bf1942.org', 'openspy', 'qtracker'],
-        'gamedigType': 'bf1942'
-    },
-    'bfvietnam': {
-        'gameName': 'bfvietnam',
-        'gameKey': 'h2P9dJ',
-        'encType': '2',
-        'queryType': '0',
-        'port': 28900,
-        'servers': ['openspy', 'qtracker'],
-        'gamedigType': 'bfv'
-    },
-    'bf2142': {
-        'gameName': 'stella',
-        'gameKey': 'M8o1Qw',
-        'encType': '-1',
-        'queryType': '8',
-        'port': 28910,
-        'servers': ['novgames', 'openspy', 'play2142'],
-        'gamedigType': 'bf2142'
-    },
-    'bf2': {
-        'gameName': 'battlefield2',
-        'gameKey': 'hW6m9a',
-        'encType': '-1',
-        'queryType': '8',
-        'port': 28910,
-        'servers': ['bf2hub', 'openspy', 'phoenixnetwork', 'playbf2'],
-        'gamedigType': 'bf2',
-        'linkTemplateRefs': {
+GAMESPY_CONFIGS: Dict[str, GamespyConfig] = {
+    'crysis': GamespyConfig(
+        game_name='crysis',
+        game_key='ZvZDcL',
+        enc_type=-1,
+        query_type=8,
+        port=28910,
+        servers=['crymp.net'],
+        gamedig_type='crysis'
+    ),
+    'crysiswars': GamespyConfig(
+        game_name='crysiswars',
+        game_key='zKbZiM',
+        enc_type=-1,
+        query_type=8,
+        port=28910,
+        servers=['jedi95.us'],
+        gamedig_type='crysiswars'
+    ),
+
+    'bf1942': GamespyConfig(
+        game_name='bfield1942',
+        game_key='HpWx9z',
+        enc_type=2,
+        query_type=0,
+        port=28900,
+        servers=['bf1942.org', 'openspy', 'qtracker'],
+        gamedig_type='bf1942'
+    ),
+
+    'bfvietnam': GamespyConfig(
+        game_name='bfvietnam',
+        game_key='h2P9dJ',
+        enc_type=2,
+        query_type=0,
+        port=28900,
+        servers=['openspy', 'qtracker'],
+        gamedig_type='bfv'
+    ),
+    'bf2142': GamespyConfig(
+        game_name='stella',
+        game_key='M8o1Qw',
+        enc_type=-1,
+        query_type=8,
+        port=28910,
+        servers=['novgames', 'openspy', 'play2142'],
+        gamedig_type='bf2142'
+    ),
+    'bf2': GamespyConfig(
+        game_name='battlefield2',
+        game_key='hW6m9a',
+        enc_type=-1,
+        query_type=8,
+        port=28910,
+        servers=['bf2hub', 'openspy', 'phoenixnetwork', 'playbf2'],
+        gamedig_type='bf2',
+        link_template_refs={
             '_any': ['bf2.tv'],
             'bf2hub': ['bf2hub']
         }
-    },
-    'jbnightfire': {
-        'gameName': 'jbnightfire',
-        'gameKey': 'S9j3L2',
-        'encType': '-1',
-        'queryType': '0',
-        'port': 28910,
-        'servers': ['openspy', 'nightfirepc.com'],
-        'gamedigType': 'jamesbondnightfire'
-    },
-    'paraworld': {
-        'gameName': 'paraworld',
-        'gameKey': 'EUZpQF',
-        'encType': '-1',
-        'queryType': '8',
-        'port': 28910,
-        'servers': ['openspy'],
-        'gamedigType': 'protocol-gamespy2'
-    },
-    'postal2': {
-        'gameName': 'postal2',
-        'gameKey': 'yw3R9c',
-        'encType': '0',
-        'queryType': '0',
-        'port': 28900,
-        'servers': ['333networks.com-1'],
-        'gamedigType': 'postal2'
-    },
-    'vietcong': {
-        'gameName': 'vietcong',
-        'gameKey': 'bq98mE',
-        'encType': '2',
-        'queryType': '0',
-        'port': 28900,
-        'servers': ['vietcong.tk', 'vietcong1.eu', 'qtracker'],
-        'gamedigType': 'vietcong'
-    },
-    'vietcong2': {
-        'gameName': 'vietcong2',
-        'gameKey': 'zX2pq6',
-        'encType': '-1',
-        'queryType': '8',
-        'port': 28910,
-        'servers': ['openspy'],
-        'gamedigType': 'vietcong2'
-    }
+    ),
+    'jbnightfire': GamespyConfig(
+        game_name='jbnightfire',
+        game_key='S9j3L2',
+        enc_type=-1,
+        query_type=0,
+        port=28910,
+        servers=['openspy', 'nightfirepc.com'],
+        gamedig_type='jamesbondnightfire'
+    ),
+    'paraworld': GamespyConfig(
+        game_name='paraworld',
+        game_key='EUZpQF',
+        enc_type=-1,
+        query_type=8,
+        port=28910,
+        servers=['openspy'],
+        gamedig_type='protocol-gamespy2'
+    ),
+    'postal2': GamespyConfig(
+        game_name='postal2',
+        game_key='yw3R9c',
+        enc_type=0,
+        query_type=0,
+        port=28900,
+        servers=['333networks.com-1'],
+        gamedig_type='postal2'
+    ),
+    'vietcong': GamespyConfig(
+        game_name='vietcong',
+        game_key='bq98mE',
+        enc_type=2,
+        query_type=0,
+        port=28900,
+        servers=['vietcong.tk', 'vietcong1.eu', 'qtracker'],
+        gamedig_type='vietcong'
+    ),
+    'vietcong2': GamespyConfig(
+        game_name='vietcong2',
+        game_key='zX2pq6',
+        enc_type=-1,
+        query_type=8,
+        port=28910,
+        servers=['openspy'],
+        gamedig_type='vietcong2'
+    )
 }
 BATTLELOG_GAME_BASE_URIS = {
     'bf3': 'https://battlelog.battlefield.com/bf3/servers/getAutoBrowseServers/',

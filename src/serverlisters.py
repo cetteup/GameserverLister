@@ -22,6 +22,7 @@ from src.helpers import find_query_port, bfbc2_server_validator, battlelog_serve
     is_server_listed_on_gametracker
 from src.servers import Server, ClassicServer, FrostbiteServer, Bfbc2Server, GametoolsServer, ObjectJSONEncoder, \
     ViaStatus, WebLink
+from src.types import GamespyConfig
 from src.weblinks import WEB_LINK_TEMPLATES
 
 
@@ -165,7 +166,7 @@ class ServerLister:
 class GameSpyServerLister(ServerLister):
     servers: List[ClassicServer]
     principal: str
-    config: dict
+    config: GamespyConfig
     gslist_bin_path: str
     gslist_filter: str
     gslist_super_query: bool
@@ -198,9 +199,9 @@ class GameSpyServerLister(ServerLister):
     def update_server_list(self):
         principal = GAMESPY_PRINCIPALS[self.principal]
         # Format hostname using game name (following old GameSpy format [game].master.gamespy.com)
-        hostname = principal['hostname'].format(self.config['gameName'])
+        hostname = principal['hostname'].format(self.config.game_name)
         # Combine game port and principal-specific port offset (defaulting to an offset of 0)
-        port = self.config['port'] + principal.get('portOffset', 0)
+        port = self.config.port + principal.get('portOffset', 0)
         # Manually look up hostname to be able to spread retried across servers
         looker_upper = Nslookup()
         dns_result = looker_upper.dns_lookup(hostname)
@@ -219,13 +220,13 @@ class GameSpyServerLister(ServerLister):
             server_ip = dns_result.answer[0] if tries % 2 == 0 else dns_result.answer[-1]
             try:
                 logging.info(f'Running gslist command against {server_ip}')
-                command = [self.gslist_bin_path, '-n', self.config['gameName'], '-x',
-                           f'{server_ip}:{port}', '-Y', self.config['gameName'], self.config['gameKey'],
-                           '-t', self.config['encType'], '-f', f'{self.gslist_filter}', '-o', '1']
+                command = [self.gslist_bin_path, '-n', self.config.game_name, '-x',
+                           f'{server_ip}:{port}', '-Y', self.config.game_name, self.config.game_key,
+                           '-t', str(self.config.enc_type), '-f', f'{self.gslist_filter}', '-o', '1']
                 timeout = self.gslist_timeout
                 # Add super query argument if requested
                 if self.gslist_super_query:
-                    command.extend(['-Q', self.config['queryType']])
+                    command.extend(['-Q', str(self.config.query_type)])
                     # Extend timeout to account for server queries
                     timeout += 10
                 gslist_result = subprocess.run(command, capture_output=True,
@@ -244,7 +245,7 @@ class GameSpyServerLister(ServerLister):
 
         # Read gslist output file
         logging.info('Reading gslist output file')
-        with open(os.path.join(self.server_list_dir_path, f'{self.config["gameName"]}.gsl'), 'r') as gslist_file:
+        with open(os.path.join(self.server_list_dir_path, f'{self.config.game_name}.gsl'), 'r') as gslist_file:
             raw_server_list = gslist_file.read()
 
         # Parse server list
@@ -276,7 +277,7 @@ class GameSpyServerLister(ServerLister):
                 responded, query_response = self.query_server(found_server)
                 logging.debug(f'Query {"was successful" if responded else "did not receive a response"}')
 
-                if responded and self.verify and not is_server_for_gamespy_game(self.config['gameName'], query_response):
+                if responded and self.verify and not is_server_for_gamespy_game(self.config.game_name, query_response):
                     logging.warning(f'Server does not seem to be a {self.game} server, ignoring it '
                                     f'({found_server.ip}:{found_server.query_port})')
                     continue
@@ -304,7 +305,7 @@ class GameSpyServerLister(ServerLister):
         return check_ok, found, checks_since_last_ok
 
     def build_server_links(self, uid: str, ip: Optional[str] = None, port: Optional[int] = None) -> Union[List[WebLink], WebLink]:
-        template_refs = self.config.get('linkTemplateRefs', {})
+        template_refs = self.config.link_template_refs if self.config.link_template_refs is not None else {}
         # Add principal-scoped links first, then add game-scoped links
         templates = [
             *[WEB_LINK_TEMPLATES.get(ref) for ref in template_refs.get(self.principal, [])],
@@ -323,7 +324,7 @@ class GameSpyServerLister(ServerLister):
 
     def query_server(self, server: ClassicServer) -> Tuple[bool, dict]:
         try:
-            command = [self.gslist_bin_path, '-d', self.config['queryType'], server.ip, str(server.query_port), '-0']
+            command = [self.gslist_bin_path, '-d', str(self.config.query_type), server.ip, str(server.query_port), '-0']
             # Timeout should never fire since gslist uses about a three-second timeout for the query
             gslist_result = subprocess.run(command, capture_output=True, timeout=self.gslist_timeout)
 

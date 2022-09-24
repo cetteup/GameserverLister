@@ -88,8 +88,8 @@ elif args.source == 'bfbc2':
 elif args.source == 'gamespy':
     # Set principal
     principal = None
-    availablePrincipals = GAMESPY_CONFIGS[args.game]['servers']
-    if len(availablePrincipals) > 1 and str(args.principal).lower() in GAMESPY_CONFIGS[args.game]['servers']:
+    availablePrincipals = GAMESPY_CONFIGS[args.game].servers
+    if len(availablePrincipals) > 1 and str(args.principal).lower() in GAMESPY_CONFIGS[args.game].servers:
         # More than one principal available and given principal is valid => use given principal
         principal = args.principal.lower()
     else:
