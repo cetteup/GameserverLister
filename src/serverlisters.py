@@ -22,7 +22,7 @@ from src.helpers import find_query_port, bfbc2_server_validator, battlelog_serve
     is_server_listed_on_gametracker
 from src.servers import Server, ClassicServer, FrostbiteServer, Bfbc2Server, GametoolsServer, ObjectJSONEncoder, \
     ViaStatus, WebLink
-from src.types import GamespyConfig
+from src.types import GamespyConfig, GamespyGame
 from src.weblinks import WEB_LINK_TEMPLATES
 
 
@@ -165,6 +165,7 @@ class ServerLister:
 
 class GameSpyServerLister(ServerLister):
     servers: List[ClassicServer]
+    game: GamespyGame
     principal: str
     config: GamespyConfig
     gslist_bin_path: str
@@ -175,7 +176,7 @@ class GameSpyServerLister(ServerLister):
 
     def __init__(
             self,
-            game: str,
+            game: GamespyGame,
             principal: str,
             gslist_bin_path: str,
             gslist_filter: str,
@@ -224,6 +225,9 @@ class GameSpyServerLister(ServerLister):
                            f'{server_ip}:{port}', '-Y', self.config.game_name, self.config.game_key,
                            '-t', str(self.config.enc_type), '-f', f'{self.gslist_filter}', '-o', '1']
                 timeout = self.gslist_timeout
+                # Some principals do not respond unless an info query is sent (e.g. FH2 principal)
+                if self.config.info_query is not None:
+                    command.extend(['-X', self.config.info_query])
                 # Add super query argument if requested
                 if self.gslist_super_query:
                     command.extend(['-Q', str(self.config.query_type)])
@@ -253,10 +257,8 @@ class GameSpyServerLister(ServerLister):
         logging.info(f'Parsing server list{" and verifying servers" if self.verify else ""}')
         found_servers = []
         for line in raw_server_list.splitlines():
-            ip, query_port = line.strip().split(':', 1)
-            # Stop parsing once we reach the first line with query server data
-            if len(query_port) > 5:
-                break
+            connect, *_ = line.split(' ', 1)
+            ip, query_port = connect.strip().split(':', 1)
 
             if not is_valid_public_ip(ip) or not is_valid_port(int(query_port)):
                 logging.warning(f'Principal returned invalid server entry ({ip}:{query_port}), skipping it')
@@ -277,7 +279,8 @@ class GameSpyServerLister(ServerLister):
                 responded, query_response = self.query_server(found_server)
                 logging.debug(f'Query {"was successful" if responded else "did not receive a response"}')
 
-                if responded and self.verify and not is_server_for_gamespy_game(self.config.game_name, query_response):
+                if responded and self.verify and \
+                        not is_server_for_gamespy_game(self.game, self.config.game_name, query_response):
                     logging.warning(f'Server does not seem to be a {self.game} server, ignoring it '
                                     f'({found_server.ip}:{found_server.query_port})')
                     continue

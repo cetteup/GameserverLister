@@ -6,6 +6,7 @@ from src.constants import GAMESPY_CONFIGS, GAMESPY_PRINCIPALS, QUAKE3_CONFIGS
 from src.parsers import commonParser, httpParser, queryPortParser
 from src.serverlisters import BattlelogServerLister, BC2ServerLister, GameSpyServerLister, GametoolsServerLister, \
     Quake3ServerLister, MedalOfHonorServerLister
+from src.types import GamespyGame
 
 parser = argparse.ArgumentParser(description='Retrieve a list of game servers from a given source and '
                                              'write it to a json file')
@@ -28,7 +29,7 @@ gamespyParser.add_argument('-g', '--gslist',
                            type=str, required=True)
 gamespyParser.add_argument('-b', '--game',
                            help='Game to query servers for',
-                           type=str, choices=list(GAMESPY_CONFIGS.keys()), default=list(GAMESPY_CONFIGS.keys())[0])
+                           type=str, choices=GamespyGame.list(), default=GamespyGame.list()[0])
 gamespyParser.add_argument('-p', '--principal',
                            help='Principal server to query',
                            type=str, choices=list(GAMESPY_PRINCIPALS.keys()))

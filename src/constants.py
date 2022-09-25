@@ -3,7 +3,7 @@ import socket
 from datetime import datetime, timezone
 from typing import Dict
 
-from src.types import GamespyConfig
+from src.types import GamespyConfig, GamespyGame
 
 ROOT_DIR = rootDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 UNIX_EPOCH_START = datetime(1970, 1, 1, tzinfo=timezone.utc)
@@ -26,6 +26,9 @@ GAMESPY_PRINCIPALS = {
     },
     'errorist.eu': {
         'hostname': 'master.errorist.eu'
+    },
+    'fh2.dev': {
+        'hostname': 'ms.fh2.dev'
     },
     'jedi95.us': {
         'hostname': 'master.g.jedi95.us',
@@ -65,27 +68,8 @@ GAMESPY_PRINCIPALS = {
         'hostname': 'vietcong1.eu'
     }
 }
-GAMESPY_CONFIGS: Dict[str, GamespyConfig] = {
-    'crysis': GamespyConfig(
-        game_name='crysis',
-        game_key='ZvZDcL',
-        enc_type=-1,
-        query_type=8,
-        port=28910,
-        servers=['crymp.net'],
-        gamedig_type='crysis'
-    ),
-    'crysiswars': GamespyConfig(
-        game_name='crysiswars',
-        game_key='zKbZiM',
-        enc_type=-1,
-        query_type=8,
-        port=28910,
-        servers=['jedi95.us'],
-        gamedig_type='crysiswars'
-    ),
-
-    'bf1942': GamespyConfig(
+GAMESPY_CONFIGS: Dict[GamespyGame, GamespyConfig] = {
+    GamespyGame.BF1942: GamespyConfig(
         game_name='bfield1942',
         game_key='HpWx9z',
         enc_type=2,
@@ -94,8 +78,7 @@ GAMESPY_CONFIGS: Dict[str, GamespyConfig] = {
         servers=['bf1942.org', 'openspy', 'qtracker'],
         gamedig_type='bf1942'
     ),
-
-    'bfvietnam': GamespyConfig(
+    GamespyGame.BFVIETNAM: GamespyConfig(
         game_name='bfvietnam',
         game_key='h2P9dJ',
         enc_type=2,
@@ -104,16 +87,7 @@ GAMESPY_CONFIGS: Dict[str, GamespyConfig] = {
         servers=['openspy', 'qtracker'],
         gamedig_type='bfv'
     ),
-    'bf2142': GamespyConfig(
-        game_name='stella',
-        game_key='M8o1Qw',
-        enc_type=-1,
-        query_type=8,
-        port=28910,
-        servers=['novgames', 'openspy', 'play2142'],
-        gamedig_type='bf2142'
-    ),
-    'bf2': GamespyConfig(
+    GamespyGame.BF2: GamespyConfig(
         game_name='battlefield2',
         game_key='hW6m9a',
         enc_type=-1,
@@ -126,7 +100,44 @@ GAMESPY_CONFIGS: Dict[str, GamespyConfig] = {
             'bf2hub': ['bf2hub']
         }
     ),
-    'jbnightfire': GamespyConfig(
+    GamespyGame.FH2: GamespyConfig(
+        game_name='battlefield2',
+        game_key='hW6m9a',
+        enc_type=-1,
+        query_type=8,
+        port=28910,
+        servers=['fh2.dev'],
+        gamedig_type='bf2',
+        info_query='\\hostname'
+    ),
+    GamespyGame.BF2142: GamespyConfig(
+        game_name='stella',
+        game_key='M8o1Qw',
+        enc_type=-1,
+        query_type=8,
+        port=28910,
+        servers=['novgames', 'openspy', 'play2142'],
+        gamedig_type='bf2142'
+    ),
+    GamespyGame.CRYSIS: GamespyConfig(
+        game_name='crysis',
+        game_key='ZvZDcL',
+        enc_type=-1,
+        query_type=8,
+        port=28910,
+        servers=['crymp.net'],
+        gamedig_type='crysis'
+    ),
+    GamespyGame.CRYSISWARS: GamespyConfig(
+        game_name='crysiswars',
+        game_key='zKbZiM',
+        enc_type=-1,
+        query_type=8,
+        port=28910,
+        servers=['jedi95.us'],
+        gamedig_type='crysiswars'
+    ),
+    GamespyGame.JBNIGHTFIRE: GamespyConfig(
         game_name='jbnightfire',
         game_key='S9j3L2',
         enc_type=-1,
@@ -135,7 +146,7 @@ GAMESPY_CONFIGS: Dict[str, GamespyConfig] = {
         servers=['openspy', 'nightfirepc.com'],
         gamedig_type='jamesbondnightfire'
     ),
-    'paraworld': GamespyConfig(
+    GamespyGame.PARAWORLD: GamespyConfig(
         game_name='paraworld',
         game_key='EUZpQF',
         enc_type=-1,
@@ -144,7 +155,7 @@ GAMESPY_CONFIGS: Dict[str, GamespyConfig] = {
         servers=['openspy'],
         gamedig_type='protocol-gamespy2'
     ),
-    'postal2': GamespyConfig(
+    GamespyGame.POSTAL2: GamespyConfig(
         game_name='postal2',
         game_key='yw3R9c',
         enc_type=0,
@@ -153,7 +164,7 @@ GAMESPY_CONFIGS: Dict[str, GamespyConfig] = {
         servers=['333networks.com-1'],
         gamedig_type='postal2'
     ),
-    'vietcong': GamespyConfig(
+    GamespyGame.VIETCONG: GamespyConfig(
         game_name='vietcong',
         game_key='bq98mE',
         enc_type=2,
@@ -162,7 +173,7 @@ GAMESPY_CONFIGS: Dict[str, GamespyConfig] = {
         servers=['vietcong.tk', 'vietcong1.eu', 'qtracker'],
         gamedig_type='vietcong'
     ),
-    'vietcong2': GamespyConfig(
+    GamespyGame.VIETCONG2: GamespyConfig(
         game_name='vietcong2',
         game_key='zX2pq6',
         enc_type=-1,
@@ -512,6 +523,7 @@ GAMETRACKER_GAME_KEYS = {
     'bf1942': 'bf1942',
     'bfvietnam': 'bfv',
     'bf2': 'bf2',
+    'fh2': 'bf2',  # Forgotten Hope 2 is technically a BF2 mod, so servers are added as BF2 servers
     'bf2142': 'bf2',  # GameTracker does not support 2142, so some servers are added as BF2 servers
     'bfbc2': 'bc2',
     'bf3': 'bf3',

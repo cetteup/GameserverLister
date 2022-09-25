@@ -7,8 +7,9 @@ import gevent.subprocess
 import requests
 from nslookup import Nslookup
 
-from src.constants import GAMESPY_CONFIGS, GAMETRACKER_GAME_KEYS
+from src.constants import GAMETRACKER_GAME_KEYS
 from src.servers import FrostbiteServer, Bfbc2Server
+from src.types import GamespyGame
 
 
 def find_query_port(gamedig_path: str, game: str, server: FrostbiteServer, ports_to_try: list, validator: Callable) -> int:
@@ -79,26 +80,30 @@ def bfbc2_server_validator(server: Bfbc2Server, used_query_port: int, parsed_res
            parsed_result.get('name') == server.name
 
 
-def is_server_for_gamespy_game(game_name: str, parsed_result: dict) -> bool:
+def is_server_for_gamespy_game(game: GamespyGame, game_name: str, parsed_result: dict) -> bool:
     """
     Check if a GameSpy query result matches key contents/structure we expect for a server of the given game
+    :param game: Game the server should be from/for
     :param game_name: Name of the game as referenced by gslist
     :param parsed_result: Parsed result of a gslist GameSpy query against the server
     :return: True, if the results matches expected key content/structure, else false
     """
-    if game_name == GAMESPY_CONFIGS['bfvietnam'].game_name:
+    if game == GamespyGame.BFVIETNAM:
         # Battlefield Vietnam does not reliably contain the gamename anywhere, but as some quite unique keys
         return 'allow_nose_cam' in parsed_result and 'name_tag_distance_scope' in parsed_result and \
                'soldier_friendly_fire_on_splash' in parsed_result and 'all_active_mods' in parsed_result
-    elif game_name == GAMESPY_CONFIGS['crysis'].game_name:
+    elif game == GamespyGame.CRYSIS:
         # Crysis uses the same keys as Crysiswars, but the "gamename" key is missing
         return 'voicecomm' in parsed_result and 'dx10' in parsed_result and \
                'gamepadsonly' in parsed_result and 'gamename' not in parsed_result
-    elif game_name == GAMESPY_CONFIGS['vietcong'].game_name:
+    elif game == GamespyGame.VIETCONG:
         # Vietcong uses many of the same keys as Vietcong 2, but the "extinfo" key is missing (amongst others)
         return 'uver' in parsed_result and 'dedic' in parsed_result and 'extinfo' not in parsed_result
-    elif game_name == GAMESPY_CONFIGS['vietcong2'].game_name:
+    elif game == GamespyGame.VIETCONG2:
         return 'uver' in parsed_result and 'dedic' in parsed_result and 'extinfo' in parsed_result
+    elif game == GamespyGame.FH2:
+        # Check mod value, since Forgotten Hope 2 is technically a Battlefield 2 mod
+        return parsed_result.get('gamename') == game_name and parsed_result.get('gamevariant') == 'fh2'
     else:
         return parsed_result.get('gamename') == game_name
 
