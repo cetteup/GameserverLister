@@ -51,6 +51,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Soldier of Fortune II: Double Helix    | Quake3               | Raven Software                                                                                                    |
 | Star Wars Jedi Knight II: Jedi Outcast | Quake3               | Raven Software, jkhub.org                                                                                         |
 | Star Wars Jedi Knight: Jedi Academy    | Quake3               | Raven Software, jkhub.org                                                                                         |
+| SWAT 4 ¹                               | GameSpy              | swat4stats.com                                                                                                    |
 | Tremulous                              | Quake3               | tremulous.net                                                                                                     |
 | UrbanTerror                            | Quake3               | FrozenSand                                                                                                        |
 | Vietcong                               | GameSpy              | vietcong.tk, vietcong1.eu, qtracker                                                                               |
@@ -59,6 +60,8 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Warsow                                 | Quake3               | deathmask.net                                                                                                     |
 | Wolfenstein: Enemy Territory           | Quake3               | id Software, etlegacy.com                                                                                         |
 | Xonotic                                | Quake3               | deathmask.net, tchr.no                                                                                            |
+
+¹ requires a [modified version of gslist](https://github.com/cetteup/gslist), which provides additional parameters
 
 ## Game server query ports
 

@@ -226,6 +226,10 @@ class GameSpyServerLister(ServerLister):
                            f'{server_ip}:{port}', '-Y', self.config.game_name, self.config.game_key,
                            '-t', str(self.config.enc_type), '-f', f'{self.gslist_filter}', '-o', '1']
                 timeout = self.gslist_timeout
+                # Some principals do not respond with the default query list type byte (1),
+                # so we need to explicitly set a different type byte
+                if self.config.list_type is not None:
+                    command.extend(['-T', str(self.config.list_type)])
                 # Some principals do not respond unless an info query is sent (e.g. FH2 principal)
                 if self.config.info_query is not None:
                     command.extend(['-X', self.config.info_query])

@@ -104,6 +104,9 @@ def is_server_for_gamespy_game(game: GamespyGame, game_name: str, parsed_result:
     elif game is GamespyGame.FH2:
         # Check mod value, since Forgotten Hope 2 is technically a Battlefield 2 mod
         return parsed_result.get('gamename') == game_name and parsed_result.get('gamevariant') == 'fh2'
+    elif game is GamespyGame.SWAT4:
+        # SWAT 4 has a very limited set of keys, so we need to look at values
+        return parsed_result.get('gamevariant') in ['SWAT 4', 'SWAT 4X', 'SEF']
     else:
         return parsed_result.get('gamename') == game_name
 

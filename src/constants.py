@@ -61,6 +61,9 @@ GAMESPY_PRINCIPAL_CONFIGS: Dict[GamespyPrincipal, GamespyPrincipalConfig] = {
     GamespyPrincipal.QTRACKER: GamespyPrincipalConfig(
         hostname='master2.qtracker.com'
     ),
+    GamespyPrincipal.SWAT4STATS_COM: GamespyPrincipalConfig(
+        hostname='master.swat4stats.com'
+    ),
     GamespyPrincipal.VIETCONG_TK: GamespyPrincipalConfig(
         hostname='brvps.tk'
     ),
@@ -192,6 +195,24 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.THREE_THREE_THREE_NETWORKS_COM_1
         ],
         gamedig_type='postal2'
+    ),
+    GamespyGame.SWAT4: GamespyGameConfig(
+        game_name='swat4',
+        game_key='tG3j8c',
+        enc_type=-1,
+        query_type=0,
+        port=28910,
+        principals=[
+            GamespyPrincipal.SWAT4STATS_COM
+        ],
+        gamedig_type='swat4',
+        # The SWAT 4 principal is the only one which does not return servers if the list type byte is set to 1,
+        # so we need to set it to 0 (only possible using a modified version glist: https://github.com/cetteup/gslist)
+        list_type=0,
+        info_query='\\hostname',
+        link_template_refs={
+            GamespyPrincipal.SWAT4STATS_COM: ['swat4stats.com']
+        }
     ),
     GamespyGame.VIETCONG: GamespyGameConfig(
         game_name='vietcong',
@@ -577,6 +598,7 @@ GAMETRACKER_GAME_KEYS: Dict[Game, str] = {
     Quake3Game.OPENARENA: 'q3',  # GameTracker does not support OpenArena, so some servers are added as Quake 3 servers
     Quake3Game.QUAKE3ARENA: 'q3',  # Quake3Arena servers are listed as Quake 3 servers
     Quake3Game.SOF2: 'sof2',
+    GamespyGame.SWAT4: 'swat4',
     Quake3Game.SWJKJA: 'swjk',  # GameTracker seems to track all Jedi Knight servers in a single category
     Quake3Game.SWJKJO: 'swjk',
     Quake3Game.URBANTERROR: 'urbanterror',

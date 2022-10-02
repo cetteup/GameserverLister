@@ -32,6 +32,7 @@ class GamespyPrincipal(Principal):
     PLAY2142 = 'play2142'
     PLAYBF2 = 'playbf2'
     QTRACKER = 'qtracker'
+    SWAT4STATS_COM = 'swat4stats.com'
     VIETCONG_TK = 'vietcong.tk'
     VIETCONG1_EU = 'vietcong1.eu'
 
@@ -62,6 +63,7 @@ class GamespyGame(Game):
     JBNIGHTFIRE = 'jbnightfire'
     PARAWORLD = 'paraworld'
     POSTAL2 = 'postal2'
+    SWAT4 = 'swat4'
     VIETCONG = 'vietcong'
     VIETCONG2 = 'vietcong2'
 
@@ -121,5 +123,6 @@ class GamespyGameConfig:
     port: int
     principals: List[GamespyPrincipal]
     gamedig_type: str
+    list_type: Optional[int] = None
     info_query: Optional[str] = None
     link_template_refs: Optional[Dict[Union[str, GamespyPrincipal], List[str]]] = None
