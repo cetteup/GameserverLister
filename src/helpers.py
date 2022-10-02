@@ -88,20 +88,20 @@ def is_server_for_gamespy_game(game: GamespyGame, game_name: str, parsed_result:
     :param parsed_result: Parsed result of a gslist GameSpy query against the server
     :return: True, if the results matches expected key content/structure, else false
     """
-    if game == GamespyGame.BFVIETNAM:
+    if game is GamespyGame.BFVIETNAM:
         # Battlefield Vietnam does not reliably contain the gamename anywhere, but as some quite unique keys
         return 'allow_nose_cam' in parsed_result and 'name_tag_distance_scope' in parsed_result and \
                'soldier_friendly_fire_on_splash' in parsed_result and 'all_active_mods' in parsed_result
-    elif game == GamespyGame.CRYSIS:
+    elif game is GamespyGame.CRYSIS:
         # Crysis uses the same keys as Crysiswars, but the "gamename" key is missing
         return 'voicecomm' in parsed_result and 'dx10' in parsed_result and \
                'gamepadsonly' in parsed_result and 'gamename' not in parsed_result
-    elif game == GamespyGame.VIETCONG:
+    elif game is GamespyGame.VIETCONG:
         # Vietcong uses many of the same keys as Vietcong 2, but the "extinfo" key is missing (amongst others)
         return 'uver' in parsed_result and 'dedic' in parsed_result and 'extinfo' not in parsed_result
-    elif game == GamespyGame.VIETCONG2:
+    elif game is GamespyGame.VIETCONG2:
         return 'uver' in parsed_result and 'dedic' in parsed_result and 'extinfo' in parsed_result
-    elif game == GamespyGame.FH2:
+    elif game is GamespyGame.FH2:
         # Check mod value, since Forgotten Hope 2 is technically a Battlefield 2 mod
         return parsed_result.get('gamename') == game_name and parsed_result.get('gamevariant') == 'fh2'
     else:

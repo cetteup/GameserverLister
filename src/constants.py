@@ -3,195 +3,230 @@ import socket
 from datetime import datetime, timezone
 from typing import Dict
 
-from src.types import GamespyConfig, GamespyGame
+from src.types import GamespyGameConfig, GamespyGame, GamespyPrincipal, GamespyPrincipalConfig, Quake3Game, \
+    BattlelogGame, Game, TheaterGame, MedalOfHonorGame
 
 ROOT_DIR = rootDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 UNIX_EPOCH_START = datetime(1970, 1, 1, tzinfo=timezone.utc)
-GAMESPY_PRINCIPALS = {
-    '333networks.com-1': {
-        'hostname': 'master.333networks.com'
-    },
-    '333networks.com-2': {
-        'hostname': 'rhea.333networks.com'
-    },
-    'bf1942.org': {
-        'hostname': 'master.bf1942.org'
-    },
-    'bf2hub': {
-        'hostname': 'servers.bf2hub.com',
-        'portOffset': 1
-    },
-    'crymp.net': {
-        'hostname': 'master.crymp.net'
-    },
-    'errorist.eu': {
-        'hostname': 'master.errorist.eu'
-    },
-    'fh2.dev': {
-        'hostname': 'ms.fh2.dev'
-    },
-    'jedi95.us': {
-        'hostname': 'master.g.jedi95.us',
-    },
-    'newbiesplayground.net': {
-        'hostname': 'master.newbiesplayground.net'
-    },
-    'nightfirepc.com': {
-        # This (currently) just points at openspy
-        'hostname': 'master.nightfirepc.com'
-    },
-    'novgames': {
-        'hostname': '2142.novgames.ru'
-    },
-    'oldunreal.com': {
-        'hostname': 'master2.oldunreal.com'
-    },
-    'openspy': {
-        'hostname': '{0}.master.openspy.net'
-    },
-    'phoenixnetwork': {
-        'hostname': 'master.phoenixnetwork.net'
-    },
-    'play2142': {
-        'hostname': '{0}.ms.play2142.ru'
-    },
-    'playbf2': {
-        'hostname': '{0}.ms.playbf2.ru'
-    },
-    'qtracker': {
-        'hostname': 'master2.qtracker.com'
-    },
-    'vietcong.tk': {
-        'hostname': 'brvps.tk'
-    },
-    'vietcong1.eu': {
-        'hostname': 'vietcong1.eu'
-    }
+GAMESPY_PRINCIPAL_CONFIGS: Dict[GamespyPrincipal, GamespyPrincipalConfig] = {
+    GamespyPrincipal.THREE_THREE_THREE_NETWORKS_COM_1: GamespyPrincipalConfig(
+        hostname='master.333networks.com'
+    ),
+    GamespyPrincipal.THREE_THREE_THREE_NETWORKS_COM_2: GamespyPrincipalConfig(
+        hostname='rhea.333networks.com'
+    ),
+    GamespyPrincipal.BF1942_ORG: GamespyPrincipalConfig(
+        hostname='master.bf1942.org'
+    ),
+    GamespyPrincipal.BF2HUB: GamespyPrincipalConfig(
+        hostname='servers.bf2hub.com',
+        port_offset=1
+    ),
+    GamespyPrincipal.CRYMP_NET: GamespyPrincipalConfig(
+        hostname='master.crymp.net'
+    ),
+    GamespyPrincipal.ERRORIST_EU: GamespyPrincipalConfig(
+        hostname='master.errorist.eu'
+    ),
+    GamespyPrincipal.FH2_DEV: GamespyPrincipalConfig(
+        hostname='ms.fh2.dev'
+    ),
+    GamespyPrincipal.JEDI95_US: GamespyPrincipalConfig(
+        hostname='master.g.jedi95.us'
+    ),
+    GamespyPrincipal.NEWBIESPLAYGROUND_NET: GamespyPrincipalConfig(
+        hostname='master.newbiesplayground.net'
+    ),
+    GamespyPrincipal.NIGHTFIREPC_COM: GamespyPrincipalConfig(
+        hostname='master.nightfirepc.com' # This (currently) just points at openspy
+    ),
+    GamespyPrincipal.NOVGAMES: GamespyPrincipalConfig(
+        hostname='2142.novgames.ru'
+    ),
+    GamespyPrincipal.OLDUNREAL_COM: GamespyPrincipalConfig(
+        hostname='master2.oldunreal.com'
+    ),
+    GamespyPrincipal.OPENSPY: GamespyPrincipalConfig(
+        hostname='{0}.master.openspy.net'
+    ),
+    GamespyPrincipal.PHOENIX_NETWORK: GamespyPrincipalConfig(
+        hostname='master.phoenixnetwork.net'
+    ),
+    GamespyPrincipal.PLAY2142: GamespyPrincipalConfig(
+        hostname='{0}.ms.play2142.ru'
+    ),
+    GamespyPrincipal.PLAYBF2: GamespyPrincipalConfig(
+        hostname='{0}.ms.playbf2.ru'
+    ),
+    GamespyPrincipal.QTRACKER: GamespyPrincipalConfig(
+        hostname='master2.qtracker.com'
+    ),
+    GamespyPrincipal.VIETCONG_TK: GamespyPrincipalConfig(
+        hostname='brvps.tk'
+    ),
+    GamespyPrincipal.VIETCONG1_EU: GamespyPrincipalConfig(
+        hostname='vietcong1.eu'
+    )
 }
-GAMESPY_CONFIGS: Dict[GamespyGame, GamespyConfig] = {
-    GamespyGame.BF1942: GamespyConfig(
+GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
+    GamespyGame.BF1942: GamespyGameConfig(
         game_name='bfield1942',
         game_key='HpWx9z',
         enc_type=2,
         query_type=0,
         port=28900,
-        servers=['bf1942.org', 'openspy', 'qtracker'],
+        principals=[
+            GamespyPrincipal.BF1942_ORG,
+            GamespyPrincipal.OPENSPY,
+            GamespyPrincipal.QTRACKER
+        ],
         gamedig_type='bf1942'
     ),
-    GamespyGame.BFVIETNAM: GamespyConfig(
+    GamespyGame.BFVIETNAM: GamespyGameConfig(
         game_name='bfvietnam',
         game_key='h2P9dJ',
         enc_type=2,
         query_type=0,
         port=28900,
-        servers=['openspy', 'qtracker'],
+        principals=[
+            GamespyPrincipal.OPENSPY,
+            GamespyPrincipal.QTRACKER
+        ],
         gamedig_type='bfv'
     ),
-    GamespyGame.BF2: GamespyConfig(
+    GamespyGame.BF2: GamespyGameConfig(
         game_name='battlefield2',
         game_key='hW6m9a',
         enc_type=-1,
         query_type=8,
         port=28910,
-        servers=['bf2hub', 'openspy', 'phoenixnetwork', 'playbf2'],
+        principals=[
+            GamespyPrincipal.BF2HUB,
+            GamespyPrincipal.OPENSPY,
+            GamespyPrincipal.PHOENIX_NETWORK,
+            GamespyPrincipal.PLAYBF2
+        ],
         gamedig_type='bf2',
         link_template_refs={
             '_any': ['bf2.tv'],
-            'bf2hub': ['bf2hub']
+            GamespyPrincipal.BF2HUB: ['bf2hub']
         }
     ),
-    GamespyGame.FH2: GamespyConfig(
+    GamespyGame.FH2: GamespyGameConfig(
         game_name='battlefield2',
         game_key='hW6m9a',
         enc_type=-1,
         query_type=8,
         port=28910,
-        servers=['fh2.dev'],
+        principals=[
+            GamespyPrincipal.FH2_DEV
+        ],
         gamedig_type='bf2',
         info_query='\\hostname'
     ),
-    GamespyGame.BF2142: GamespyConfig(
+    GamespyGame.BF2142: GamespyGameConfig(
         game_name='stella',
         game_key='M8o1Qw',
         enc_type=-1,
         query_type=8,
         port=28910,
-        servers=['novgames', 'openspy', 'play2142'],
+        principals=[
+            GamespyPrincipal.NOVGAMES,
+            GamespyPrincipal.OPENSPY,
+            GamespyPrincipal.PLAY2142
+        ],
         gamedig_type='bf2142'
     ),
-    GamespyGame.CRYSIS: GamespyConfig(
+    GamespyGame.CRYSIS: GamespyGameConfig(
         game_name='crysis',
         game_key='ZvZDcL',
         enc_type=-1,
         query_type=8,
         port=28910,
-        servers=['crymp.net'],
+        principals=[
+            GamespyPrincipal.CRYMP_NET
+        ],
         gamedig_type='crysis'
     ),
-    GamespyGame.CRYSISWARS: GamespyConfig(
+    GamespyGame.CRYSISWARS: GamespyGameConfig(
         game_name='crysiswars',
         game_key='zKbZiM',
         enc_type=-1,
         query_type=8,
         port=28910,
-        servers=['jedi95.us'],
+        principals=[
+            GamespyPrincipal.JEDI95_US
+        ],
         gamedig_type='crysiswars'
     ),
-    GamespyGame.JBNIGHTFIRE: GamespyConfig(
+    GamespyGame.JBNIGHTFIRE: GamespyGameConfig(
         game_name='jbnightfire',
         game_key='S9j3L2',
         enc_type=-1,
         query_type=0,
         port=28910,
-        servers=['openspy', 'nightfirepc.com'],
+        principals=[
+            GamespyPrincipal.OPENSPY,
+            GamespyPrincipal.NIGHTFIREPC_COM
+        ],
         gamedig_type='jamesbondnightfire'
     ),
-    GamespyGame.PARAWORLD: GamespyConfig(
+    GamespyGame.PARAWORLD: GamespyGameConfig(
         game_name='paraworld',
         game_key='EUZpQF',
         enc_type=-1,
         query_type=8,
         port=28910,
-        servers=['openspy'],
+        principals=[
+            GamespyPrincipal.OPENSPY
+        ],
         gamedig_type='protocol-gamespy2'
     ),
-    GamespyGame.POSTAL2: GamespyConfig(
+    GamespyGame.POSTAL2: GamespyGameConfig(
         game_name='postal2',
         game_key='yw3R9c',
         enc_type=0,
         query_type=0,
         port=28900,
-        servers=['333networks.com-1'],
+        principals=[
+            GamespyPrincipal.THREE_THREE_THREE_NETWORKS_COM_1
+        ],
         gamedig_type='postal2'
     ),
-    GamespyGame.VIETCONG: GamespyConfig(
+    GamespyGame.VIETCONG: GamespyGameConfig(
         game_name='vietcong',
         game_key='bq98mE',
         enc_type=2,
         query_type=0,
         port=28900,
-        servers=['vietcong.tk', 'vietcong1.eu', 'qtracker'],
+        principals=[
+            GamespyPrincipal.VIETCONG_TK,
+            GamespyPrincipal.VIETCONG1_EU,
+            GamespyPrincipal.QTRACKER
+        ],
         gamedig_type='vietcong'
     ),
-    GamespyGame.VIETCONG2: GamespyConfig(
+    GamespyGame.VIETCONG2: GamespyGameConfig(
         game_name='vietcong2',
         game_key='zX2pq6',
         enc_type=-1,
         query_type=8,
         port=28910,
-        servers=['openspy'],
+        principals=[
+            GamespyPrincipal.OPENSPY
+        ],
         gamedig_type='vietcong2'
     )
 }
-BATTLELOG_GAME_BASE_URIS = {
-    'bf3': 'https://battlelog.battlefield.com/bf3/servers/getAutoBrowseServers/',
-    'bf4': 'https://battlelog.battlefield.com/bf4/servers/getServers/pc/',
-    'bfh': 'https://battlelog.battlefield.com/bfh/servers/getServers/pc/',
-    'mohwf': 'https://battlelog.battlefield.com/mohw/servers/getAutoBrowseServers/'
+BATTLELOG_GAME_BASE_URIS: Dict[BattlelogGame, str] = {
+    BattlelogGame.BF3: 'https://battlelog.battlefield.com/bf3/servers/getAutoBrowseServers/',
+    BattlelogGame.BF4: 'https://battlelog.battlefield.com/bf4/servers/getServers/pc/',
+    BattlelogGame.BFH: 'https://battlelog.battlefield.com/bfh/servers/getServers/pc/',
+    BattlelogGame.MOHWF: 'https://battlelog.battlefield.com/mohw/servers/getAutoBrowseServers/'
 }
 GAMETOOLS_BASE_URI = 'https://api.gametools.network'
-QUAKE3_CONFIGS = {
-    'cod': {
+QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
+    Quake3Game.COD: {
         'protocols': [
             1,  # version 1.1
             2,  # version 1.2
@@ -209,7 +244,7 @@ QUAKE3_CONFIGS = {
             'activision': ['cod.pm']
         }
     },
-    'coduo': {
+    Quake3Game.CODUO: {
         'protocols': [
             21,  # version 1.41
             22,  # version 1.51
@@ -224,7 +259,7 @@ QUAKE3_CONFIGS = {
             'activision': ['cod.pm']
         }
     },
-    'cod2': {
+    Quake3Game.COD2: {
         'protocols': [
             115,  # version 1.0
             117,  # version 1.2
@@ -240,7 +275,7 @@ QUAKE3_CONFIGS = {
             'activision': ['cod.pm']
         }
     },
-    'cod4': {
+    Quake3Game.COD4: {
         'protocols': [
             1,  # version 1.0
             6,  # version 1.7
@@ -256,7 +291,7 @@ QUAKE3_CONFIGS = {
             'activision': ['cod.pm']
         }
     },
-    'cod4x': {
+    Quake3Game.COD4X: {
         'protocols': [
             6  # cod4 does not support different protocols, you seem to get the same servers regardless
         ],
@@ -271,7 +306,7 @@ QUAKE3_CONFIGS = {
             }
         }
     },
-    'nexuiz': {
+    Quake3Game.NEXUIZ: {
         'protocols': [
             3
         ],
@@ -286,7 +321,7 @@ QUAKE3_CONFIGS = {
             'deathmask.net': ['deathmask.net-official']
         }
     },
-    'openarena': {
+    Quake3Game.OPENARENA: {
         'protocols': [
             71
         ],
@@ -301,7 +336,7 @@ QUAKE3_CONFIGS = {
             'deathmask.net': ['deathmask.net-official', 'arena.sh']
         }
     },
-    'q3rally': {
+    Quake3Game.Q3RALLY: {
         'protocols': [
             71
         ],
@@ -316,7 +351,7 @@ QUAKE3_CONFIGS = {
             'deathmask.net': ['deathmask.net-official']
         }
     },
-    'quake': {
+    Quake3Game.QUAKE: {
         'protocols': [
             3
         ],
@@ -331,7 +366,7 @@ QUAKE3_CONFIGS = {
             'deathmask.net': ['deathmask.net-official']
         }
     },
-    'quake3arena': {
+    Quake3Game.QUAKE3ARENA: {
         'protocols': [
             68
         ],
@@ -370,7 +405,7 @@ QUAKE3_CONFIGS = {
             }
         }
     },
-    'rtcw': {
+    Quake3Game.RTCW: {
         'protocols': [
             57
         ],
@@ -381,7 +416,7 @@ QUAKE3_CONFIGS = {
             }
         }
     },
-    'sof2': {
+    Quake3Game.SOF2: {
         'protocols': [
             2001,  # version sof2mp-1.02t (demo)
             2002,  # version sof2mp-1.00 (full)
@@ -394,7 +429,7 @@ QUAKE3_CONFIGS = {
             }
         }
     },
-    'swjkja': {
+    Quake3Game.SWJKJA: {
         'protocols': [
             25,  # version 1.00
             26,  # version 1.01
@@ -410,7 +445,7 @@ QUAKE3_CONFIGS = {
             }
         }
     },
-    'swjkjo': {
+    Quake3Game.SWJKJO: {
         'protocols': [
             15,  # version 1.02
             16,  # version 1.04
@@ -426,7 +461,7 @@ QUAKE3_CONFIGS = {
             }
         }
     },
-    'tremulous': {
+    Quake3Game.TREMULOUS: {
         'protocols': [
             69
         ],
@@ -440,7 +475,7 @@ QUAKE3_CONFIGS = {
             'tremulous.net': ['deathmask.net-unofficial']
         }
     },
-    'urbanterror': {
+    Quake3Game.URBANTERROR: {
         'protocols': [
             68
         ],
@@ -454,7 +489,7 @@ QUAKE3_CONFIGS = {
             'urbanterror.info': ['deathmask.net-unofficial']
         }
     },
-    'warfork': {
+    Quake3Game.WARFORK: {
         'protocols': [
             23
         ],
@@ -469,7 +504,7 @@ QUAKE3_CONFIGS = {
             'deathmask.net': ['deathmask.net-official']
         }
     },
-    'warsow': {
+    Quake3Game.WARSOW: {
         'protocols': [
             22
         ],
@@ -484,7 +519,7 @@ QUAKE3_CONFIGS = {
             'deathmask.net': ['deathmask.net-official', 'arena.sh']
         }
     },
-    'wolfensteinet': {
+    Quake3Game.WOLFENSTEINET: {
         'protocols': [
             84
         ],
@@ -499,7 +534,7 @@ QUAKE3_CONFIGS = {
             }
         }
     },
-    'xonotic': {
+    Quake3Game.XONOTIC: {
         'protocols': [
             3
         ],
@@ -519,31 +554,31 @@ QUAKE3_CONFIGS = {
         }
     }
 }
-GAMETRACKER_GAME_KEYS = {
-    'bf1942': 'bf1942',
-    'bfvietnam': 'bfv',
-    'bf2': 'bf2',
-    'fh2': 'bf2',  # Forgotten Hope 2 is technically a BF2 mod, so servers are added as BF2 servers
-    'bf2142': 'bf2',  # GameTracker does not support 2142, so some servers are added as BF2 servers
-    'bfbc2': 'bc2',
-    'bf3': 'bf3',
-    'bf4': 'bf4',
-    'bfh': 'bfhl',
-    'cod': 'cod',
-    'coduo': 'uo',
-    'cod2': 'cod2',
-    'cod4': 'cod4',
-    'crysis': 'crysis',
-    'crysiswars': 'warhead',
-    'mohaa': 'mohaa',
-    'mohbt': 'bt',
-    'mohsh': 'sh',
-    'mohwf': 'mohw',
-    'openarena': 'q3',  # GameTracker does not support OpenArena, so some servers are added as Quake 3 servers
-    'quake3arena': 'q3',  # Quake3Arena servers are listed as Quake 3 servers
-    'sof2': 'sof2',
-    'swjkja': 'swjk',  # GameTracker seems to track all Jedi Knight servers in a single category
-    'swjkjo': 'swjk',
-    'urbanterror': 'urbanterror',
-    'wolfensteinet': 'et',
+GAMETRACKER_GAME_KEYS: Dict[Game, str] = {
+    GamespyGame.BF1942: 'bf1942',
+    GamespyGame.BFVIETNAM: 'bfv',
+    GamespyGame.BF2: 'bf2',
+    GamespyGame.FH2: 'bf2',  # Forgotten Hope 2 is technically a BF2 mod, so servers are added as BF2 servers
+    GamespyGame.BF2142: 'bf2',  # GameTracker does not support 2142, so some servers are added as BF2 servers
+    TheaterGame.BFBC2: 'bc2',
+    BattlelogGame.BF3: 'bf3',
+    BattlelogGame.BF4: 'bf4',
+    BattlelogGame.BFH: 'bfhl',
+    Quake3Game.COD: 'cod',
+    Quake3Game.CODUO: 'uo',
+    Quake3Game.COD2: 'cod2',
+    Quake3Game.COD4: 'cod4',
+    GamespyGame.CRYSIS: 'crysis',
+    GamespyGame.CRYSISWARS: 'warhead',
+    MedalOfHonorGame.AA: 'mohaa',
+    MedalOfHonorGame.BT: 'bt',
+    MedalOfHonorGame.SH: 'sh',
+    BattlelogGame.MOHWF: 'mohw',
+    Quake3Game.OPENARENA: 'q3',  # GameTracker does not support OpenArena, so some servers are added as Quake 3 servers
+    Quake3Game.QUAKE3ARENA: 'q3',  # Quake3Arena servers are listed as Quake 3 servers
+    Quake3Game.SOF2: 'sof2',
+    Quake3Game.SWJKJA: 'swjk',  # GameTracker seems to track all Jedi Knight servers in a single category
+    Quake3Game.SWJKJO: 'swjk',
+    Quake3Game.URBANTERROR: 'urbanterror',
+    Quake3Game.WOLFENSTEINET: 'et',
 }

@@ -15,19 +15,20 @@ import requests
 from gevent.pool import Pool
 from nslookup import Nslookup
 
-from src.constants import BATTLELOG_GAME_BASE_URIS, GAMESPY_CONFIGS, QUAKE3_CONFIGS, GAMESPY_PRINCIPALS, \
+from src.constants import BATTLELOG_GAME_BASE_URIS, GAMESPY_GAME_CONFIGS, QUAKE3_CONFIGS, GAMESPY_PRINCIPAL_CONFIGS, \
     GAMETOOLS_BASE_URI
 from src.helpers import find_query_port, bfbc2_server_validator, battlelog_server_validator, \
     guid_from_ip_port, mohwf_server_validator, is_valid_port, is_valid_public_ip, is_server_for_gamespy_game, \
     is_server_listed_on_gametracker
 from src.servers import Server, ClassicServer, FrostbiteServer, Bfbc2Server, GametoolsServer, ObjectJSONEncoder, \
     ViaStatus, WebLink
-from src.types import GamespyConfig, GamespyGame
+from src.types import GamespyGameConfig, GamespyGame, GamespyPrincipal, Game, Quake3Game, BattlelogGame, GametoolsGame, \
+    MedalOfHonorGame, TheaterGame
 from src.weblinks import WEB_LINK_TEMPLATES
 
 
 class ServerLister:
-    game: str
+    game: Game
     server_list_dir_path: str
     server_list_file_path: str
     expired_ttl: float
@@ -42,7 +43,7 @@ class ServerLister:
 
     def __init__(
             self,
-            game: str,
+            game: Game,
             server_class: Type[Server],
             expired_ttl: float,
             recover: bool,
@@ -50,7 +51,7 @@ class ServerLister:
             list_dir: str,
             request_timeout: float = 5.0
     ):
-        self.game = game.lower()
+        self.game = game
         self.server_list_dir_path = os.path.realpath(list_dir)
         self.server_list_file_path = os.path.join(self.server_list_dir_path, f'{self.game}-servers.json')
 
@@ -164,10 +165,10 @@ class ServerLister:
 
 
 class GameSpyServerLister(ServerLister):
-    servers: List[ClassicServer]
     game: GamespyGame
-    principal: str
-    config: GamespyConfig
+    servers: List[ClassicServer]
+    principal: GamespyPrincipal
+    config: GamespyGameConfig
     gslist_bin_path: str
     gslist_filter: str
     gslist_super_query: bool
@@ -177,7 +178,7 @@ class GameSpyServerLister(ServerLister):
     def __init__(
             self,
             game: GamespyGame,
-            principal: str,
+            principal: GamespyPrincipal,
             gslist_bin_path: str,
             gslist_filter: str,
             gslist_super_query: bool,
@@ -190,7 +191,7 @@ class GameSpyServerLister(ServerLister):
     ):
         super().__init__(game, ClassicServer, expired_ttl, recover, add_links, list_dir)
         self.principal = principal.lower()
-        self.config = GAMESPY_CONFIGS[self.game]
+        self.config = GAMESPY_GAME_CONFIGS[self.game]
         self.gslist_bin_path = gslist_bin_path
         self.gslist_filter = gslist_filter
         self.gslist_super_query = gslist_super_query
@@ -198,11 +199,11 @@ class GameSpyServerLister(ServerLister):
         self.verify = verify
 
     def update_server_list(self):
-        principal = GAMESPY_PRINCIPALS[self.principal]
+        principal = GAMESPY_PRINCIPAL_CONFIGS[self.principal]
         # Format hostname using game name (following old GameSpy format [game].master.gamespy.com)
-        hostname = principal['hostname'].format(self.config.game_name)
-        # Combine game port and principal-specific port offset (defaulting to an offset of 0)
-        port = self.config.port + principal.get('portOffset', 0)
+        hostname = principal.hostname.format(self.config.game_name)
+        # Combine game port and principal-specific port offset (defaults to an offset of 0)
+        port = self.config.port + principal.get_port_offset()
         # Manually look up hostname to be able to spread retried across servers
         looker_upper = Nslookup()
         dns_result = looker_upper.dns_lookup(hostname)
@@ -354,7 +355,7 @@ class FrostbiteServerLister(ServerLister):
 
     def __init__(
             self,
-            game: str,
+            game: Game,
             server_class: Type[Server],
             expired_ttl: float,
             recover: bool,
@@ -411,8 +412,10 @@ class FrostbiteServerLister(ServerLister):
 
 
 class BC2ServerLister(FrostbiteServerLister):
+    game: TheaterGame
+
     def __init__(self, expired_ttl: float, recover: bool, add_links: bool, list_dir: str, timeout: float):
-        super().__init__('bfbc2', Bfbc2Server, expired_ttl, recover, add_links, list_dir, timeout)
+        super().__init__(TheaterGame.BFBC2, Bfbc2Server, expired_ttl, recover, add_links, list_dir, timeout)
         self.server_validator = bfbc2_server_validator
 
     def update_server_list(self):
@@ -532,7 +535,7 @@ class HttpServerLister(ServerLister):
 
     def __init__(
             self,
-            game: str,
+            game: Game,
             server_class: Type[Server],
             page_limit: int,
             per_page: int,
@@ -616,9 +619,11 @@ class HttpServerLister(ServerLister):
 
 
 class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
+    game: BattlelogGame
+
     def __init__(
             self,
-            game: str,
+            game: BattlelogGame,
             page_limit: int,
             expired_ttl: float,
             recover: bool,
@@ -631,7 +636,7 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
         super().__init__(game, FrostbiteServer, page_limit, 60, expired_ttl, recover, add_links, list_dir, sleep, max_attempts)
         # Medal of Honor: Warfighter servers return the query port as part of the connect string, not the game port
         # => use different validator
-        if self.game == 'mohwf':
+        if self.game is BattlelogGame.MOHWF:
             self.server_validator = mohwf_server_validator
         else:
             self.server_validator = battlelog_server_validator
@@ -662,7 +667,7 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
             if self.add_links:
                 found_server.add_links(self.build_server_links(found_server.uid))
                 # Gametools uses the gameid for BF4 server URLs, so add that separately
-                if self.game == 'bf4':
+                if self.game is BattlelogGame.BF4:
                     found_server.add_links(WEB_LINK_TEMPLATES['gametools'].render(self.game, server['gameId']))
 
             # Add non-private servers (servers with an IP) that are new
@@ -712,7 +717,7 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
 
     def build_server_links(self, uid: str, ip: Optional[str] = None, port: Optional[int] = None) -> Union[List[WebLink], WebLink]:
         # Medal of Honor: Warfighter (mohwf) is just called "mohw" on Battlelog
-        game = 'mohw' if self.game == 'mohwf' else self.game
+        game = 'mohw' if self.game is BattlelogGame.MOHWF else self.game
         links = [WEB_LINK_TEMPLATES['battlelog'].render(game, uid)]
 
         # Gametools uses the guid as the "gameid" for BF3 and BFH, so we can add links for those
@@ -747,11 +752,12 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
 
 
 class GametoolsServerLister(HttpServerLister):
+    game: GametoolsGame
     include_official: bool
 
     def __init__(
             self,
-            game: str,
+            game: GametoolsGame,
             page_limit: int,
             expired_ttl: float,
             recover: bool,
@@ -828,13 +834,14 @@ class GametoolsServerLister(HttpServerLister):
     def build_server_links(self, uid: str, ip: Optional[str] = None, port: Optional[int] = None) -> Union[List[WebLink], WebLink]:
         links = [WEB_LINK_TEMPLATES['gametools'].render(self.game, uid)]
         # BF1 servers are also listed on battlefieldtracker.com
-        if self.game == 'bf1':
+        if self.game is GametoolsGame.BF1:
             links.append(WEB_LINK_TEMPLATES['battlefieldtracker'].render(self.game, uid))
 
         return links
 
 
 class Quake3ServerLister(ServerLister):
+    game: Quake3Game
     principal: str
     protocols: List[int]
     network_protocol: int
@@ -842,7 +849,7 @@ class Quake3ServerLister(ServerLister):
     keywords: str
     server_entry_prefix: bytes
 
-    def __init__(self, game: str, principal: str, expired_ttl: float, recover: bool, add_links: bool, list_dir: str):
+    def __init__(self, game: Quake3Game, principal: str, expired_ttl: float, recover: bool, add_links: bool, list_dir: str):
         super().__init__(game, ClassicServer, expired_ttl, recover, add_links, list_dir)
         # Merge default config with given principal config
         default_config = {
@@ -952,8 +959,9 @@ class MedalOfHonorServerLister(ServerLister):
     text files to find servers. Since the Medal of Honor games support Quake3-like queries on the game port, we can use
     that to query servers with the information we have.
     """
+    game: MedalOfHonorGame
 
-    def __init__(self, game: str, expired_ttl: float, recover: bool, add_links: bool, list_dir: str):
+    def __init__(self, game: MedalOfHonorGame, expired_ttl: float, recover: bool, add_links: bool, list_dir: str):
         super().__init__(game, ClassicServer, expired_ttl, recover, add_links, list_dir)
 
     def update_server_list(self):

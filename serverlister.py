@@ -2,11 +2,11 @@ import argparse
 import logging
 import sys
 
-from src.constants import GAMESPY_CONFIGS, GAMESPY_PRINCIPALS, QUAKE3_CONFIGS
+from src.constants import GAMESPY_GAME_CONFIGS, QUAKE3_CONFIGS
 from src.parsers import commonParser, httpParser, queryPortParser
 from src.serverlisters import BattlelogServerLister, BC2ServerLister, GameSpyServerLister, GametoolsServerLister, \
     Quake3ServerLister, MedalOfHonorServerLister
-from src.types import GamespyGame
+from src.types import GamespyGame, GamespyPrincipal, BattlelogGame, GametoolsGame, Quake3Game, MedalOfHonorGame
 
 parser = argparse.ArgumentParser(description='Retrieve a list of game servers from a given source and '
                                              'write it to a json file')
@@ -15,7 +15,7 @@ subparsers = parser.add_subparsers(title='Server list source', dest='source', re
 battlelogParser = subparsers.add_parser('battlelog', parents=[commonParser, httpParser, queryPortParser])
 battlelogParser.add_argument('-g', '--game',
                              help='Battlelog game to retrieve server list for (BF3/BF4/BFH/MOHWF)',
-                             type=str, choices=['bf3', 'bf4', 'bfh', 'mohwf'], required=True)
+                             type=BattlelogGame, choices=BattlelogGame.list(), required=True)
 
 bfbc2Parser = subparsers.add_parser('bfbc2', parents=[commonParser, queryPortParser])
 bfbc2Parser.add_argument('-t', '--timeout',
@@ -29,10 +29,10 @@ gamespyParser.add_argument('-g', '--gslist',
                            type=str, required=True)
 gamespyParser.add_argument('-b', '--game',
                            help='Game to query servers for',
-                           type=str, choices=GamespyGame.list(), default=GamespyGame.list()[0])
+                           type=GamespyGame, choices=GamespyGame.list(), default=GamespyGame.list()[0])
 gamespyParser.add_argument('-p', '--principal',
                            help='Principal server to query',
-                           type=str, choices=list(GAMESPY_PRINCIPALS.keys()))
+                           type=GamespyPrincipal, choices=GamespyPrincipal.list())
 gamespyParser.add_argument('-f', '--filter',
                            help='Filter to apply to server list',
                            type=str, default='')
@@ -49,8 +49,8 @@ gamespyParser.add_argument('-v', '--verify',
 gamespyParser.set_defaults(super_query=False, verify=False)
 
 gametoolsParser = subparsers.add_parser('gametools', parents=[commonParser, httpParser])
-gametoolsParser.add_argument('-g', '--game', help='Game to retrieve server list for (BF1/BFV)', type=str,
-                             choices=['bf1', 'bfv'], required=True)
+gametoolsParser.add_argument('-g', '--game', help='Game to retrieve server list for (BF1/BFV)', type=GametoolsGame,
+                             choices=GametoolsGame.list(), required=True)
 gametoolsParser.add_argument('--include-official',
                              help='Add DICE official servers to the server list '
                                   '(not recommended due to auto scaling official servers)',
@@ -60,7 +60,7 @@ parser.set_defaults(include_official=False)
 quake3Parser = subparsers.add_parser('quake3', parents=[commonParser])
 quake3Parser.add_argument('-b', '--game',
                           help='Game to query servers for',
-                          type=str, choices=list(QUAKE3_CONFIGS.keys()), default=list(QUAKE3_CONFIGS.keys())[0])
+                          type=Quake3Game, choices=Quake3Game.list(), default=Quake3Game.list()[0])
 quake3Parser.add_argument('-p', '--principal',
                           help='Principal server to query',
                           type=str, choices=[p for g in QUAKE3_CONFIGS for p in QUAKE3_CONFIGS[g]['servers'].keys()])
@@ -68,7 +68,7 @@ quake3Parser.add_argument('-p', '--principal',
 medalOfHonorParser = subparsers.add_parser('medalofhonor', parents=[commonParser])
 medalOfHonorParser.add_argument('-b', '--game',
                                 help='Game to query servers for',
-                                type=str, choices=['mohaa', 'mohbt', 'mohpa', 'mohsh'], default='mohaa')
+                                type=MedalOfHonorGame, choices=MedalOfHonorGame.list(), default=MedalOfHonorGame.AA)
 
 args = parser.parse_args()
 
@@ -89,10 +89,10 @@ elif args.source == 'bfbc2':
 elif args.source == 'gamespy':
     # Set principal
     principal = None
-    availablePrincipals = GAMESPY_CONFIGS[args.game].servers
-    if len(availablePrincipals) > 1 and str(args.principal).lower() in GAMESPY_CONFIGS[args.game].servers:
+    availablePrincipals = GAMESPY_GAME_CONFIGS[args.game].principals
+    if len(availablePrincipals) > 1 and args.principal in GAMESPY_GAME_CONFIGS[args.game].principals:
         # More than one principal available and given principal is valid => use given principal
-        principal = args.principal.lower()
+        principal = args.principal
     else:
         # Only one principal available or given principal is invalid => use default principal
         principal = availablePrincipals[0]
@@ -112,7 +112,7 @@ elif args.source == 'gametools':
 elif args.source == 'quake3':
     # Set principal
     principal = None
-    availablePrincipals = list(QUAKE3_CONFIGS[args.game.lower()]['servers'].keys())
+    availablePrincipals = list(QUAKE3_CONFIGS[args.game]['servers'].keys())
     if len(availablePrincipals) > 1 and str(args.principal).lower() in availablePrincipals:
         # More than one principal available and given principal is valid => use given principal
         principal = args.principal.lower()
@@ -123,7 +123,7 @@ elif args.source == 'quake3':
     # Add principal name to server list source
     serverListSource += f'/{principal}'
 
-    # Init GameSpy server lister
+    # Init Quake3 server lister
     game = args.game
     lister = Quake3ServerLister(game, principal, args.expired_ttl, args.recover, args.add_links, args.list_dir)
 else:
