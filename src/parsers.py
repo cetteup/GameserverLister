@@ -4,7 +4,7 @@ import argparse
 commonParser = argparse.ArgumentParser(add_help=False)
 commonParser.add_argument('-e', '--expired-ttl',
                           help='How long to keep a server in list after it was last seen (in hours)',
-                          type=float, default=24.0)
+                          type=float, default=12.0)
 commonParser.add_argument('-d', '--list-dir',
                           help='Path to directory in which servers lists will be stored',
                           type=str, default='.')
