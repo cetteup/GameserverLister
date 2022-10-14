@@ -305,7 +305,9 @@ class GameSpyServerLister(ServerLister):
         # Since we query the server directly, there is no way of handling HTTP server errors differently then
         # actually failed checks, so even if the query fails, we have to treat it as "check ok"
         check_ok = True
-        responded, server_for_game = self.query_server(server)
+        responded, query_response = self.query_server(server)
+        # Treat as server for game if verify is turned off
+        server_for_game = not self.verify or is_server_for_gamespy_game(self.game, self.config.game_name, query_response)
         found = responded and server_for_game
         if responded and not server_for_game:
             logging.warning(f'Server {server.uid} does not seem to be a {self.game} server, treating as not found')
