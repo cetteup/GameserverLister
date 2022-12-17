@@ -98,6 +98,10 @@ class MedalOfHonorGame(Game):
     SH = 'mohsh'
 
 
+class Unreal2Game(Game):
+    UT2004 = 'ut2004'
+
+
 class TheaterGame(Game):
     BFBC2 = 'bfbc2'
 

@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from typing import Dict
 
 from src.types import GamespyGameConfig, GamespyGame, GamespyPrincipal, GamespyPrincipalConfig, Quake3Game, \
-    BattlelogGame, Game, TheaterGame, MedalOfHonorGame
+    BattlelogGame, Game, TheaterGame, MedalOfHonorGame, Unreal2Game
 
 ROOT_DIR = rootDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 UNIX_EPOCH_START = datetime(1970, 1, 1, tzinfo=timezone.utc)
@@ -575,6 +575,20 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
         }
     }
 }
+UNREAL2_CONFIGS: Dict[Unreal2Game, dict] = {
+    Unreal2Game.UT2004: {
+        'servers': {
+            'epic.com': {
+                'hostname': 'ut2004master1.epicgames.com',
+                'port': 28902
+            },
+            'openspy.net': {
+                'hostname': 'utmaster.openspy.net',
+                'port': 28902
+            }
+        }
+    }
+}
 GAMETRACKER_GAME_KEYS: Dict[Game, str] = {
     GamespyGame.BF1942: 'bf1942',
     GamespyGame.BFVIETNAM: 'bfv',
@@ -601,6 +615,7 @@ GAMETRACKER_GAME_KEYS: Dict[Game, str] = {
     GamespyGame.SWAT4: 'swat4',
     Quake3Game.SWJKJA: 'swjk',  # GameTracker seems to track all Jedi Knight servers in a single category
     Quake3Game.SWJKJO: 'swjk',
+    Unreal2Game.UT2004: 'ut2k4',
     Quake3Game.URBANTERROR: 'urbanterror',
     Quake3Game.WOLFENSTEINET: 'et',
 }

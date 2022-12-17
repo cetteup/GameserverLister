@@ -11,19 +11,20 @@ from typing import Callable, List, Tuple, Type, Optional, Union
 
 import gevent
 import pyq3serverlist
+import pyut2serverlist
 import requests
 from gevent.pool import Pool
 from nslookup import Nslookup
 
 from src.constants import BATTLELOG_GAME_BASE_URIS, GAMESPY_GAME_CONFIGS, QUAKE3_CONFIGS, GAMESPY_PRINCIPAL_CONFIGS, \
-    GAMETOOLS_BASE_URI
+    GAMETOOLS_BASE_URI, UNREAL2_CONFIGS
 from src.helpers import find_query_port, bfbc2_server_validator, battlelog_server_validator, \
     guid_from_ip_port, mohwf_server_validator, is_valid_port, is_valid_public_ip, is_server_for_gamespy_game, \
     is_server_listed_on_gametracker
 from src.servers import Server, ClassicServer, FrostbiteServer, Bfbc2Server, GametoolsServer, ObjectJSONEncoder, \
     ViaStatus, WebLink
 from src.types import GamespyGameConfig, GamespyGame, GamespyPrincipal, Game, Quake3Game, BattlelogGame, GametoolsGame, \
-    MedalOfHonorGame, TheaterGame
+    MedalOfHonorGame, TheaterGame, Unreal2Game
 from src.weblinks import WEB_LINK_TEMPLATES
 
 
@@ -1058,5 +1059,93 @@ class MedalOfHonorServerLister(ServerLister):
         links = []
         if is_server_listed_on_gametracker(self.game, ip, port):
             links.append(WEB_LINK_TEMPLATES['gametracker'].render(self.game, uid, ip=ip, port=port))
+
+        return links
+
+
+class Unreal2ServerLister(ServerLister):
+    game: Unreal2Game
+    principal: str
+    cd_key: str
+
+    def __init__(
+            self,
+            game: Quake3Game,
+            principal: str,
+            cd_key: str,
+            expired_ttl: float,
+            recover: bool,
+            add_links: bool,
+            list_dir: str
+    ):
+        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, list_dir)
+        self.principal = principal
+        self.cd_key = cd_key
+
+    def update_server_list(self):
+        hostname, port = UNREAL2_CONFIGS[self.game]['servers'][self.principal].values()
+        principal = pyut2serverlist.PrincipalServer(hostname, port, self.cd_key)
+
+        found_servers = []
+        raw_servers = self.get_servers(principal)
+        for raw_server in raw_servers:
+            via = ViaStatus(self.principal)
+            found_server = ClassicServer(
+                guid_from_ip_port(raw_server.ip, str(raw_server.query_port)),
+                raw_server.ip,
+                raw_server.query_port,
+                via
+            )
+
+            if self.add_links:
+                found_server.add_links(self.build_server_links(
+                    found_server.uid,
+                    found_server.ip,
+                    raw_server.game_port
+                ))
+
+            found_servers.append(found_server)
+
+        self.add_update_servers(found_servers)
+
+    @staticmethod
+    def get_servers(principal: pyut2serverlist.PrincipalServer) -> List[pyut2serverlist.Server]:
+        query_ok = False
+        attempt = 0
+        max_attempts = 3
+        servers = []
+        while not query_ok and attempt < max_attempts:
+            try:
+                servers = principal.get_servers()
+                query_ok = True
+            except pyut2serverlist.TimeoutError:
+                logging.error(f'Principal server query timed out, attempt {attempt + 1}/{max_attempts}')
+                attempt += 1
+            except pyut2serverlist.Error as e:
+                logging.debug(e)
+                logging.error(f'Failed to query principal server, attempt {attempt + 1}/{max_attempts}')
+                attempt += 1
+
+        return servers
+
+    def check_if_server_still_exists(self, server: ClassicServer, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
+        # TODO Actually check if server is still online
+        return True, True, checks_since_last_ok
+
+    def build_server_links(self, uid: str, ip: Optional[str] = None, port: Optional[int] = None) -> Union[List[WebLink], WebLink]:
+        template_refs = UNREAL2_CONFIGS[self.game].get('linkTemplateRefs', {})
+        # Add principal-scoped links first, then add game-scoped links
+        templates = [
+            *[WEB_LINK_TEMPLATES.get(ref) for ref in template_refs.get(self.principal, [])],
+            *[WEB_LINK_TEMPLATES.get(ref) for ref in template_refs.get('_any', [])]
+        ]
+
+        # Add GameTracker link if server is listed there
+        if is_server_listed_on_gametracker(self.game, ip, port):
+            templates.append(WEB_LINK_TEMPLATES['gametracker'])
+
+        links = []
+        for template in templates:
+            links.append(template.render(self.game, uid, ip=ip, port=port))
 
         return links

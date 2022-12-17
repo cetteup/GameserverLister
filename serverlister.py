@@ -2,11 +2,12 @@ import argparse
 import logging
 import sys
 
-from src.constants import GAMESPY_GAME_CONFIGS, QUAKE3_CONFIGS
+from src.constants import GAMESPY_GAME_CONFIGS, QUAKE3_CONFIGS, UNREAL2_CONFIGS
 from src.parsers import commonParser, httpParser, queryPortParser
 from src.serverlisters import BattlelogServerLister, BC2ServerLister, GameSpyServerLister, GametoolsServerLister, \
-    Quake3ServerLister, MedalOfHonorServerLister
-from src.types import GamespyGame, GamespyPrincipal, BattlelogGame, GametoolsGame, Quake3Game, MedalOfHonorGame
+    Quake3ServerLister, MedalOfHonorServerLister, Unreal2ServerLister
+from src.types import GamespyGame, GamespyPrincipal, BattlelogGame, GametoolsGame, Quake3Game, MedalOfHonorGame, \
+    Unreal2Game
 
 parser = argparse.ArgumentParser(description='Retrieve a list of game servers from a given source and '
                                              'write it to a json file')
@@ -70,6 +71,17 @@ medalOfHonorParser.add_argument('-b', '--game',
                                 help='Game to query servers for',
                                 type=MedalOfHonorGame, choices=MedalOfHonorGame.list(), default=MedalOfHonorGame.AA)
 
+unreal2Parser = subparsers.add_parser('unreal2', parents=[commonParser])
+unreal2Parser.add_argument('-b', '--game',
+                           help='Game to query servers for',
+                           type=Unreal2Game, choices=Unreal2Game.list(), default=Unreal2Game.list()[0])
+unreal2Parser.add_argument('-p', '--principal',
+                           help='Principal server to query',
+                           type=str, choices=[p for g in UNREAL2_CONFIGS for p in UNREAL2_CONFIGS[g]['servers'].keys()])
+unreal2Parser.add_argument('-c', '--cd-key',
+                           help='CD key for game',
+                           type=str, required=True)
+
 args = parser.parse_args()
 
 logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO, stream=sys.stdout,
@@ -126,10 +138,31 @@ elif args.source == 'quake3':
     # Init Quake3 server lister
     game = args.game
     lister = Quake3ServerLister(game, principal, args.expired_ttl, args.recover, args.add_links, args.list_dir)
-else:
+elif args.source == 'medalofhonor':
     serverListSource = 'mohaaservers.tk'
     game = args.game
     lister = MedalOfHonorServerLister(game, args.expired_ttl, args.recover, args.add_links, args.list_dir)
+elif args.source == 'unreal2':
+    # Set principal
+    principal = None
+    availablePrincipals = list(UNREAL2_CONFIGS[args.game]['servers'].keys())
+    if len(availablePrincipals) > 1 and str(args.principal).lower() in availablePrincipals:
+        # More than one principal available and given principal is valid => use given principal
+        principal = args.principal.lower()
+    else:
+        # Only one principal available or given principal is invalid => use default principal
+        principal = availablePrincipals[0]
+
+    # Add principal name to server list source
+    serverListSource += f'/{principal}'
+
+    # Init Unreal2 server lister
+    game = args.game
+    lister = Unreal2ServerLister(game, principal, args.cd_key, args.expired_ttl, args.recover, args.add_links,
+                                 args.list_dir)
+else:
+    logging.critical('Unknown server list source')
+    sys.exit(1)
 
 logging.info(f'Listing servers for {game} via {serverListSource}')
 
