@@ -25,6 +25,9 @@ GAMESPY_PRINCIPAL_CONFIGS: Dict[GamespyPrincipal, GamespyPrincipalConfig] = {
     GamespyPrincipal.CRYMP_NET: GamespyPrincipalConfig(
         hostname='master.crymp.net'
     ),
+    GamespyPrincipal.EPIC_GAMES_UT3: GamespyPrincipalConfig(
+        hostname='ut3master1.epicgames.com'
+    ),
     GamespyPrincipal.ERRORIST_EU: GamespyPrincipalConfig(
         hostname='master.errorist.eu'
     ),
@@ -213,6 +216,17 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         link_template_refs={
             GamespyPrincipal.SWAT4STATS_COM: ['swat4stats.com']
         }
+    ),
+    GamespyGame.UT3: GamespyGameConfig(
+        game_name='ut3pc',
+        game_key='nT2Mtz',
+        enc_type=-1,
+        query_type=11,
+        port=28910,
+        principals=[
+            GamespyPrincipal.EPIC_GAMES_UT3
+        ],
+        gamedig_type='ut3'
     ),
     GamespyGame.VIETCONG: GamespyGameConfig(
         game_name='vietcong',
@@ -616,6 +630,7 @@ GAMETRACKER_GAME_KEYS: Dict[Game, str] = {
     Quake3Game.SWJKJA: 'swjk',  # GameTracker seems to track all Jedi Knight servers in a single category
     Quake3Game.SWJKJO: 'swjk',
     Unreal2Game.UT2004: 'ut2k4',
+    GamespyGame.UT3: 'ut3',
     Quake3Game.URBANTERROR: 'urbanterror',
     Quake3Game.WOLFENSTEINET: 'et',
 }

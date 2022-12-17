@@ -53,7 +53,8 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Star Wars Jedi Knight: Jedi Academy    | Quake3               | Raven Software, jkhub.org                                                                                         |
 | SWAT 4 ¹                               | GameSpy              | swat4stats.com                                                                                                    |
 | Tremulous                              | Quake3               | tremulous.net                                                                                                     |
-| Unreal Tournament 2004                 | Unreal2              | epic.com, openspy.net                                                                                             |
+| Unreal Tournament 2004                 | Unreal2              | epicgames.com, openspy                                                                                            |
+| Unreal Tournament 3                    | GameSpy              | epicgames.com                                                                                                     |
 | UrbanTerror                            | Quake3               | FrozenSand                                                                                                        |
 | Vietcong                               | GameSpy              | vietcong.tk, vietcong1.eu, qtracker                                                                               |
 | Vietcong 2                             | GameSpy              | openspy                                                                                                           |

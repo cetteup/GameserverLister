@@ -107,6 +107,9 @@ def is_server_for_gamespy_game(game: GamespyGame, game_name: str, parsed_result:
     elif game is GamespyGame.SWAT4:
         # SWAT 4 has a very limited set of keys, so we need to look at values
         return parsed_result.get('gamevariant') in ['SWAT 4', 'SWAT 4X', 'SEF']
+    elif game is GamespyGame.UT3:
+        # UT3 has some *very* unique keys, see https://github.com/gamedig/node-gamedig/blob/master/protocols/ut3.js#L7
+        return 'p1073741825' in parsed_result and 'p1073741826' in parsed_result
     else:
         return parsed_result.get('gamename') == game_name
 

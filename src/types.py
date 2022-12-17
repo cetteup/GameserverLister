@@ -20,6 +20,7 @@ class GamespyPrincipal(Principal):
     BF1942_ORG = 'bf1942.org'
     BF2HUB = 'bf2hub'
     CRYMP_NET = 'crymp.net'
+    EPIC_GAMES_UT3 = 'epicgames.com-ut3'
     ERRORIST_EU = 'errorist.eu'
     FH2_DEV = 'fh2.dev'
     JEDI95_US = 'jedi95.us'
@@ -64,6 +65,7 @@ class GamespyGame(Game):
     PARAWORLD = 'paraworld'
     POSTAL2 = 'postal2'
     SWAT4 = 'swat4'
+    UT3 = 'ut3'
     VIETCONG = 'vietcong'
     VIETCONG2 = 'vietcong2'
 
