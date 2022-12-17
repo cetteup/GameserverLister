@@ -1129,8 +1129,21 @@ class Unreal2ServerLister(ServerLister):
         return servers
 
     def check_if_server_still_exists(self, server: ClassicServer, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
-        # TODO Actually check if server is still online
-        return True, True, checks_since_last_ok
+        # Since we query the server directly, there is no way of handling HTTP server errors differently then
+        # actually failed checks, so even if the query fails, we have to treat it as "check ok"
+        check_ok = True
+        found = False
+        try:
+            pyut2serverlist.Server(server.ip, server.query_port).get_info()
+
+            # get_info will raise an exception if the server cannot be contacted,
+            # so this will only be reached if the query succeeds
+            found = True
+        except pyut2serverlist.Error as e:
+            logging.debug(e)
+            logging.debug(f'Failed to query server {server.uid} for expiration check')
+
+        return check_ok, found, checks_since_last_ok
 
     def build_server_links(self, uid: str, ip: Optional[str] = None, port: Optional[int] = None) -> Union[List[WebLink], WebLink]:
         template_refs = UNREAL2_CONFIGS[self.game].get('linkTemplateRefs', {})
