@@ -882,6 +882,13 @@ class Quake3ServerLister(ServerLister):
         for protocol in self.protocols:
             raw_servers = self.get_servers(principal, protocol)
             for raw_server in raw_servers:
+                if not is_valid_public_ip(raw_server.ip) or not is_valid_port(raw_server.port):
+                    logging.warning(
+                        f'Principal returned invalid server entry '
+                        f'({raw_server.ip}:{raw_server.port}), skipping it'
+                    )
+                    continue
+
                 via = ViaStatus(self.principal)
                 found_server = ClassicServer(
                     guid_from_ip_port(raw_server.ip, str(raw_server.port)),
@@ -1093,6 +1100,13 @@ class Unreal2ServerLister(ServerLister):
         found_servers = []
         raw_servers = self.get_servers(principal)
         for raw_server in raw_servers:
+            if not is_valid_public_ip(raw_server.ip) or not is_valid_port(raw_server.query_port):
+                logging.warning(
+                    f'Principal returned invalid server entry '
+                    f'({raw_server.ip}:{raw_server.query_port}), skipping it'
+                )
+                continue
+
             via = ViaStatus(self.principal)
             found_server = ClassicServer(
                 guid_from_ip_port(raw_server.ip, str(raw_server.query_port)),
