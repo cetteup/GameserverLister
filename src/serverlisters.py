@@ -1068,11 +1068,14 @@ class Unreal2ServerLister(ServerLister):
     principal: str
     cd_key: str
 
+    principal_timeout: float
+
     def __init__(
             self,
             game: Quake3Game,
             principal: str,
             cd_key: str,
+            principal_timeout: float,
             expired_ttl: float,
             recover: bool,
             add_links: bool,
@@ -1081,10 +1084,11 @@ class Unreal2ServerLister(ServerLister):
         super().__init__(game, ClassicServer, expired_ttl, recover, add_links, list_dir)
         self.principal = principal
         self.cd_key = cd_key
+        self.principal_timeout = principal_timeout
 
     def update_server_list(self):
         hostname, port = UNREAL2_CONFIGS[self.game]['servers'][self.principal].values()
-        principal = pyut2serverlist.PrincipalServer(hostname, port, self.cd_key)
+        principal = pyut2serverlist.PrincipalServer(hostname, port, self.cd_key, timeout=self.principal_timeout)
 
         found_servers = []
         raw_servers = self.get_servers(principal)

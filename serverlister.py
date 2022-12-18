@@ -81,6 +81,9 @@ unreal2Parser.add_argument('-p', '--principal',
 unreal2Parser.add_argument('-c', '--cd-key',
                            help='CD key for game',
                            type=str, required=True)
+unreal2Parser.add_argument('-t', '--timeout',
+                           help='Timeout to use for principal query',
+                           type=int, default=5)
 
 args = parser.parse_args()
 
@@ -158,8 +161,8 @@ elif args.source == 'unreal2':
 
     # Init Unreal2 server lister
     game = args.game
-    lister = Unreal2ServerLister(game, principal, args.cd_key, args.expired_ttl, args.recover, args.add_links,
-                                 args.list_dir)
+    lister = Unreal2ServerLister(game, principal, args.cd_key, args.timeout, args.expired_ttl, args.recover,
+                                 args.add_links, args.list_dir)
 else:
     logging.critical('Unknown server list source')
     sys.exit(1)
