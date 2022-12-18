@@ -590,6 +590,14 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
     }
 }
 UNREAL2_CONFIGS: Dict[Unreal2Game, dict] = {
+    Unreal2Game.UT2003: {
+        'servers': {
+            'openspy.net': {
+                'hostname': 'utmaster.openspy.net',
+                'port': 28902
+            }
+        }
+    },
     Unreal2Game.UT2004: {
         'servers': {
             'epic.com': {

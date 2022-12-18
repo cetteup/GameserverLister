@@ -101,6 +101,7 @@ class MedalOfHonorGame(Game):
 
 
 class Unreal2Game(Game):
+    UT2003 = 'ut2003'
     UT2004 = 'ut2004'
 
 
