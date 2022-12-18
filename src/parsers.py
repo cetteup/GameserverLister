@@ -7,7 +7,7 @@ commonParser.add_argument('-e', '--expired-ttl',
                           type=float, default=12.0)
 commonParser.add_argument('-d', '--list-dir',
                           help='Path to directory in which servers lists will be stored',
-                          type=str, default='.')
+                          type=str, default='lists')
 commonParser.add_argument('--no-recover',
                           help='Remove servers that were not returned by the source after they expired, '
                                'do not attempt to contact/access server directly to check if they are still online',

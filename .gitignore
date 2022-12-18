@@ -126,5 +126,4 @@ dmypy.json
 .idea/
 
 # Game server list files
-*.gsl
-*.json
+lists/
