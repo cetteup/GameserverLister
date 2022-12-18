@@ -1095,7 +1095,13 @@ class Unreal2ServerLister(ServerLister):
 
     def update_server_list(self):
         hostname, port = UNREAL2_CONFIGS[self.game]['servers'][self.principal].values()
-        principal = pyut2serverlist.PrincipalServer(hostname, port, self.cd_key, timeout=self.principal_timeout)
+        principal = pyut2serverlist.PrincipalServer(
+            hostname,
+            port,
+            pyut2serverlist.Game(self.game),
+            self.cd_key,
+            timeout=self.principal_timeout
+        )
 
         found_servers = []
         raw_servers = self.get_servers(principal)
