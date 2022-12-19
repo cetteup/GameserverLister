@@ -97,7 +97,7 @@ class ServerLister:
 
     def add_update_servers(self, found_servers: List[Server]):
         # Add/update found servers to/in known servers
-        logging.info('Updating known server list with found servers')
+        logging.info(f'Updating known server list with {len(found_servers)} found servers')
         for found_server in found_servers:
             known_server_uids = [s.uid for s in self.servers]
             # Update existing server entry or add new one

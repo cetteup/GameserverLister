@@ -46,7 +46,10 @@ GAMESPY_PRINCIPAL_CONFIGS: Dict[GamespyPrincipal, GamespyPrincipalConfig] = {
     GamespyPrincipal.NOVGAMES: GamespyPrincipalConfig(
         hostname='2142.novgames.ru'
     ),
-    GamespyPrincipal.OLDUNREAL_COM: GamespyPrincipalConfig(
+    GamespyPrincipal.OLDUNREAL_COM_1: GamespyPrincipalConfig(
+        hostname='master.oldunreal.com'
+    ),
+    GamespyPrincipal.OLDUNREAL_COM_2: GamespyPrincipalConfig(
         hostname='master2.oldunreal.com'
     ),
     GamespyPrincipal.OPENSPY: GamespyPrincipalConfig(
@@ -216,6 +219,36 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         link_template_refs={
             GamespyPrincipal.SWAT4STATS_COM: ['swat4stats.com']
         }
+    ),
+    GamespyGame.UNREAL: GamespyGameConfig(
+        game_name='unreal',
+        game_key='DAncRK',
+        enc_type=0,
+        query_type=0,
+        port=28900,
+        principals=[
+            GamespyPrincipal.THREE_THREE_THREE_NETWORKS_COM_1,
+            GamespyPrincipal.OLDUNREAL_COM_1,
+            GamespyPrincipal.ERRORIST_EU,
+            GamespyPrincipal.OPENSPY,
+            GamespyPrincipal.QTRACKER
+        ],
+        gamedig_type='unreal'
+    ),
+    GamespyGame.UT: GamespyGameConfig(
+        game_name='ut',
+        game_key='Z5Nfb0',
+        enc_type=0,
+        query_type=0,
+        port=28900,
+        principals=[
+            GamespyPrincipal.THREE_THREE_THREE_NETWORKS_COM_1,
+            GamespyPrincipal.OLDUNREAL_COM_1,
+            GamespyPrincipal.ERRORIST_EU,
+            GamespyPrincipal.OPENSPY,
+            GamespyPrincipal.QTRACKER
+        ],
+        gamedig_type='ut'
     ),
     GamespyGame.UT3: GamespyGameConfig(
         game_name='ut3pc',
@@ -637,6 +670,7 @@ GAMETRACKER_GAME_KEYS: Dict[Game, str] = {
     GamespyGame.SWAT4: 'swat4',
     Quake3Game.SWJKJA: 'swjk',  # GameTracker seems to track all Jedi Knight servers in a single category
     Quake3Game.SWJKJO: 'swjk',
+    GamespyGame.UT: 'ut',
     Unreal2Game.UT2004: 'ut2k4',
     GamespyGame.UT3: 'ut3',
     Quake3Game.URBANTERROR: 'urbanterror',
