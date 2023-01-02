@@ -671,6 +671,7 @@ GAMETRACKER_GAME_KEYS: Dict[Game, str] = {
     Quake3Game.SWJKJA: 'swjk',  # GameTracker seems to track all Jedi Knight servers in a single category
     Quake3Game.SWJKJO: 'swjk',
     GamespyGame.UT: 'ut',
+    Unreal2Game.UT2003: 'ut2k4',  # GameTracker does not support UT2003, so some servers are added UT2004 servers
     Unreal2Game.UT2004: 'ut2k4',
     GamespyGame.UT3: 'ut3',
     Quake3Game.URBANTERROR: 'urbanterror',
