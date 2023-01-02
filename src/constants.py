@@ -633,7 +633,7 @@ UNREAL2_CONFIGS: Dict[Unreal2Game, dict] = {
     },
     Unreal2Game.UT2004: {
         'servers': {
-            'epic.com': {
+            'epicgames.com': {
                 'hostname': 'ut2004master1.epicgames.com',
                 'port': 28902
             },
