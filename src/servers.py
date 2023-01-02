@@ -46,7 +46,7 @@ class Server:
         :param expired_ttl: Number of hours attributes remain valid after being last updated
         :return:
         """
-        pass
+        self.links = [link for link in self.links if not link.is_expired(expired_ttl)]
 
     def update(self, updated: 'Server') -> None:
         self.last_seen_at = updated.last_seen_at
@@ -189,6 +189,7 @@ class ClassicServer(QueryableServer):
         self.via = via if isinstance(via, list) else [via]
 
     def trim(self, expired_ttl: float) -> None:
+        super().trim(expired_ttl)
         self.via = [via for via in self.via if not via.is_expired(expired_ttl)]
 
     def update(self, updated: 'ClassicServer') -> None:
