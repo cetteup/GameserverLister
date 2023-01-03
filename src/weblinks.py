@@ -28,7 +28,7 @@ class WebLink:
     @staticmethod
     def load(parsed: dict) -> 'WebLink':
         as_of = datetime.fromisoformat(parsed['asOf']) \
-            if parsed.get('as_of') is not None else UNIX_EPOCH_START
+            if parsed.get('asOf') is not None else UNIX_EPOCH_START
         return WebLink(
             parsed['site'],
             parsed['url'],
