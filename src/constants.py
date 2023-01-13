@@ -312,6 +312,13 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
             ValvePrincipal.VALVE
         ]
     ),
+    ValveGame.SEVEND2D: ValveGameConfig(
+        app_id=251570,
+        principals=[
+            ValvePrincipal.VALVE
+        ],
+        query_port_offset=1
+    ),
     ValveGame.TFC: ValveGameConfig(
         app_id=20,
         principals=[
@@ -684,6 +691,7 @@ UNREAL2_CONFIGS: Dict[Unreal2Game, dict] = {
     }
 }
 GAMETRACKER_GAME_KEYS: Dict[Game, str] = {
+    ValveGame.SEVEND2D: '7daystodie',
     GamespyGame.BF1942: 'bf1942',
     GamespyGame.BFVIETNAM: 'bfv',
     GamespyGame.BF2: 'bf2',

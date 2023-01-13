@@ -122,6 +122,7 @@ class ValveGame(Game):
     DOD = 'dod'
     DODS = 'dods'
     RS2 = 'rs2'
+    SEVEND2D = '7d2d'
     TFC = 'tfc'
     TF2 = 'tf2'
 
