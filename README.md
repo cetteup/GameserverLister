@@ -38,6 +38,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Crysis                                 | GameSpy              | crymp.net                                                                                                         |
 | Crysis Wars                            | GameSpy              | jedi95.us                                                                                                         |
 | Day of Defeat                          | Valve                | Valve ²                                                                                                           |
+| Day of Defeat: Source                  | Valve                | Valve ²                                                                                                           |
 | Forgotten Hope 2                       | GameSpy              | fh2.dev                                                                                                           |
 | James Bond 007: Nightfire              | GameSpy              | openspy, nightfirepc.com                                                                                          |
 | Medal of Honor Warfighter              | Battlelog            | battlelog.com                                                                                                     |

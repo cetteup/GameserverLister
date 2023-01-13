@@ -120,6 +120,7 @@ class Unreal2Game(Game):
 
 class ValveGame(Game):
     DOD = 'dod'
+    DODS = 'dods'
     TFC = 'tfc'
     TF2 = 'tf2'
 

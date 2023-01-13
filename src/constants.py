@@ -300,6 +300,12 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
             ValvePrincipal.VALVE
         ]
     ),
+    ValveGame.DODS: ValveGameConfig(
+        app_id=300,
+        principals=[
+            ValvePrincipal.VALVE
+        ]
+    ),
     ValveGame.TFC: ValveGameConfig(
         app_id=20,
         principals=[
@@ -688,6 +694,7 @@ GAMETRACKER_GAME_KEYS: Dict[Game, str] = {
     GamespyGame.CRYSIS: 'crysis',
     GamespyGame.CRYSISWARS: 'warhead',
     ValveGame.DOD: 'dod',
+    ValveGame.DODS: 'dods',
     MedalOfHonorGame.AA: 'mohaa',
     MedalOfHonorGame.BT: 'bt',
     MedalOfHonorGame.SH: 'sh',
