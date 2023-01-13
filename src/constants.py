@@ -316,8 +316,7 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
         app_id=251570,
         principals=[
             ValvePrincipal.VALVE
-        ],
-        query_port_offset=1
+        ]
     ),
     ValveGame.TFC: ValveGameConfig(
         app_id=20,
