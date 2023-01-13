@@ -73,7 +73,8 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Xonotic                                | Quake3               | deathmask.net, tchr.no                                                                                            |
 
 ¹ Requires a [modified version of gslist](https://github.com/cetteup/gslist) which provides additional parameters.
-² Valve's principal servers are rate limited. If you do not use additional filters to only retrieve matching servers, you will get blocked/timed out.
+
+² Valve's principal servers are rate limited. If you do not use additional filters to only retrieve matching servers, you will get blocked/timed out. You can pass filters via the `-f`/`--filter` argument, e.g. use `-f "\dedicated\1\password\0\empty\1\full\1"` to only retrieve dedicated servers without a password which are neither full nor empty. You can find a full list of filter options [here](https://developer.valvesoftware.com/wiki/Master_Server_Query_Protocol#Filter) (the `\appid\` filter is applied automatically). 
 
 ## Game server query ports
 
