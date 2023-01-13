@@ -170,7 +170,7 @@ def is_server_in_search_results(ip: str, port: int, search_results: List[Dict]) 
             dns_result = looker_upper.dns_lookup(result['host'])
 
             if len(dns_result.answer) == 0:
-                logging.warning(f'DNS lookup failed for server hostname received from GameTracker ({result["host"]}')
+                logging.warning(f'Failed to resolve server hostname from GameTracker ({result["host"]})')
                 continue
 
             # We already compared the port => return true if resolved IP matches

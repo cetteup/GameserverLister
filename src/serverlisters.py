@@ -82,7 +82,7 @@ class ServerLister:
         if os.path.isfile(self.server_list_file_path):
             try:
                 with open(self.server_list_file_path, 'r') as serverListFile:
-                    logging.info('Reading servers from existing server list')
+                    logging.info('Loading existing server list')
                     self.servers = json.load(serverListFile, object_hook=self.server_class.load)
             except IOError as e:
                 logging.debug(e)
@@ -98,7 +98,7 @@ class ServerLister:
 
     def add_update_servers(self, found_servers: List[Server]):
         # Add/update found servers to/in known servers
-        logging.info(f'Updating known server list with {len(found_servers)} found servers')
+        logging.info(f'Updating server list with {len(found_servers)} found servers')
         for found_server in found_servers:
             known_server_uids = [s.uid for s in self.servers]
             # Update existing server entry or add new one
@@ -114,7 +114,7 @@ class ServerLister:
 
     def remove_expired_servers(self) -> tuple:
         # Iterate over copy of server list and remove any expired servers from the (actual) server list
-        logging.info(f'Checking server expiration ttl for {len(self.servers)} servers')
+        logging.info(f'Checking expiration ttl for {len(self.servers)} servers')
         checks_since_last_ok = 0
         expired_servers_removed = 0
         expired_servers_recovered = 0
