@@ -306,6 +306,12 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
             ValvePrincipal.VALVE
         ]
     ),
+    ValveGame.RS2: ValveGameConfig(
+        app_id=418460,
+        principals=[
+            ValvePrincipal.VALVE
+        ]
+    ),
     ValveGame.TFC: ValveGameConfig(
         app_id=20,
         principals=[

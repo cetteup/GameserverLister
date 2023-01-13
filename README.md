@@ -50,6 +50,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Quake                                  | Quake3               | deathmask.net                                                                                                     |
 | Quake 3 Arena                          | Quake3               | quake3arena.com, urbanterror.info, excessiveplus.net, ioquake3.org, huxxer.de, maverickservers.com, deathmask.net |
 | Return to Castle Wolfenstein           | Quake3               | id Software                                                                                                       |
+| Rising Storm 2: Vietnam                | Valve                | Valve ²                                                                                                           |
 | Soldier of Fortune II: Double Helix    | Quake3               | Raven Software                                                                                                    |
 | Star Wars Jedi Knight II: Jedi Outcast | Quake3               | Raven Software, jkhub.org                                                                                         |
 | Star Wars Jedi Knight: Jedi Academy    | Quake3               | Raven Software, jkhub.org                                                                                         |
