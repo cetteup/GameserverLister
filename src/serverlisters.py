@@ -12,19 +12,20 @@ from typing import Callable, List, Tuple, Type, Optional, Union
 import gevent
 import pyq3serverlist
 import pyut2serverlist
+import pyvpsq
 import requests
 from gevent.pool import Pool
 from nslookup import Nslookup
 
 from src.constants import BATTLELOG_GAME_BASE_URIS, GAMESPY_GAME_CONFIGS, QUAKE3_CONFIGS, GAMESPY_PRINCIPAL_CONFIGS, \
-    GAMETOOLS_BASE_URI, UNREAL2_CONFIGS
+    GAMETOOLS_BASE_URI, UNREAL2_CONFIGS, VALVE_GAME_CONFIGS, VALVE_PRINCIPAL_CONFIGS
 from src.helpers import find_query_port, bfbc2_server_validator, battlelog_server_validator, \
     guid_from_ip_port, mohwf_server_validator, is_valid_port, is_valid_public_ip, is_server_for_gamespy_game, \
     is_server_listed_on_gametracker
 from src.servers import Server, ClassicServer, FrostbiteServer, Bfbc2Server, GametoolsServer, ObjectJSONEncoder, \
     ViaStatus, WebLink
 from src.types import GamespyGameConfig, GamespyGame, GamespyPrincipal, Game, Quake3Game, BattlelogGame, GametoolsGame, \
-    MedalOfHonorGame, TheaterGame, Unreal2Game
+    MedalOfHonorGame, TheaterGame, Unreal2Game, ValveGame, ValvePrincipal, ValveGameConfig
 from src.weblinks import WEB_LINK_TEMPLATES
 
 
@@ -1184,5 +1185,116 @@ class Unreal2ServerLister(ServerLister):
         links = []
         for template in templates:
             links.append(template.render(self.game, uid, ip=ip, port=port))
+
+        return links
+
+
+class ValveServerLister(ServerLister):
+    game: ValveGame
+    servers: List[ClassicServer]
+    principal: ValvePrincipal
+    config: ValveGameConfig
+
+    principal_timeout: float
+    filters: str
+    max_pages: int
+
+    def __init__(
+            self,
+            game: ValveGame,
+            principal: ValvePrincipal,
+            principal_timeout: float,
+            filters: str,
+            max_pages: int,
+            expired_ttl: float,
+            recover: bool,
+            add_links: bool,
+            list_dir: str
+    ):
+        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, list_dir)
+        self.principal = principal
+        self.config = VALVE_GAME_CONFIGS[self.game]
+        self.principal_timeout = principal_timeout
+        self.filters = filters
+        self.max_pages = max_pages
+
+    def update_server_list(self):
+        principal_config = VALVE_PRINCIPAL_CONFIGS[self.principal]
+        principal = pyvpsq.PrincipalServer(
+            principal_config.hostname,
+            principal_config.port,
+            timeout=self.principal_timeout
+        )
+
+        found_servers = []
+        # Try to reduce the consecutive number of requests by iterating over regions
+        for region in pyvpsq.Region:
+            for raw_server in self.get_servers(principal, self.config.app_id, region, self.filters, self.max_pages):
+                if not is_valid_public_ip(raw_server.ip) or not is_valid_port(raw_server.query_port):
+                    logging.warning(
+                        f'Principal returned invalid server entry '
+                        f'({raw_server.ip}:{raw_server.query_port}), skipping it'
+                    )
+                    continue
+
+                via = ViaStatus(self.principal)
+                found_server = ClassicServer(
+                    guid_from_ip_port(raw_server.ip, str(raw_server.query_port)),
+                    raw_server.ip,
+                    raw_server.query_port,
+                    via
+                )
+
+                if found_server not in found_servers:
+                    if self.add_links:
+                        game_port = found_server.query_port
+                        if self.config.query_port_offset is not None:
+                            game_port -= self.config.query_port_offset
+                        found_server.add_links(self.build_server_links(
+                            found_server.uid,
+                            found_server.ip,
+                            game_port
+                        ))
+                    found_servers.append(found_server)
+
+        self.add_update_servers(found_servers)
+
+    @staticmethod
+    def get_servers(
+            principal: pyvpsq.PrincipalServer,
+            app_id: int,
+            region: pyvpsq.Region,
+            filters: str,
+            max_pages: int
+    ) -> List[pyvpsq.Server]:
+        servers = []
+        try:
+            for server in principal.get_servers(fr'\appid\{app_id}{filters}', region, max_pages):
+                servers.append(server)
+        except pyvpsq.TimeoutError:
+            logging.error('Principal server query timed out')
+        except pyvpsq.Error:
+            logging.error('Failed to query principal server')
+
+        return servers
+
+    def check_if_server_still_exists(self, server: ClassicServer, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
+        found, _ = self.query_server(server)
+        return True, found, checks_since_last_ok
+
+    @staticmethod
+    def query_server(server: ClassicServer) -> Tuple[bool, Optional[pyvpsq.ServerInfo]]:
+        try:
+            info = pyvpsq.Server(server.ip, server.query_port).get_info()
+            return True, info
+        except pyvpsq.Error as e:
+            logging.debug(e)
+            logging.debug(f'Failed to query server {server.uid}')
+            return False, None
+
+    def build_server_links(self, uid: str, ip: Optional[str] = None, port: Optional[int] = None) -> Union[List[WebLink], WebLink]:
+        links = []
+        if is_server_listed_on_gametracker(self.game, ip, port):
+            links.append(WEB_LINK_TEMPLATES['gametracker'].render(self.game, uid, ip=ip, port=port))
 
         return links

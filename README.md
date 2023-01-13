@@ -52,6 +52,8 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Star Wars Jedi Knight II: Jedi Outcast | Quake3               | Raven Software, jkhub.org                                                                                         |
 | Star Wars Jedi Knight: Jedi Academy    | Quake3               | Raven Software, jkhub.org                                                                                         |
 | SWAT 4 ¹                               | GameSpy              | swat4stats.com                                                                                                    |
+| Team Fortress Classic                  | Valve                | Valve ²                                                                                                           |
+| Team Fortress 2                        | Valve                | Valve ²                                                                                                           |
 | Tremulous                              | Quake3               | tremulous.net                                                                                                     |
 | Unreal                                 | GameSpy              | 333networks.com, errorist.eu, openspy, oldunreal.com, qtracker                                                    |
 | Unreal Tournament                      | GameSpy              | 333networks.com, errorist.eu, openspy, oldunreal.com, qtracker                                                    |
@@ -66,7 +68,8 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Wolfenstein: Enemy Territory           | Quake3               | id Software, etlegacy.com                                                                                         |
 | Xonotic                                | Quake3               | deathmask.net, tchr.no                                                                                            |
 
-¹ requires a [modified version of gslist](https://github.com/cetteup/gslist), which provides additional parameters
+¹ Requires a [modified version of gslist](https://github.com/cetteup/gslist) which provides additional parameters.
+² Valve's principal servers are rate limited. If you do not use additional filters to only retrieve matching servers, you will get blocked/timed out.
 
 ## Game server query ports
 

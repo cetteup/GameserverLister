@@ -4,7 +4,8 @@ from datetime import datetime, timezone
 from typing import Dict
 
 from src.types import GamespyGameConfig, GamespyGame, GamespyPrincipal, GamespyPrincipalConfig, Quake3Game, \
-    BattlelogGame, Game, TheaterGame, MedalOfHonorGame, Unreal2Game
+    BattlelogGame, Game, TheaterGame, MedalOfHonorGame, Unreal2Game, ValvePrincipal, ValvePrincipalConfig, \
+    ValveGameConfig, ValveGame
 
 ROOT_DIR = rootDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 UNIX_EPOCH_START = datetime(1970, 1, 1, tzinfo=timezone.utc)
@@ -284,6 +285,26 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.OPENSPY
         ],
         gamedig_type='vietcong2'
+    )
+}
+VALVE_PRINCIPAL_CONFIGS: Dict[ValvePrincipal, ValvePrincipalConfig] = {
+    ValvePrincipal.VALVE: ValvePrincipalConfig(
+        hostname='hl2master.steampowered.com',
+        port=27011
+    )
+}
+VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
+    ValveGame.TFC: ValveGameConfig(
+        app_id=20,
+        principals=[
+            ValvePrincipal.VALVE
+        ]
+    ),
+    ValveGame.TF2: ValveGameConfig(
+        app_id=440,
+        principals=[
+            ValvePrincipal.VALVE
+        ]
     )
 }
 BATTLELOG_GAME_BASE_URIS: Dict[BattlelogGame, str] = {
@@ -670,6 +691,8 @@ GAMETRACKER_GAME_KEYS: Dict[Game, str] = {
     GamespyGame.SWAT4: 'swat4',
     Quake3Game.SWJKJA: 'swjk',  # GameTracker seems to track all Jedi Knight servers in a single category
     Quake3Game.SWJKJO: 'swjk',
+    ValveGame.TFC: 'tfc',
+    ValveGame.TF2: 'tf2',
     GamespyGame.UT: 'ut',
     Unreal2Game.UT2003: 'ut2k4',  # GameTracker does not support UT2003, so some servers are added UT2004 servers
     Unreal2Game.UT2004: 'ut2k4',

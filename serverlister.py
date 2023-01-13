@@ -2,12 +2,12 @@ import argparse
 import logging
 import sys
 
-from src.constants import GAMESPY_GAME_CONFIGS, QUAKE3_CONFIGS, UNREAL2_CONFIGS
+from src.constants import GAMESPY_GAME_CONFIGS, QUAKE3_CONFIGS, UNREAL2_CONFIGS, VALVE_GAME_CONFIGS
 from src.parsers import commonParser, httpParser, queryPortParser
 from src.serverlisters import BattlelogServerLister, BC2ServerLister, GameSpyServerLister, GametoolsServerLister, \
-    Quake3ServerLister, MedalOfHonorServerLister, Unreal2ServerLister
+    Quake3ServerLister, MedalOfHonorServerLister, Unreal2ServerLister, ValveServerLister
 from src.types import GamespyGame, GamespyPrincipal, BattlelogGame, GametoolsGame, Quake3Game, MedalOfHonorGame, \
-    Unreal2Game
+    Unreal2Game, ValvePrincipal, ValveGame
 
 parser = argparse.ArgumentParser(description='Retrieve a list of game servers from a given source and '
                                              'write it to a json file')
@@ -84,6 +84,23 @@ unreal2Parser.add_argument('-c', '--cd-key',
 unreal2Parser.add_argument('-t', '--timeout',
                            help='Timeout to use for principal query',
                            type=int, default=5)
+
+valveParser = subparsers.add_parser('valve', parents=[commonParser])
+valveParser.add_argument('-b', '--game',
+                         help='Game to query servers for',
+                         type=ValveGame, choices=ValveGame.list(), default=ValveGame.list()[0])
+valveParser.add_argument('-p', '--principal',
+                         help='Principal server to query',
+                         type=ValvePrincipal, choices=ValvePrincipal.list())
+valveParser.add_argument('-f', '--filter',
+                         help='Filter to apply to server list',
+                         type=str, default='')
+valveParser.add_argument('-t', '--timeout',
+                         help='Timeout to use for principal query',
+                         type=int, default=5)
+valveParser.add_argument('-m', '--max-pages',
+                         help='Maximum number of pages to retrieve from the server list (per region)',
+                         type=int, default=10)
 
 args = parser.parse_args()
 
@@ -163,6 +180,24 @@ elif args.source == 'unreal2':
     game = args.game
     lister = Unreal2ServerLister(game, principal, args.cd_key, args.timeout, args.expired_ttl, args.recover,
                                  args.add_links, args.list_dir)
+elif args.source == 'valve':
+    # Set principal
+    principal = None
+    availablePrincipals = VALVE_GAME_CONFIGS[args.game].principals
+    if len(availablePrincipals) > 1 and args.principal in VALVE_GAME_CONFIGS[args.game].principals:
+        # More than one principal available and given principal is valid => use given principal
+        principal = args.principal
+    else:
+        # Only one principal available or given principal is invalid => use default principal
+        principal = availablePrincipals[0]
+
+    # Add principal name to server list source
+    serverListSource += f'/{principal}'
+
+    # Init GameSpy server lister
+    game = args.game
+    lister = ValveServerLister(game, principal, args.timeout, args.filter, args.max_pages, args.expired_ttl,
+                               args.recover, args.add_links, args.list_dir)
 else:
     logging.critical('Unknown server list source')
     sys.exit(1)

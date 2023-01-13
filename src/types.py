@@ -39,6 +39,10 @@ class GamespyPrincipal(Principal):
     VIETCONG1_EU = 'vietcong1.eu'
 
 
+class ValvePrincipal(Principal):
+    VALVE = 'valve'
+
+
 @dataclass
 class GamespyPrincipalConfig:
     hostname: str
@@ -48,6 +52,12 @@ class GamespyPrincipalConfig:
         if self.port_offset is None:
             return 0
         return self.port_offset
+
+
+@dataclass
+class ValvePrincipalConfig:
+    hostname: str
+    port: int
 
 
 class Game(str, ExtendedEnum):
@@ -108,6 +118,11 @@ class Unreal2Game(Game):
     UT2004 = 'ut2004'
 
 
+class ValveGame(Game):
+    TFC = 'tfc'
+    TF2 = 'tf2'
+
+
 class TheaterGame(Game):
     BFBC2 = 'bfbc2'
 
@@ -136,3 +151,11 @@ class GamespyGameConfig:
     list_type: Optional[int] = None
     info_query: Optional[str] = None
     link_template_refs: Optional[Dict[Union[str, GamespyPrincipal], List[str]]] = None
+
+
+@dataclass
+class ValveGameConfig:
+    app_id: int
+    principals: List[ValvePrincipal]
+    query_port_offset: Optional[int] = None
+    link_template_refs: Optional[Dict[Union[str, ValvePrincipal], List[str]]] = None
