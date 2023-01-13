@@ -119,6 +119,7 @@ class Unreal2Game(Game):
 
 
 class ValveGame(Game):
+    DOD = 'dod'
     TFC = 'tfc'
     TF2 = 'tf2'
 

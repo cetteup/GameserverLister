@@ -294,6 +294,12 @@ VALVE_PRINCIPAL_CONFIGS: Dict[ValvePrincipal, ValvePrincipalConfig] = {
     )
 }
 VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
+    ValveGame.DOD: ValveGameConfig(
+        app_id=30,
+        principals=[
+            ValvePrincipal.VALVE
+        ]
+    ),
     ValveGame.TFC: ValveGameConfig(
         app_id=20,
         principals=[
@@ -681,6 +687,7 @@ GAMETRACKER_GAME_KEYS: Dict[Game, str] = {
     Quake3Game.COD4: 'cod4',
     GamespyGame.CRYSIS: 'crysis',
     GamespyGame.CRYSISWARS: 'warhead',
+    ValveGame.DOD: 'dod',
     MedalOfHonorGame.AA: 'mohaa',
     MedalOfHonorGame.BT: 'bt',
     MedalOfHonorGame.SH: 'sh',
