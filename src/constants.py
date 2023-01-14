@@ -312,6 +312,12 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
             ValvePrincipal.VALVE
         ]
     ),
+    ValveGame.Rust: ValveGameConfig(
+        app_id=252490,
+        principals=[
+            ValvePrincipal.VALVE
+        ]
+    ),
     ValveGame.SEVEND2D: ValveGameConfig(
         app_id=251570,
         principals=[
@@ -714,6 +720,7 @@ GAMETRACKER_GAME_KEYS: Dict[Game, str] = {
     BattlelogGame.MOHWF: 'mohw',
     Quake3Game.OPENARENA: 'q3',  # GameTracker does not support OpenArena, so some servers are added as Quake 3 servers
     Quake3Game.QUAKE3ARENA: 'q3',  # Quake3Arena servers are listed as Quake 3 servers
+    ValveGame.Rust: 'rust',
     Quake3Game.SOF2: 'sof2',
     GamespyGame.SWAT4: 'swat4',
     Quake3Game.SWJKJA: 'swjk',  # GameTracker seems to track all Jedi Knight servers in a single category
