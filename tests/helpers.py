@@ -1,8 +1,8 @@
 import unittest
 
-from src.helpers import is_valid_public_ip, is_valid_port, battlelog_server_validator, mohwf_server_validator, \
-    bfbc2_server_validator, guid_from_ip_port
-from src.servers import FrostbiteServer, Bfbc2Server
+from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, battlelog_server_validator, \
+    mohwf_server_validator, bfbc2_server_validator, guid_from_ip_port
+from GameserverLister.common.servers import FrostbiteServer, BadCompany2Server
 
 
 class IsValidPublicIPTest(unittest.TestCase):
@@ -92,42 +92,42 @@ class ServerValidatorTest(unittest.TestCase):
 
     def test_bfbcb2_valid_battlelog(self):
         name, ip, game_port = 'a-server-name', '1.1.1.1', 19567
-        server = Bfbc2Server('a-guid', name, 257, 123456, ip, game_port, 48888)
+        server = BadCompany2Server('a-guid', name, 257, 123456, ip, game_port, 48888)
         parsed_result = {'connect': f'{ip}:{game_port}', 'name': name}
         valid = bfbc2_server_validator(server, -1, parsed_result)
         self.assertTrue(valid)
 
     def test_bfbcb2_valid_any_ip(self):
         name, ip, game_port = 'a-server-name', '1.1.1.1', 19567
-        server = Bfbc2Server('a-guid', name, 257, 123456, ip, game_port, 48888)
+        server = BadCompany2Server('a-guid', name, 257, 123456, ip, game_port, 48888)
         parsed_result = {'connect': f'0.0.0.0:{game_port}', 'name': name}
         valid = bfbc2_server_validator(server, -1, parsed_result)
         self.assertTrue(valid)
 
     def test_bfbcb2_valid_name(self):
         name, ip, game_port = 'a-server-name', '1.1.1.1', 19567
-        server = Bfbc2Server('a-guid', name, 257, 123456, ip, game_port, 48888)
+        server = BadCompany2Server('a-guid', name, 257, 123456, ip, game_port, 48888)
         parsed_result = {'connect': f'0.0.0.0:{game_port + 1}', 'name': name}
         valid = bfbc2_server_validator(server, -1, parsed_result)
         self.assertTrue(valid)
 
     def test_bfbcb2_ip_name_mismatch(self):
         name, ip, game_port = 'a-server-name', '1.1.1.1', 19567
-        server = Bfbc2Server('a-guid', name, 257, 123456, ip, game_port, 48888)
+        server = BadCompany2Server('a-guid', name, 257, 123456, ip, game_port, 48888)
         parsed_result = {'connect': f'1.0.0.1:{game_port}', 'name': 'different-name'}
         valid = bfbc2_server_validator(server, -1, parsed_result)
         self.assertFalse(valid)
 
     def test_bfbcb2_port_name_mismatch(self):
         name, ip, game_port = 'a-server-name', '1.1.1.1', 19567
-        server = Bfbc2Server('a-guid', name, 257, 123456, ip, game_port, 48888)
+        server = BadCompany2Server('a-guid', name, 257, 123456, ip, game_port, 48888)
         parsed_result = {'connect': f'{ip}:{game_port + 1}', 'name': 'different-name'}
         valid = bfbc2_server_validator(server, -1, parsed_result)
         self.assertFalse(valid)
 
     def test_bfbcb2_invalid_parsed_result(self):
         name, ip, game_port = 'a-server-name', '1.1.1.1', 19567
-        server = Bfbc2Server('a-guid', name, 257, 123456, ip, game_port, 48888)
+        server = BadCompany2Server('a-guid', name, 257, 123456, ip, game_port, 48888)
         parsed_result = {}
         valid = bfbc2_server_validator(server, -1, parsed_result)
         self.assertFalse(valid)
@@ -137,6 +137,7 @@ class GuidTest(unittest.TestCase):
     def test_guid_from_ip_port(self):
         actual = guid_from_ip_port('1.1.1.1', '443')
         self.assertEqual('1f2-1f2-1f2-1f2', actual)
+
 
 if __name__ == '__main__':
     unittest.main()

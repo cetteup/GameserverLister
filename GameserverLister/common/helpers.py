@@ -7,9 +7,9 @@ import gevent.subprocess
 import requests
 from nslookup import Nslookup
 
-from src.constants import GAMETRACKER_GAME_KEYS
-from src.servers import FrostbiteServer, Bfbc2Server
-from src.types import GamespyGame
+from GameserverLister.common.constants import GAMETRACKER_GAME_KEYS
+from GameserverLister.common.servers import FrostbiteServer, BadCompany2Server
+from GameserverLister.common.types import GamespyGame
 
 
 def find_query_port(gamedig_path: str, game: str, server: FrostbiteServer, ports_to_try: list, validator: Callable) -> int:
@@ -74,7 +74,7 @@ def mohwf_server_validator(server: FrostbiteServer, used_query_port: int, parsed
     return parsed_result.get('connect') == f'{server.ip}:{used_query_port}'
 
 
-def bfbc2_server_validator(server: Bfbc2Server, used_query_port: int, parsed_result: dict) -> bool:
+def bfbc2_server_validator(server: BadCompany2Server, used_query_port: int, parsed_result: dict) -> bool:
     return battlelog_server_validator(server, used_query_port, parsed_result) or \
            parsed_result.get('connect') == f'0.0.0.0:{server.game_port}' or \
            parsed_result.get('name') == server.name

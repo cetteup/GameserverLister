@@ -2,7 +2,7 @@ import json
 from datetime import datetime, timedelta
 from typing import Dict, Optional
 
-from src.constants import UNIX_EPOCH_START
+from GameserverLister.common.constants import UNIX_EPOCH_START
 
 
 class WebLink:
@@ -81,6 +81,7 @@ class WebLinkTemplate:
             self.url_template.format(game, uid, ip, port),
             self.official
         )
+
 
 """
 For URL templates:

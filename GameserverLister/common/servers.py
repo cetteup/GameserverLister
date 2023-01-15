@@ -2,8 +2,8 @@ import json
 from datetime import datetime, timedelta
 from typing import Union, Optional, Any, List
 
-from src.constants import UNIX_EPOCH_START
-from src.weblinks import WebLink
+from GameserverLister.common.constants import UNIX_EPOCH_START
+from GameserverLister.common.weblinks import WebLink
 
 
 class ObjectJSONEncoder(json.JSONEncoder):
@@ -327,7 +327,7 @@ class FrostbiteServer(QueryableServer):
         }
 
 
-class Bfbc2Server(FrostbiteServer):
+class BadCompany2Server(FrostbiteServer):
     lid: int
     gid: int
 
@@ -350,7 +350,7 @@ class Bfbc2Server(FrostbiteServer):
         self.gid = gid
 
     @staticmethod
-    def load(parsed: dict) -> Union['Bfbc2Server', dict]:
+    def load(parsed: dict) -> Union['BadCompany2Server', dict]:
         # Will change to own validation in future
         if not FrostbiteServer.is_json_repr(parsed):
             return parsed
@@ -362,7 +362,7 @@ class Bfbc2Server(FrostbiteServer):
         last_queried_at = datetime.fromisoformat(parsed['lastQueriedAt']) \
             if parsed.get('lastQueriedAt') not in [None, ''] else None
 
-        server = Bfbc2Server(
+        server = BadCompany2Server(
             parsed['guid'],
             parsed['name'],
             parsed.get('lid', -1),

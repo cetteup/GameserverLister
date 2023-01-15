@@ -1,9 +1,9 @@
 import unittest
 from datetime import datetime, timedelta
 
-from src.constants import UNIX_EPOCH_START
-from src.servers import Server, QueryableServer, ClassicServer, FrostbiteServer, Bfbc2Server, GametoolsServer, \
-    ViaStatus, WebLink
+from GameserverLister.common.constants import UNIX_EPOCH_START
+from GameserverLister.common.servers import Server, QueryableServer, ClassicServer, FrostbiteServer, BadCompany2Server, \
+    GametoolsServer, ViaStatus, WebLink
 
 
 class ServerTest(unittest.TestCase):
@@ -401,9 +401,9 @@ class Bfbc2ServerTest(unittest.TestCase):
                   'gamePort': game_port, 'queryPort': query_port,
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at.isoformat(),
                   'lastQueriedAt': last_queried_at.isoformat()}
-        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
-                             last_queried_at)
-        actual = Bfbc2Server.load(parsed)
+        expect = BadCompany2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
+                                   last_queried_at)
+        actual = BadCompany2Server.load(parsed)
         self.assertEqual(expect, actual)
 
     def test_load_first_seen_at_none(self):
@@ -414,9 +414,9 @@ class Bfbc2ServerTest(unittest.TestCase):
                   'gamePort': game_port, 'queryPort': query_port,
                   'firstSeenAt': first_seen_at, 'lastSeenAt': last_seen_at.isoformat(),
                   'lastQueriedAt': last_queried_at.isoformat()}
-        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
-                             last_queried_at)
-        actual = Bfbc2Server.load(parsed)
+        expect = BadCompany2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
+                                   last_queried_at)
+        actual = BadCompany2Server.load(parsed)
         self.assertEqual(expect, actual)
 
     def test_load_last_seen_at_none(self):
@@ -427,9 +427,9 @@ class Bfbc2ServerTest(unittest.TestCase):
                   'gamePort': game_port, 'queryPort': query_port,
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at,
                   'lastQueriedAt': last_queried_at.isoformat()}
-        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, UNIX_EPOCH_START,
-                             last_queried_at)
-        actual = Bfbc2Server.load(parsed)
+        expect = BadCompany2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, UNIX_EPOCH_START,
+                                   last_queried_at)
+        actual = BadCompany2Server.load(parsed)
         self.assertEqual(expect, actual)
 
     def test_load_last_queried_at_none(self):
@@ -440,9 +440,9 @@ class Bfbc2ServerTest(unittest.TestCase):
                   'gamePort': game_port, 'queryPort': query_port,
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at.isoformat(),
                   'lastQueriedAt': last_queried_at}
-        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
-                             last_queried_at)
-        actual = Bfbc2Server.load(parsed)
+        expect = BadCompany2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
+                                   last_queried_at)
+        actual = BadCompany2Server.load(parsed)
         self.assertEqual(expect, actual)
 
     def test_load_lid_missing(self):
@@ -453,9 +453,9 @@ class Bfbc2ServerTest(unittest.TestCase):
                   'gamePort': game_port, 'queryPort': query_port,
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at.isoformat(),
                   'lastQueriedAt': last_queried_at.isoformat()}
-        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
-                             last_queried_at)
-        actual = Bfbc2Server.load(parsed)
+        expect = BadCompany2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
+                                   last_queried_at)
+        actual = BadCompany2Server.load(parsed)
         self.assertEqual(expect, actual)
 
     def test_load_gid_missing(self):
@@ -466,17 +466,17 @@ class Bfbc2ServerTest(unittest.TestCase):
                   'gamePort': game_port, 'queryPort': query_port,
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at.isoformat(),
                   'lastQueriedAt': last_queried_at.isoformat()}
-        expect = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
-                             last_queried_at)
-        actual = Bfbc2Server.load(parsed)
+        expect = BadCompany2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
+                                   last_queried_at)
+        actual = BadCompany2Server.load(parsed)
         self.assertEqual(expect, actual)
 
     def test_dump(self):
         guid, name, lid, gid, ip, game_port, query_port = 'a-guid', 'a-server-name', 257, 123456, '1.1.1.1', 25200, 47200
         now = datetime.now().astimezone()
         first_seen_at, last_seen_at, last_queried_at = now, now + timedelta(minutes=10), now + timedelta(minutes=5)
-        server = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
-                             last_queried_at)
+        server = BadCompany2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
+                                   last_queried_at)
         expect = {'guid': guid, 'name': name, 'lid': lid, 'gid': gid, 'ip': ip,
                   'gamePort': game_port, 'queryPort': query_port, 'links': [],
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at.isoformat(),
@@ -488,8 +488,8 @@ class Bfbc2ServerTest(unittest.TestCase):
         guid, name, lid, gid, ip, game_port, query_port = 'a-guid', 'a-server-name', 257, 123456, '1.1.1.1', 25200, 47200
         now = datetime.now().astimezone()
         first_seen_at, last_seen_at, last_queried_at = None, now + timedelta(minutes=10), now + timedelta(minutes=5)
-        server = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
-                             last_queried_at)
+        server = BadCompany2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
+                                   last_queried_at)
         expect = {'guid': guid, 'name': name, 'lid': lid, 'gid': gid, 'ip': ip,
                   'gamePort': game_port, 'queryPort': query_port, 'links': [],
                   'firstSeenAt': first_seen_at, 'lastSeenAt': last_seen_at.isoformat(),
@@ -501,8 +501,8 @@ class Bfbc2ServerTest(unittest.TestCase):
         guid, name, lid, gid, ip, game_port, query_port = 'a-guid', 'a-server-name', 257, 123456, '1.1.1.1', 25200, 47200
         now = datetime.now().astimezone()
         first_seen_at, last_seen_at, last_queried_at = now, now + timedelta(minutes=10), None
-        server = Bfbc2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
-                             last_queried_at)
+        server = BadCompany2Server(guid, name, lid, gid, ip, game_port, query_port, first_seen_at, last_seen_at,
+                                   last_queried_at)
         expect = {'guid': guid, 'name': name, 'lid': lid, 'gid': gid, 'ip': ip,
                   'gamePort': game_port, 'queryPort': query_port, 'links': [],
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': last_seen_at.isoformat(),
@@ -545,13 +545,13 @@ class GametoolsServerTest(unittest.TestCase):
     def test_load_last_seen_at_none(self):
         game_id, name = 'a-game-id', 'a-server-name'
         now = datetime.now().astimezone()
-        first_seen_at, last_seen_at = now, None
+        first_seen_at = now
         parsed = {'gameId': game_id, 'name': name,
                   'firstSeenAt': first_seen_at.isoformat(), 'lastSeenAt': None}
         expect = GametoolsServer(game_id, name, first_seen_at, UNIX_EPOCH_START)
         actual = GametoolsServer.load(parsed)
         self.assertEqual(expect, actual)
-    
+
     def test_is_json_repr_valid(self):
         parsed = {'gameId': 'a-game-id', 'name': 'a-server-name'}
         self.assertTrue(GametoolsServer.is_json_repr(parsed))
@@ -563,7 +563,7 @@ class GametoolsServerTest(unittest.TestCase):
     def test_is_json_repr_name_missing(self):
         parsed = {'name': 'a-server-name'}
         self.assertFalse(GametoolsServer.is_json_repr(parsed))
-        
+
 
 if __name__ == '__main__':
     unittest.main()
