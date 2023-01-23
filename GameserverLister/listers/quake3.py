@@ -10,7 +10,7 @@ from GameserverLister.common.servers import ClassicServer, ViaStatus
 from GameserverLister.common.types import Quake3Game
 from GameserverLister.common.weblinks import WebLink, WEB_LINK_TEMPLATES
 from GameserverLister.games.quake3 import QUAKE3_CONFIGS
-from GameserverLister.listers.common import ServerLister
+from .common import ServerLister
 
 
 class Quake3ServerLister(ServerLister):

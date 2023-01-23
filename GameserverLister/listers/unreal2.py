@@ -9,7 +9,7 @@ from GameserverLister.common.servers import ClassicServer, ViaStatus
 from GameserverLister.common.types import Unreal2Game
 from GameserverLister.common.weblinks import WebLink, WEB_LINK_TEMPLATES
 from GameserverLister.games.unreal2 import UNREAL2_CONFIGS
-from GameserverLister.listers.common import ServerLister
+from .common import ServerLister
 
 
 class Unreal2ServerLister(ServerLister):

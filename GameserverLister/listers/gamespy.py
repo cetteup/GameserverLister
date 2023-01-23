@@ -6,13 +6,14 @@ from typing import List, Tuple, Optional, Union
 
 from nslookup import Nslookup
 
-from GameserverLister.games.gamespy import GAMESPY_PRINCIPAL_CONFIGS, GAMESPY_GAME_CONFIGS
-from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, guid_from_ip_port, is_server_for_gamespy_game, \
+from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, guid_from_ip_port, \
+    is_server_for_gamespy_game, \
     is_server_listed_on_gametracker
-from GameserverLister.listers.common import ServerLister
 from GameserverLister.common.servers import ClassicServer, ViaStatus
 from GameserverLister.common.types import GamespyGame, GamespyPrincipal, GamespyGameConfig
 from GameserverLister.common.weblinks import WebLink, WEB_LINK_TEMPLATES
+from GameserverLister.games.gamespy import GAMESPY_PRINCIPAL_CONFIGS, GAMESPY_GAME_CONFIGS
+from .common import ServerLister
 
 
 class GameSpyServerLister(ServerLister):

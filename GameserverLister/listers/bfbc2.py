@@ -6,10 +6,10 @@ from typing import Tuple, Optional, Union, List
 import requests
 
 from GameserverLister.common.helpers import bfbc2_server_validator, guid_from_ip_port, is_server_listed_on_gametracker
-from GameserverLister.listers.common import FrostbiteServerLister
 from GameserverLister.common.servers import BadCompany2Server
 from GameserverLister.common.types import TheaterGame
 from GameserverLister.common.weblinks import WebLink, WEB_LINK_TEMPLATES
+from .common import FrostbiteServerLister
 
 
 class BadCompany2ServerLister(FrostbiteServerLister):

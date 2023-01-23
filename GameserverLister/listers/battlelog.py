@@ -4,12 +4,12 @@ from typing import List, Tuple, Optional, Union
 
 import requests
 
-from GameserverLister.games.battlelog import BATTLELOG_GAME_BASE_URIS
 from GameserverLister.common.helpers import mohwf_server_validator, battlelog_server_validator
-from GameserverLister.listers.common import HttpServerLister, FrostbiteServerLister
 from GameserverLister.common.servers import FrostbiteServer
 from GameserverLister.common.types import BattlelogGame
 from GameserverLister.common.weblinks import WEB_LINK_TEMPLATES, WebLink
+from GameserverLister.games.battlelog import BATTLELOG_GAME_BASE_URIS
+from .common import HttpServerLister, FrostbiteServerLister
 
 
 class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):

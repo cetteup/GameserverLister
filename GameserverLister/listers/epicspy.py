@@ -7,7 +7,7 @@ from pyq3serverlist.buffer import Buffer
 
 from GameserverLister.common.types import GamespyGame, GamespyPrincipal
 from GameserverLister.games.gamespy import GAMESPY_PRINCIPAL_CONFIGS
-from GameserverLister.listers import GameSpyServerLister
+from .gamespy import GameSpyServerLister
 
 
 class EpicSpyServerLister(GameSpyServerLister):

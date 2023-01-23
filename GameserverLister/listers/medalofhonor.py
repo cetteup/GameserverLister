@@ -10,7 +10,7 @@ from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, g
 from GameserverLister.common.servers import ClassicServer, ViaStatus
 from GameserverLister.common.types import MedalOfHonorGame
 from GameserverLister.common.weblinks import WebLink, WEB_LINK_TEMPLATES
-from GameserverLister.listers.common import ServerLister
+from .common import ServerLister
 
 
 class MedalOfHonorServerLister(ServerLister):

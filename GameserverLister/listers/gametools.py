@@ -4,11 +4,11 @@ from typing import List, Tuple, Optional, Union
 
 import requests
 
-from GameserverLister.games.gametools import GAMETOOLS_BASE_URI
-from GameserverLister.listers.common import HttpServerLister
 from GameserverLister.common.servers import GametoolsServer
 from GameserverLister.common.types import GametoolsGame
 from GameserverLister.common.weblinks import WebLink, WEB_LINK_TEMPLATES
+from GameserverLister.games.gametools import GAMETOOLS_BASE_URI
+from .common import HttpServerLister
 
 
 class GametoolsServerLister(HttpServerLister):
