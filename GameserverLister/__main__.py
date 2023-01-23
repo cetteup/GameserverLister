@@ -1,6 +1,7 @@
 import click
 
-from GameserverLister.commands import gamespy, battlelog, unreal2, valve, quake3, gametools, bfbc2, medalofhonor
+from GameserverLister.commands import gamespy, battlelog, unreal2, valve, quake3, gametools, bfbc2, medalofhonor, \
+    epicspy
 
 
 @click.group()
@@ -10,6 +11,7 @@ def cli():
 
 cli.add_command(battlelog.run, 'battlelog')
 cli.add_command(bfbc2.run, 'bfbc2')
+cli.add_command(epicspy.run, 'epicspy')
 cli.add_command(gamespy.run, 'gamespy')
 cli.add_command(gametools.run, 'gametools')
 cli.add_command(medalofhonor.run, 'medalofhonor')

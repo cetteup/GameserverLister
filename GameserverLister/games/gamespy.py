@@ -19,6 +19,12 @@ GAMESPY_PRINCIPAL_CONFIGS: Dict[GamespyPrincipal, GamespyPrincipalConfig] = {
     GamespyPrincipal.CRYMP_NET: GamespyPrincipalConfig(
         hostname='master.crymp.net'
     ),
+    GamespyPrincipal.EPIC_GAMES_UNREAL: GamespyPrincipalConfig(
+        hostname='unreal.epicgames.com'
+    ),
+    GamespyPrincipal.EPIC_GAMES_UT: GamespyPrincipalConfig(
+        hostname='utmaster.epicgames.com'
+    ),
     GamespyPrincipal.EPIC_GAMES_UT3: GamespyPrincipalConfig(
         hostname='ut3master1.epicgames.com'
     ),
