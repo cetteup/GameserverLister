@@ -50,6 +50,46 @@ class GameSpyServerLister(ServerLister):
         self.verify = verify
 
     def update_server_list(self):
+        raw_servers = self.get_servers()
+        found_servers = []
+        for ip, query_port in raw_servers:
+            if not is_valid_public_ip(ip) or not is_valid_port(int(query_port)):
+                logging.warning(f'Principal returned invalid server entry ({ip}:{query_port}), skipping it')
+                continue
+
+            via = ViaStatus(self.principal)
+            found_server = ClassicServer(
+                guid_from_ip_port(ip, str(query_port)),
+                ip,
+                query_port,
+                via
+            )
+
+            if self.verify or self.add_links:
+                # Attempt to query server in order to verify is a server for the current game
+                # (some principals return servers for other games than what we queried)
+                logging.debug(f'Querying server {found_server.uid}/{found_server.ip}:{found_server.query_port}')
+                responded, query_response = self.query_server(found_server)
+                logging.debug(f'Query {"was successful" if responded else "did not receive a response"}')
+
+                if responded and self.verify and \
+                        not is_server_for_gamespy_game(self.game, self.config.game_name, query_response):
+                    logging.warning(f'Server does not seem to be a {self.game} server, ignoring it '
+                                    f'({found_server.ip}:{found_server.query_port})')
+                    continue
+
+                if responded and 'hostport' in query_response and self.add_links:
+                    found_server.add_links(self.build_server_links(
+                        found_server.uid,
+                        found_server.ip,
+                        int(query_response['hostport'])
+                    ))
+
+            found_servers.append(found_server)
+
+        self.add_update_servers(found_servers)
+
+    def get_servers(self) -> List[Tuple[str, int]]:
         principal = GAMESPY_PRINCIPAL_CONFIGS[self.principal]
         # Format hostname using game name (following old GameSpy format [game].master.gamespy.com)
         hostname = principal.hostname.format(self.config.game_name)
@@ -89,8 +129,10 @@ class GameSpyServerLister(ServerLister):
                     command.extend(['-Q', str(self.config.query_type)])
                     # Extend timeout to account for server queries
                     timeout += 10
-                gslist_result = subprocess.run(command, capture_output=True,
-                                               cwd=self.server_list_dir_path, timeout=timeout)
+                gslist_result = subprocess.run(
+                    command, capture_output=True,
+                    cwd=self.server_list_dir_path, timeout=timeout
+                )
                 command_ok = True
             except subprocess.TimeoutExpired as e:
                 logging.debug(e)
@@ -111,46 +153,13 @@ class GameSpyServerLister(ServerLister):
         # Parse server list
         # List format: [ip-address]:[port]
         logging.info(f'Parsing server list{" and verifying servers" if self.verify else ""}')
-        found_servers = []
+        servers: List[Tuple[str, int]] = []
         for line in raw_server_list.splitlines():
             connect, *_ = line.split(' ', 1)
             ip, query_port = connect.strip().split(':', 1)
+            servers.append((ip, int(query_port)))
 
-            if not is_valid_public_ip(ip) or not is_valid_port(int(query_port)):
-                logging.warning(f'Principal returned invalid server entry ({ip}:{query_port}), skipping it')
-                continue
-
-            via = ViaStatus(self.principal)
-            found_server = ClassicServer(
-                guid_from_ip_port(ip, query_port),
-                ip,
-                int(query_port),
-                via
-            )
-
-            if self.verify or self.add_links:
-                # Attempt to query server in order to verify is a server for the current game
-                # (some principals return servers for other games than what we queried)
-                logging.debug(f'Querying server {found_server.uid}/{found_server.ip}:{found_server.query_port}')
-                responded, query_response = self.query_server(found_server)
-                logging.debug(f'Query {"was successful" if responded else "did not receive a response"}')
-
-                if responded and self.verify and \
-                        not is_server_for_gamespy_game(self.game, self.config.game_name, query_response):
-                    logging.warning(f'Server does not seem to be a {self.game} server, ignoring it '
-                                    f'({found_server.ip}:{found_server.query_port})')
-                    continue
-
-                if responded and 'hostport' in query_response and self.add_links:
-                    found_server.add_links(self.build_server_links(
-                        found_server.uid,
-                        found_server.ip,
-                        int(query_response['hostport'])
-                    ))
-
-            found_servers.append(found_server)
-
-        self.add_update_servers(found_servers)
+        return servers
 
     def check_if_server_still_exists(self, server: ClassicServer, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
         # Since we query the server directly, there is no way of handling HTTP server errors differently then
