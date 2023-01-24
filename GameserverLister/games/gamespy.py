@@ -257,7 +257,8 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         query_type=11,
         port=28910,
         principals=[
-            GamespyPrincipal.EPIC_GAMES_UT3
+            GamespyPrincipal.EPIC_GAMES_UT3,
+            GamespyPrincipal.OPENSPY
         ],
         gamedig_type='ut3'
     ),
