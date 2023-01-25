@@ -1,4 +1,4 @@
-# gameserver-lister
+# GameserverLister
 
 A Python 🐍 command line tool to retrieve game server lists for various games.
 
