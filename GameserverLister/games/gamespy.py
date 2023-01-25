@@ -152,6 +152,19 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.Jedi95_us
         ]
     ),
+    GamespyGame.DeusEx: GamespyGameConfig(
+        game_name='deusex',
+        game_key='Av3M99',
+        enc_type=0,
+        query_type=0,
+        port=28900,
+        principals=[
+            GamespyPrincipal.TripleThreeNetworks_com_1,
+            GamespyPrincipal.Errorist_eu,
+            GamespyPrincipal.Newbiesplayground_net,
+            GamespyPrincipal.OldUnreal_com_1
+        ]
+    ),
     GamespyGame.DukeNukemForever: GamespyGameConfig(
         game_name='dnf',
         game_key='      ',

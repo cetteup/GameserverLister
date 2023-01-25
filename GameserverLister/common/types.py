@@ -71,6 +71,7 @@ class GamespyGame(Game):
     BF2142 = 'bf2142'
     Crysis = 'crysis'
     CrysisWars = 'crysiswars'
+    DeusEx = 'deusex'
     DukeNukemForever = 'dnf'
     JBNightfire = 'jbnightfire'
     Paraworld = 'paraworld'
