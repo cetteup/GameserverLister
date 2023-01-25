@@ -4,7 +4,7 @@ from typing import Dict
 from GameserverLister.common.types import Quake3Game
 
 QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
-    Quake3Game.COD: {
+    Quake3Game.CoD: {
         'protocols': [
             1,  # version 1.1
             2,  # version 1.2
@@ -22,7 +22,7 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             'activision': ['cod.pm']
         }
     },
-    Quake3Game.CODUO: {
+    Quake3Game.CoDUO: {
         'protocols': [
             21,  # version 1.41
             22,  # version 1.51
@@ -37,7 +37,7 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             'activision': ['cod.pm']
         }
     },
-    Quake3Game.COD2: {
+    Quake3Game.CoD2: {
         'protocols': [
             115,  # version 1.0
             117,  # version 1.2
@@ -53,7 +53,7 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             'activision': ['cod.pm']
         }
     },
-    Quake3Game.COD4: {
+    Quake3Game.CoD4: {
         'protocols': [
             1,  # version 1.0
             6,  # version 1.7
@@ -69,7 +69,7 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             'activision': ['cod.pm']
         }
     },
-    Quake3Game.COD4X: {
+    Quake3Game.CoD4X: {
         'protocols': [
             6  # cod4 does not support different protocols, you seem to get the same servers regardless
         ],
@@ -84,7 +84,7 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             }
         }
     },
-    Quake3Game.NEXUIZ: {
+    Quake3Game.Nexuiz: {
         'protocols': [
             3
         ],
@@ -99,7 +99,7 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             'deathmask.net': ['deathmask.net-official']
         }
     },
-    Quake3Game.OPENARENA: {
+    Quake3Game.OpenArena: {
         'protocols': [
             71
         ],
@@ -114,7 +114,7 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             'deathmask.net': ['deathmask.net-official', 'arena.sh']
         }
     },
-    Quake3Game.Q3RALLY: {
+    Quake3Game.Q3Rally: {
         'protocols': [
             71
         ],
@@ -129,7 +129,7 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             'deathmask.net': ['deathmask.net-official']
         }
     },
-    Quake3Game.QUAKE: {
+    Quake3Game.Quake: {
         'protocols': [
             3
         ],
@@ -144,7 +144,7 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             'deathmask.net': ['deathmask.net-official']
         }
     },
-    Quake3Game.QUAKE3ARENA: {
+    Quake3Game.Quake3Arena: {
         'protocols': [
             68
         ],
@@ -239,7 +239,7 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             }
         }
     },
-    Quake3Game.TREMULOUS: {
+    Quake3Game.Tremulous: {
         'protocols': [
             69
         ],
@@ -253,7 +253,7 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             'tremulous.net': ['deathmask.net-unofficial']
         }
     },
-    Quake3Game.URBANTERROR: {
+    Quake3Game.UrbanTerror: {
         'protocols': [
             68
         ],
@@ -267,7 +267,7 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             'urbanterror.info': ['deathmask.net-unofficial']
         }
     },
-    Quake3Game.WARFORK: {
+    Quake3Game.Warfork: {
         'protocols': [
             23
         ],
@@ -282,7 +282,7 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             'deathmask.net': ['deathmask.net-official']
         }
     },
-    Quake3Game.WARSOW: {
+    Quake3Game.Warsow: {
         'protocols': [
             22
         ],
@@ -297,7 +297,7 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             'deathmask.net': ['deathmask.net-official', 'arena.sh']
         }
     },
-    Quake3Game.WOLFENSTEINET: {
+    Quake3Game.WolfensteinET: {
         'protocols': [
             84
         ],
@@ -312,7 +312,7 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             }
         }
     },
-    Quake3Game.XONOTIC: {
+    Quake3Game.Xonotic: {
         'protocols': [
             3
         ],

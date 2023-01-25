@@ -9,13 +9,13 @@ VALVE_PRINCIPAL_CONFIGS: Dict[ValvePrincipal, ValvePrincipalConfig] = {
     )
 }
 VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
-    ValveGame.DOD: ValveGameConfig(
+    ValveGame.DoD: ValveGameConfig(
         app_id=30,
         principals=[
             ValvePrincipal.VALVE
         ]
     ),
-    ValveGame.DODS: ValveGameConfig(
+    ValveGame.DoDS: ValveGameConfig(
         app_id=300,
         principals=[
             ValvePrincipal.VALVE
@@ -33,7 +33,7 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
             ValvePrincipal.VALVE
         ]
     ),
-    ValveGame.SEVEND2D: ValveGameConfig(
+    ValveGame.SevenD2D: ValveGameConfig(
         app_id=251570,
         principals=[
             ValvePrincipal.VALVE

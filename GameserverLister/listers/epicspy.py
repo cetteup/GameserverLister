@@ -28,7 +28,7 @@ class EpicSpyServerLister(GameSpyServerLister):
     ):
         super().__init__(
             game,
-            GamespyPrincipal.EPIC_GAMES_UNREAL if game is GamespyGame.UNREAL else GamespyPrincipal.EPIC_GAMES_UT,
+            GamespyPrincipal.EpicGamesUnreal if game is GamespyGame.Unreal else GamespyPrincipal.EpicGamesUT,
             gslist_bin_path,
             '',
             False,

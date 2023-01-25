@@ -13,7 +13,7 @@ from GameserverLister.listers import EpicSpyServerLister
 @click.option(
     '-g',
     '--game',
-    type=click.Choice([GamespyGame.UNREAL, GamespyGame.UT]),
+    type=click.Choice([GamespyGame.Unreal, GamespyGame.UT]),
     required=True,
     help='Game to list servers for'
 )

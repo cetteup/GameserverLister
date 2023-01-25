@@ -21,10 +21,10 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Game                                   | Source type/protocol | Server list source(s)                                                                                             |
 |----------------------------------------|----------------------|-------------------------------------------------------------------------------------------------------------------|
 | 7 Days to Die                          | Valve                | Valve ²                                                                                                           |
-| Battlefield 1942                       | GameSpy              | bf1942.org, openspy, qtracker                                                                                     |
-| Battlefield Vietnam                    | GameSpy              | openspy, qtracker                                                                                                 |
-| Battlefield 2                          | GamsSpy              | bf2hub, playbf2                                                                                                   |
-| Battlefield 2142                       | GameSpy              | novgames, openspy, play2142                                                                                       |
+| Battlefield 1942                       | GameSpy              | bf1942.org, openspy.net, qtracker.com                                                                             |
+| Battlefield Vietnam                    | GameSpy              | openspy.net, qtracker.com                                                                                         |
+| Battlefield 2                          | GamsSpy              | bf2hub.com, playbf2.ru                                                                                            |
+| Battlefield 2142                       | GameSpy              | novgames.ru, openspy.net, play2142.ru                                                                             |
 | Battlefield: Bad Company 2             | fesl/theater         | Electronic Arts                                                                                                   |
 | Battlefield 3                          | Battlelog            | battlelog.com                                                                                                     |
 | Battlefield 4                          | Battlelog            | battlelog.com                                                                                                     |
@@ -41,11 +41,11 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Day of Defeat                          | Valve                | Valve ²                                                                                                           |
 | Day of Defeat: Source                  | Valve                | Valve ²                                                                                                           |
 | Forgotten Hope 2                       | GameSpy              | fh2.dev                                                                                                           |
-| James Bond 007: Nightfire              | GameSpy              | openspy, nightfirepc.com                                                                                          |
+| James Bond 007: Nightfire              | GameSpy              | openspy.net, nightfirepc.com                                                                                      |
 | Medal of Honor Warfighter              | Battlelog            | battlelog.com                                                                                                     |
 | Nexuiz                                 | Quake3               | deathmask.net                                                                                                     |
 | OpenArena                              | Quake3               | deathmask.net                                                                                                     |
-| ParaWorld                              | GameSpy              | openspy                                                                                                           |
+| ParaWorld                              | GameSpy              | openspy.net                                                                                                       |
 | Postal 2                               | GameSpy              | 333networks.com                                                                                                   |
 | Q3Rally                                | Quake3               | deathmask.net                                                                                                     |
 | Quake                                  | Quake3               | deathmask.net                                                                                                     |
@@ -60,14 +60,14 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Team Fortress Classic                  | Valve                | Valve ²                                                                                                           |
 | Team Fortress 2                        | Valve                | Valve ²                                                                                                           |
 | Tremulous                              | Quake3               | tremulous.net                                                                                                     |
-| Unreal                                 | GameSpy              | 333networks.com, errorist.eu, openspy, oldunreal.com, qtracker                                                    |
-| Unreal Tournament                      | GameSpy              | 333networks.com, errorist.eu, openspy, oldunreal.com, qtracker                                                    |
-| Unreal Tournament 2003                 | Unreal2              | openspy                                                                                                           |
-| Unreal Tournament 2004                 | Unreal2              | epicgames.com, openspy                                                                                            |
-| Unreal Tournament 3                    | GameSpy              | epicgames.com, openspy                                                                                            |
+| Unreal                                 | GameSpy              | 333networks.com, errorist.eu, openspy.net, oldunreal.com, qtracker.com                                            |
+| Unreal Tournament                      | GameSpy              | 333networks.com, errorist.eu, openspy.net, oldunreal.com, qtracker.com                                            |
+| Unreal Tournament 2003                 | Unreal2              | openspy.net                                                                                                       |
+| Unreal Tournament 2004                 | Unreal2              | epicgames.com, openspy.net                                                                                        |
+| Unreal Tournament 3                    | GameSpy              | epicgames.com, openspy.net                                                                                        |
 | UrbanTerror                            | Quake3               | FrozenSand                                                                                                        |
-| Vietcong                               | GameSpy              | vietcong.tk, vietcong1.eu, qtracker                                                                               |
-| Vietcong 2                             | GameSpy              | openspy                                                                                                           |
+| Vietcong                               | GameSpy              | vietcong.tk, vietcong1.eu, qtracker.com                                                                           |
+| Vietcong 2                             | GameSpy              | openspy.net                                                                                                       |
 | Warfork                                | Quake3               | deathmask.net                                                                                                     |
 | Warsow                                 | Quake3               | deathmask.net                                                                                                     |
 | Wolfenstein: Enemy Territory           | Quake3               | id Software, etlegacy.com                                                                                         |
