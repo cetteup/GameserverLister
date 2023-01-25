@@ -40,6 +40,8 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Crysis Wars                            | GameSpy              | jedi95.us                                                                                                         |
 | Day of Defeat                          | Valve                | Valve ²                                                                                                           |
 | Day of Defeat: Source                  | Valve                | Valve ²                                                                                                           |
+| Deus Ex                                | GameSpy              | 333networks.com, errorist.eu, newbiesplayground.net, oldunreal.com                                                |
+| Duke Nukem Forever                     | GameSpy              | 333networks.com                                                                                                   |
 | Forgotten Hope 2                       | GameSpy              | fh2.dev                                                                                                           |
 | James Bond 007: Nightfire              | GameSpy              | openspy.net, nightfirepc.com                                                                                      |
 | Medal of Honor Warfighter              | Battlelog            | battlelog.com                                                                                                     |
@@ -52,7 +54,10 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Quake 3 Arena                          | Quake3               | quake3arena.com, urbanterror.info, excessiveplus.net, ioquake3.org, huxxer.de, maverickservers.com, deathmask.net |
 | Return to Castle Wolfenstein           | Quake3               | id Software                                                                                                       |
 | Rising Storm 2: Vietnam                | Valve                | Valve ²                                                                                                           |
+| Rune                                   | GameSpy              | 333networks.com, errorist.eu, newbiesplayground.net, oldunreal.com                                                |
 | Rust                                   | Valve                | Valve ²                                                                                                           |
+| Serious Sam: The First Encounter       | GameSpy              | 333networks.com, errorist.eu, newbiesplayground.net, oldunreal.com                                                |
+| Serious Sam: Second Encounter          | GameSpy              | 333networks.com, errorist.eu, newbiesplayground.net, oldunreal.com                                                |
 | Soldier of Fortune II: Double Helix    | Quake3               | Raven Software                                                                                                    |
 | Star Wars Jedi Knight II: Jedi Outcast | Quake3               | Raven Software, jkhub.org                                                                                         |
 | Star Wars Jedi Knight: Jedi Academy    | Quake3               | Raven Software, jkhub.org                                                                                         |
