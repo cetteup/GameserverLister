@@ -206,6 +206,19 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.OldUnreal_com_1
         ]
     ),
+    GamespyGame.SeriousSamSE: GamespyGameConfig(
+        game_name='serioussamse',
+        game_key='AKbna4',
+        enc_type=0,
+        query_type=0,
+        port=28900,
+        principals=[
+            GamespyPrincipal.TripleThreeNetworks_com_1,
+            GamespyPrincipal.Errorist_eu,
+            GamespyPrincipal.Newbiesplayground_net,
+            GamespyPrincipal.OldUnreal_com_1
+        ]
+    ),
     GamespyGame.SWAT4: GamespyGameConfig(
         game_name='swat4',
         game_key='tG3j8c',
