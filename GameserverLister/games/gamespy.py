@@ -79,8 +79,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.BF1942_org,
             GamespyPrincipal.OpenSpy_net,
             GamespyPrincipal.Qtracker_com
-        ],
-        gamedig_type='bf1942'
+        ]
     ),
     GamespyGame.BFVietnam: GamespyGameConfig(
         game_name='bfvietnam',
@@ -91,8 +90,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         principals=[
             GamespyPrincipal.OpenSpy_net,
             GamespyPrincipal.Qtracker_com
-        ],
-        gamedig_type='bfv'
+        ]
     ),
     GamespyGame.BF2: GamespyGameConfig(
         game_name='battlefield2',
@@ -106,7 +104,6 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.PhoenixNetwork_net,
             GamespyPrincipal.PlayBF2_ru
         ],
-        gamedig_type='bf2',
         link_template_refs={
             '_any': ['bf2.tv'],
             GamespyPrincipal.BF2Hub_com: ['bf2hub']
@@ -121,7 +118,6 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         principals=[
             GamespyPrincipal.FH2_dev
         ],
-        gamedig_type='bf2',
         info_query='\\hostname'
     ),
     GamespyGame.BF2142: GamespyGameConfig(
@@ -134,8 +130,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.NovGames_ru,
             GamespyPrincipal.OpenSpy_net,
             GamespyPrincipal.Play2142_ru
-        ],
-        gamedig_type='bf2142'
+        ]
     ),
     GamespyGame.Crysis: GamespyGameConfig(
         game_name='crysis',
@@ -145,8 +140,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         port=28910,
         principals=[
             GamespyPrincipal.Crymp_net
-        ],
-        gamedig_type='crysis'
+        ]
     ),
     GamespyGame.CrysisWars: GamespyGameConfig(
         game_name='crysiswars',
@@ -156,8 +150,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         port=28910,
         principals=[
             GamespyPrincipal.Jedi95_us
-        ],
-        gamedig_type='crysiswars'
+        ]
     ),
     GamespyGame.JBNightfire: GamespyGameConfig(
         game_name='jbnightfire',
@@ -168,8 +161,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         principals=[
             GamespyPrincipal.OpenSpy_net,
             GamespyPrincipal.NightfirePC_com
-        ],
-        gamedig_type='jamesbondnightfire'
+        ]
     ),
     GamespyGame.Paraworld: GamespyGameConfig(
         game_name='paraworld',
@@ -179,8 +171,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         port=28910,
         principals=[
             GamespyPrincipal.OpenSpy_net
-        ],
-        gamedig_type='protocol-gamespy2'
+        ]
     ),
     GamespyGame.Postal2: GamespyGameConfig(
         game_name='postal2',
@@ -190,8 +181,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         port=28900,
         principals=[
             GamespyPrincipal.TripleThreeNetworks_com_1
-        ],
-        gamedig_type='postal2'
+        ]
     ),
     GamespyGame.SWAT4: GamespyGameConfig(
         game_name='swat4',
@@ -202,7 +192,6 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         principals=[
             GamespyPrincipal.SWAT4Stats_com
         ],
-        gamedig_type='swat4',
         # The SWAT 4 principal is the only one which does not return servers if the list type byte is set to 1,
         # so we need to set it to 0 (only possible using a modified version glist: https://github.com/cetteup/gslist)
         list_type=0,
@@ -223,8 +212,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.OpenSpy_net,
             GamespyPrincipal.Qtracker_com
-        ],
-        gamedig_type='unreal'
+        ]
     ),
     GamespyGame.UT: GamespyGameConfig(
         game_name='ut',
@@ -238,8 +226,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.OpenSpy_net,
             GamespyPrincipal.Qtracker_com
-        ],
-        gamedig_type='ut'
+        ]
     ),
     GamespyGame.UT3: GamespyGameConfig(
         game_name='ut3pc',
@@ -249,8 +236,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         port=28910,
         principals=[
             GamespyPrincipal.OpenSpy_net
-        ],
-        gamedig_type='ut3'
+        ]
     ),
     GamespyGame.Vietcong: GamespyGameConfig(
         game_name='vietcong',
@@ -262,8 +248,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.Vietcong_tk,
             GamespyPrincipal.Vietcong1_eu,
             GamespyPrincipal.Qtracker_com
-        ],
-        gamedig_type='vietcong'
+        ]
     ),
     GamespyGame.Vietcong2: GamespyGameConfig(
         game_name='vietcong2',
@@ -273,7 +258,6 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         port=28910,
         principals=[
             GamespyPrincipal.OpenSpy_net
-        ],
-        gamedig_type='vietcong2'
+        ]
     )
 }

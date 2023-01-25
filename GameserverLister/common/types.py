@@ -151,7 +151,6 @@ class GamespyGameConfig:
     query_type: int
     port: int
     principals: List[GamespyPrincipal]
-    gamedig_type: str
     list_type: Optional[int] = None
     info_query: Optional[str] = None
     link_template_refs: Optional[Dict[Union[str, GamespyPrincipal], List[str]]] = None
