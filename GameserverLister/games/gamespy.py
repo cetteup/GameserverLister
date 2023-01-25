@@ -152,6 +152,16 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.Jedi95_us
         ]
     ),
+    GamespyGame.DukeNukemForever: GamespyGameConfig(
+        game_name='dnf',
+        game_key='      ',
+        enc_type=0,
+        query_type=0,
+        port=28900,
+        principals=[
+            GamespyPrincipal.TripleThreeNetworks_com_1
+        ]
+    ),
     GamespyGame.JBNightfire: GamespyGameConfig(
         game_name='jbnightfire',
         game_key='S9j3L2',
