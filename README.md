@@ -1,6 +1,6 @@
 # gameserver-lister
 
-A Python 🐍 script to retrieve game server lists for various games.
+A Python 🐍 command line tool to retrieve game server lists for various games.
 
 ## Features
 
