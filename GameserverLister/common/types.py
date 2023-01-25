@@ -20,9 +20,6 @@ class GamespyPrincipal(Principal):
     BF1942_org = 'bf1942.org'
     BF2Hub_com = 'bf2hub.com'
     Crymp_net = 'crymp.net'
-    EpicGamesUnreal = 'epicgames.com-unreal'  # Not a real GameSpy Principal, response structure is different
-    EpicGamesUT = 'epicgames.com-ut'  # Not a real GameSpy Principal, response structure is different
-    EpicGamesUT3 = 'epicgames.com-ut3'
     Errorist_eu = 'errorist.eu'
     FH2_dev = 'fh2.dev'
     Jedi95_us = 'jedi95.us'

@@ -63,8 +63,8 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Unreal                                 | GameSpy              | 333networks.com, errorist.eu, openspy.net, oldunreal.com, qtracker.com                                            |
 | Unreal Tournament                      | GameSpy              | 333networks.com, errorist.eu, openspy.net, oldunreal.com, qtracker.com                                            |
 | Unreal Tournament 2003                 | Unreal2              | openspy.net                                                                                                       |
-| Unreal Tournament 2004                 | Unreal2              | epicgames.com, openspy.net                                                                                        |
-| Unreal Tournament 3                    | GameSpy              | epicgames.com, openspy.net                                                                                        |
+| Unreal Tournament 2004                 | Unreal2              | openspy.net                                                                                                       |
+| Unreal Tournament 3                    | GameSpy              | openspy.net                                                                                                       |
 | UrbanTerror                            | Quake3               | FrozenSand                                                                                                        |
 | Vietcong                               | GameSpy              | vietcong.tk, vietcong1.eu, qtracker.com                                                                           |
 | Vietcong 2                             | GameSpy              | openspy.net                                                                                                       |

@@ -19,15 +19,6 @@ GAMESPY_PRINCIPAL_CONFIGS: Dict[GamespyPrincipal, GamespyPrincipalConfig] = {
     GamespyPrincipal.Crymp_net: GamespyPrincipalConfig(
         hostname='master.crymp.net'
     ),
-    GamespyPrincipal.EpicGamesUnreal: GamespyPrincipalConfig(
-        hostname='unreal.epicgames.com'
-    ),
-    GamespyPrincipal.EpicGamesUT: GamespyPrincipalConfig(
-        hostname='utmaster.epicgames.com'
-    ),
-    GamespyPrincipal.EpicGamesUT3: GamespyPrincipalConfig(
-        hostname='ut3master1.epicgames.com'
-    ),
     GamespyPrincipal.Errorist_eu: GamespyPrincipalConfig(
         hostname='master.errorist.eu'
     ),
@@ -257,7 +248,6 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         query_type=11,
         port=28910,
         principals=[
-            GamespyPrincipal.EpicGamesUT3,
             GamespyPrincipal.OpenSpy_net
         ],
         gamedig_type='ut3'
