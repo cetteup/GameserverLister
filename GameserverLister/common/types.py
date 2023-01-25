@@ -75,6 +75,7 @@ class GamespyGame(Game):
     JBNightfire = 'jbnightfire'
     Paraworld = 'paraworld'
     Postal2 = 'postal2'
+    SeriousSam = 'serioussam'
     SWAT4 = 'swat4'
     Unreal = 'unreal'
     UT = 'ut'
