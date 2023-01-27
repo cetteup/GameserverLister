@@ -15,6 +15,13 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
             ValvePrincipal.VALVE
         ]
     ),
+    ValveGame.Arma3: ValveGameConfig(
+        app_id=107410,
+        principals=[
+            ValvePrincipal.VALVE
+        ],
+        query_port_offset=-1
+    ),
     ValveGame.DoD: ValveGameConfig(
         app_id=30,
         principals=[
