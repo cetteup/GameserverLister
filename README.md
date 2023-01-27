@@ -22,6 +22,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 |----------------------------------------|----------------------|-------------------------------------------------------------------------------------------------------------------|
 | 7 Days to Die                          | Valve                | Valve ²                                                                                                           |
 | ARK: Survival Evolved                  | Valve                | Valve ²                                                                                                           |
+| Arma 2                                 | Valve                | Valve ²                                                                                                           |
 | Arma 3                                 | Valve                | Valve ²                                                                                                           |
 | Battlefield 1942                       | GameSpy              | bf1942.org, openspy.net, qtracker.com                                                                             |
 | Battlefield Vietnam                    | GameSpy              | openspy.net, qtracker.com                                                                                         |

@@ -125,6 +125,7 @@ class Unreal2Game(Game):
 
 class ValveGame(Game):
     ARKSurvivalEvolved = 'arkse'
+    Arma2 = 'arma2'
     Arma3 = 'arma3'
     DoD = 'dod'
     DoDS = 'dods'
