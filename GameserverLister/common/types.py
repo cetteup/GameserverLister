@@ -130,6 +130,7 @@ class ValveGame(Game):
     CounterStrike  = 'cs'
     CounterStrikeConditionZero = 'cscz'
     CounterStrikeSource = 'css'
+    CounterStrikeGlobalOffensive = 'csgo'
     DayZ = 'dayz'
     DayZMod = 'dayzmod'
     DoD = 'dod'

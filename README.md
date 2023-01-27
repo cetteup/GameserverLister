@@ -42,6 +42,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Counter Strike                         | Valve                | Valve ²                                                                                                           |
 | Counter Strike: Condition Zero         | Valve                | Valve ²                                                                                                           |
 | Counter Strike: Source                 | Valve                | Valve ²                                                                                                           |
+| Counter Strike: Global Offensive       | Valve                | Valve ²                                                                                                           |
 | Crysis                                 | GameSpy              | crymp.net                                                                                                         |
 | Crysis Wars                            | GameSpy              | jedi95.us                                                                                                         |
 | Day of Defeat                          | Valve                | Valve ²                                                                                                           |

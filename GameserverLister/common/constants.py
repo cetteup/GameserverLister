@@ -27,6 +27,7 @@ GAMETRACKER_GAME_KEYS: Dict[Game, str] = {
     ValveGame.CounterStrike: 'cs',
     ValveGame.CounterStrikeConditionZero: 'czero',
     ValveGame.CounterStrikeSource: 'css',
+    ValveGame.CounterStrikeGlobalOffensive: 'csgo',
     GamespyGame.Crysis: 'crysis',
     GamespyGame.CrysisWars: 'warhead',
     ValveGame.DayZ: 'dayz',
