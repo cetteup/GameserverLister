@@ -128,6 +128,7 @@ class ValveGame(Game):
     Arma2 = 'arma2'
     Arma3 = 'arma3'
     CounterStrike  = 'cs'
+    CounterStrikeConditionZero = 'cscz'
     DayZ = 'dayz'
     DayZMod = 'dayzmod'
     DoD = 'dod'

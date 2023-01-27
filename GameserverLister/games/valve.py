@@ -35,6 +35,12 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
             ValvePrincipal.VALVE
         ]
     ),
+    ValveGame.CounterStrikeConditionZero: ValveGameConfig(
+        app_id=80,
+        principals=[
+            ValvePrincipal.VALVE
+        ]
+    ),
     ValveGame.DayZ: ValveGameConfig(
         app_id=221100,
         principals=[

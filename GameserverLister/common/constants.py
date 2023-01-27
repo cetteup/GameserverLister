@@ -25,6 +25,7 @@ GAMETRACKER_GAME_KEYS: Dict[Game, str] = {
     Quake3Game.CoD2: 'cod2',
     Quake3Game.CoD4: 'cod4',
     ValveGame.CounterStrike: 'cs',
+    ValveGame.CounterStrikeConditionZero: 'czero',
     GamespyGame.Crysis: 'crysis',
     GamespyGame.CrysisWars: 'warhead',
     ValveGame.DayZ: 'dayz',
