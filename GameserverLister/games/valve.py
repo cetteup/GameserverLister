@@ -29,6 +29,20 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
         ],
         query_port_offset=-1
     ),
+    ValveGame.DayZ: ValveGameConfig(
+        app_id=221100,
+        principals=[
+            ValvePrincipal.VALVE
+        ],
+        query_port_offset=-1
+    ),
+    ValveGame.DayZMod: ValveGameConfig(
+        app_id=224580,
+        principals=[
+            ValvePrincipal.VALVE
+        ],
+        query_port_offset=-1
+    ),
     ValveGame.DoD: ValveGameConfig(
         app_id=30,
         principals=[

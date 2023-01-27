@@ -127,6 +127,8 @@ class ValveGame(Game):
     ARKSurvivalEvolved = 'arkse'
     Arma2 = 'arma2'
     Arma3 = 'arma3'
+    DayZ = 'dayz'
+    DayZMod = 'dayzmod'
     DoD = 'dod'
     DoDS = 'dods'
     RS2 = 'rs2'

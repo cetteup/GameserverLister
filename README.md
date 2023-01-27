@@ -43,6 +43,8 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Crysis Wars                            | GameSpy              | jedi95.us                                                                                                         |
 | Day of Defeat                          | Valve                | Valve ²                                                                                                           |
 | Day of Defeat: Source                  | Valve                | Valve ²                                                                                                           |
+| DayZ                                   | Valve                | Valve ²                                                                                                           |
+| DayZ (Arma 2 mod)                      | Valve                | Valve ²                                                                                                           |
 | Deus Ex                                | GameSpy              | 333networks.com, errorist.eu, newbiesplayground.net, oldunreal.com                                                |
 | Duke Nukem Forever                     | GameSpy              | 333networks.com                                                                                                   |
 | Forgotten Hope 2                       | GameSpy              | fh2.dev                                                                                                           |
