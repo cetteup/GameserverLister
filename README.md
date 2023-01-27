@@ -75,6 +75,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Vietcong 2                             | GameSpy              | openspy.net                                                                                                       |
 | Warfork                                | Quake3               | deathmask.net                                                                                                     |
 | Warsow                                 | Quake3               | deathmask.net                                                                                                     |
+| Wheel of Time                          | GameSpy              | 333networks.com, errorist.eu, newbiesplayground.net, oldunreal.com                                                |
 | Wolfenstein: Enemy Territory           | Quake3               | id Software, etlegacy.com                                                                                         |
 | Xonotic                                | Quake3               | deathmask.net, tchr.no                                                                                            |
 

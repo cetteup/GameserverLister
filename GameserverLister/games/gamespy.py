@@ -321,5 +321,18 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         principals=[
             GamespyPrincipal.OpenSpy_net
         ]
-    )
+    ),
+    GamespyGame.WheelOfTime: GamespyGameConfig(
+        game_name='wot',
+        game_key='RSSSpA',
+        enc_type=0,
+        query_type=0,
+        port=28900,
+        principals=[
+            GamespyPrincipal.TripleThreeNetworks_com_1,
+            GamespyPrincipal.Errorist_eu,
+            GamespyPrincipal.Newbiesplayground_net,
+            GamespyPrincipal.OldUnreal_com_1
+        ]
+    ),
 }

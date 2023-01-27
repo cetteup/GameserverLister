@@ -85,6 +85,7 @@ class GamespyGame(Game):
     UT3 = 'ut3'
     Vietcong = 'vietcong'
     Vietcong2 = 'vietcong2'
+    WheelOfTime = 'wot'
 
 
 class Quake3Game(Game):
