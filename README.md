@@ -39,6 +39,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Call of Duty 2                         | Quake3               | Activision                                                                                                        |
 | Call of Duty 4: Modern Warfare         | Quake3               | Activision                                                                                                        |
 | CoD4x Mod                              | Quake3               | cod4x.ovh                                                                                                         |
+| Counter Strike                         | Valve                | Valve ²                                                                                                           |
 | Crysis                                 | GameSpy              | crymp.net                                                                                                         |
 | Crysis Wars                            | GameSpy              | jedi95.us                                                                                                         |
 | Day of Defeat                          | Valve                | Valve ²                                                                                                           |

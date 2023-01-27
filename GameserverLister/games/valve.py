@@ -29,6 +29,12 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
         ],
         query_port_offset=-1
     ),
+    ValveGame.CounterStrike: ValveGameConfig(
+        app_id=10,
+        principals=[
+            ValvePrincipal.VALVE
+        ]
+    ),
     ValveGame.DayZ: ValveGameConfig(
         app_id=221100,
         principals=[
