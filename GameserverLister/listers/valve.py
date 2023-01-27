@@ -72,7 +72,7 @@ class ValveServerLister(ServerLister):
                     if self.add_links:
                         game_port = found_server.query_port
                         if self.config.query_port_offset is not None:
-                            game_port -= self.config.query_port_offset
+                            game_port += self.config.query_port_offset
                         found_server.add_links(self.build_server_links(
                             found_server.uid,
                             found_server.ip,
