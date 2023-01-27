@@ -9,6 +9,12 @@ VALVE_PRINCIPAL_CONFIGS: Dict[ValvePrincipal, ValvePrincipalConfig] = {
     )
 }
 VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
+    ValveGame.ARKSurvivalEvolved: ValveGameConfig(
+        app_id=346110,
+        principals=[
+            ValvePrincipal.VALVE
+        ]
+    ),
     ValveGame.DoD: ValveGameConfig(
         app_id=30,
         principals=[

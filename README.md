@@ -21,6 +21,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Game                                   | Source type/protocol | Server list source(s)                                                                                             |
 |----------------------------------------|----------------------|-------------------------------------------------------------------------------------------------------------------|
 | 7 Days to Die                          | Valve                | Valve ²                                                                                                           |
+| ARK: Survival Evolved                  | Valve                | Valve ²                                                                                                           |
 | Battlefield 1942                       | GameSpy              | bf1942.org, openspy.net, qtracker.com                                                                             |
 | Battlefield Vietnam                    | GameSpy              | openspy.net, qtracker.com                                                                                         |
 | Battlefield 2                          | GamsSpy              | bf2hub.com, playbf2.ru                                                                                            |
