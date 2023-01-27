@@ -1,5 +1,10 @@
 # GameserverLister
 
+[![ci](https://img.shields.io/github/actions/workflow/status/cetteup/GameserverLister/ci.yml?label=ci)](https://github.com/cetteup/GameserverLister/actions?query=workflow%3Aci)
+[![License](https://img.shields.io/github/license/cetteup/GameserverLister)](/LICENSE)
+[![Package](https://img.shields.io/pypi/v/GameserverLister)](https://pypi.org/project/GameserverLister/)
+[![Last commit](https://img.shields.io/github/last-commit/cetteup/GameserverLister)](https://github.com/cetteup/GameserverLister/commits/main)
+
 A Python 🐍 command line tool to retrieve game server lists for various games.
 
 ## Features
