@@ -309,6 +309,10 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             'etlegacy.com': {
                 'hostname': 'master.etlegacy.com',
                 'port': 27950
+            },
+            'etmaster.net': {
+                'hostname': 'master0.etmaster.net',
+                'port': 27950
             }
         }
     },
