@@ -9,6 +9,7 @@ ROOT_DIR = rootDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '
 UNIX_EPOCH_START = datetime(1970, 1, 1, tzinfo=timezone.utc)
 GAMETRACKER_GAME_KEYS: Dict[Game, str] = {
     ValveGame.SevenD2D: '7daystodie',
+    ValveGame.AmericasArmyProvingGrounds: 'aapg',
     ValveGame.Arma2: 'arma2',
     ValveGame.Arma3: 'arma3',
     GamespyGame.BF1942: 'bf1942',

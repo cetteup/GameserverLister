@@ -124,6 +124,7 @@ class Unreal2Game(Game):
 
 
 class ValveGame(Game):
+    AmericasArmyProvingGrounds = 'aapg'
     ARKSurvivalEvolved = 'arkse'
     Arma2 = 'arma2'
     Arma3 = 'arma3'

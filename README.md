@@ -26,6 +26,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Game                                   | Source type/protocol | Server list source(s)                                                                                             |
 |----------------------------------------|----------------------|-------------------------------------------------------------------------------------------------------------------|
 | 7 Days to Die                          | Valve                | Valve ¹                                                                                                           |
+| America's Army: Proving Grounds        | Valve                | Valve ¹                                                                                                           |
 | ARK: Survival Evolved                  | Valve                | Valve ¹                                                                                                           |
 | Arma 2                                 | Valve                | Valve ¹                                                                                                           |
 | Arma 3                                 | Valve                | Valve ¹                                                                                                           |
