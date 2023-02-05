@@ -25,10 +25,10 @@ The scripts support retrieval for following games from the listed sources. If yo
 
 | Game                                   | Source type/protocol | Server list source(s)                                                                                             |
 |----------------------------------------|----------------------|-------------------------------------------------------------------------------------------------------------------|
-| 7 Days to Die                          | Valve                | Valve ²                                                                                                           |
-| ARK: Survival Evolved                  | Valve                | Valve ²                                                                                                           |
-| Arma 2                                 | Valve                | Valve ²                                                                                                           |
-| Arma 3                                 | Valve                | Valve ²                                                                                                           |
+| 7 Days to Die                          | Valve                | Valve ¹                                                                                                           |
+| ARK: Survival Evolved                  | Valve                | Valve ¹                                                                                                           |
+| Arma 2                                 | Valve                | Valve ¹                                                                                                           |
+| Arma 3                                 | Valve                | Valve ¹                                                                                                           |
 | Battlefield 1942                       | GameSpy              | bf1942.org, openspy.net, qtracker.com                                                                             |
 | Battlefield Vietnam                    | GameSpy              | openspy.net, qtracker.com                                                                                         |
 | Battlefield 2                          | GamsSpy              | bf2hub.com, playbf2.ru                                                                                            |
@@ -44,16 +44,16 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Call of Duty 2                         | Quake3               | Activision                                                                                                        |
 | Call of Duty 4: Modern Warfare         | Quake3               | Activision                                                                                                        |
 | CoD4x Mod                              | Quake3               | cod4x.ovh                                                                                                         |
-| Counter Strike                         | Valve                | Valve ²                                                                                                           |
-| Counter Strike: Condition Zero         | Valve                | Valve ²                                                                                                           |
-| Counter Strike: Source                 | Valve                | Valve ²                                                                                                           |
-| Counter Strike: Global Offensive       | Valve                | Valve ²                                                                                                           |
+| Counter Strike                         | Valve                | Valve ¹                                                                                                           |
+| Counter Strike: Condition Zero         | Valve                | Valve ¹                                                                                                           |
+| Counter Strike: Source                 | Valve                | Valve ¹                                                                                                           |
+| Counter Strike: Global Offensive       | Valve                | Valve ¹                                                                                                           |
 | Crysis                                 | GameSpy              | crymp.net                                                                                                         |
 | Crysis Wars                            | GameSpy              | jedi95.us                                                                                                         |
-| Day of Defeat                          | Valve                | Valve ²                                                                                                           |
-| Day of Defeat: Source                  | Valve                | Valve ²                                                                                                           |
-| DayZ                                   | Valve                | Valve ²                                                                                                           |
-| DayZ (Arma 2 mod)                      | Valve                | Valve ²                                                                                                           |
+| Day of Defeat                          | Valve                | Valve ¹                                                                                                           |
+| Day of Defeat: Source                  | Valve                | Valve ¹                                                                                                           |
+| DayZ                                   | Valve                | Valve ¹                                                                                                           |
+| DayZ (Arma 2 mod)                      | Valve                | Valve ¹                                                                                                           |
 | Deus Ex                                | GameSpy              | 333networks.com, errorist.eu, newbiesplayground.net, oldunreal.com                                                |
 | Duke Nukem Forever                     | GameSpy              | 333networks.com                                                                                                   |
 | Forgotten Hope 2                       | GameSpy              | fh2.dev                                                                                                           |
@@ -67,17 +67,17 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Quake                                  | Quake3               | deathmask.net                                                                                                     |
 | Quake 3 Arena                          | Quake3               | quake3arena.com, urbanterror.info, excessiveplus.net, ioquake3.org, huxxer.de, maverickservers.com, deathmask.net |
 | Return to Castle Wolfenstein           | Quake3               | id Software                                                                                                       |
-| Rising Storm 2: Vietnam                | Valve                | Valve ²                                                                                                           |
+| Rising Storm 2: Vietnam                | Valve                | Valve ¹                                                                                                           |
 | Rune                                   | GameSpy              | 333networks.com, errorist.eu, newbiesplayground.net, oldunreal.com                                                |
-| Rust                                   | Valve                | Valve ²                                                                                                           |
+| Rust                                   | Valve                | Valve ¹                                                                                                           |
 | Serious Sam: The First Encounter       | GameSpy              | 333networks.com, errorist.eu, newbiesplayground.net, oldunreal.com                                                |
 | Serious Sam: Second Encounter          | GameSpy              | 333networks.com, errorist.eu, newbiesplayground.net, oldunreal.com                                                |
 | Soldier of Fortune II: Double Helix    | Quake3               | Raven Software                                                                                                    |
 | Star Wars Jedi Knight II: Jedi Outcast | Quake3               | Raven Software, jkhub.org                                                                                         |
 | Star Wars Jedi Knight: Jedi Academy    | Quake3               | Raven Software, jkhub.org                                                                                         |
-| SWAT 4 ¹                               | GameSpy              | swat4stats.com                                                                                                    |
-| Team Fortress Classic                  | Valve                | Valve ²                                                                                                           |
-| Team Fortress 2                        | Valve                | Valve ²                                                                                                           |
+| SWAT 4                                 | GameSpy              | swat4stats.com                                                                                                    |
+| Team Fortress Classic                  | Valve                | Valve ¹                                                                                                           |
+| Team Fortress 2                        | Valve                | Valve ¹                                                                                                           |
 | Tremulous                              | Quake3               | tremulous.net                                                                                                     |
 | Unreal                                 | GameSpy              | 333networks.com, errorist.eu, openspy.net, oldunreal.com, qtracker.com                                            |
 | Unreal Tournament                      | GameSpy              | 333networks.com, errorist.eu, openspy.net, oldunreal.com, qtracker.com                                            |
@@ -93,9 +93,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Wolfenstein: Enemy Territory           | Quake3               | id Software, etlegacy.com                                                                                         |
 | Xonotic                                | Quake3               | deathmask.net, tchr.no                                                                                            |
 
-¹ Requires a [modified version of gslist](https://github.com/cetteup/gslist) which provides additional parameters.
-
-² Valve's principal servers are rate limited. If you do not use additional filters to only retrieve matching servers, you will get blocked/timed out. You can pass filters via the `-f`/`--filter` argument, e.g. use `-f "\dedicated\1\password\0\empty\1\full\1"` to only retrieve dedicated servers without a password which are neither full nor empty. You can find a full list of filter options [here](https://developer.valvesoftware.com/wiki/Master_Server_Query_Protocol#Filter) (the `\appid\` filter is applied automatically). 
+¹ Valve's principal servers are rate limited. If you do not use additional filters to only retrieve matching servers, you will get blocked/timed out. You can pass filters via the `-f`/`--filter` argument, e.g. use `-f "\dedicated\1\password\0\empty\1\full\1"` to only retrieve dedicated servers without a password which are neither full nor empty. You can find a full list of filter options [here](https://developer.valvesoftware.com/wiki/Master_Server_Query_Protocol#Filter) (the `\appid\` filter is applied automatically). 
 
 ## Game server query ports
 
