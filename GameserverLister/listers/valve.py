@@ -70,14 +70,13 @@ class ValveServerLister(ServerLister):
 
                 if found_server not in found_servers:
                     if self.add_links:
-                        game_port = found_server.query_port
-                        if self.config.query_port_offset is not None:
-                            game_port += self.config.query_port_offset
-                        found_server.add_links(self.build_server_links(
-                            found_server.uid,
-                            found_server.ip,
-                            game_port
-                        ))
+                        game_port = self.get_server_game_port(found_server)
+                        if game_port is not None:
+                            found_server.add_links(self.build_server_links(
+                                found_server.uid,
+                                found_server.ip,
+                                game_port
+                            ))
                     found_servers.append(found_server)
 
         self.add_update_servers(found_servers)
@@ -100,6 +99,14 @@ class ValveServerLister(ServerLister):
             logging.error('Failed to query principal server')
 
         return servers
+
+    def get_server_game_port(self, server: ClassicServer) -> Optional[int]:
+        if not self.config.distinct_query_port:
+            return server.query_port
+
+        responded, info = self.query_server(server)
+        if responded and info.game_port is not None:
+            return info.game_port
 
     def check_if_server_still_exists(self, server: ClassicServer, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
         found, _ = self.query_server(server)

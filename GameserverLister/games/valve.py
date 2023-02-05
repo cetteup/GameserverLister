@@ -20,14 +20,14 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
         principals=[
             ValvePrincipal.VALVE
         ],
-        query_port_offset=-1
+        distinct_query_port=True
     ),
     ValveGame.Arma3: ValveGameConfig(
         app_id=107410,
         principals=[
             ValvePrincipal.VALVE
         ],
-        query_port_offset=-1
+        distinct_query_port=True
     ),
     ValveGame.CounterStrike: ValveGameConfig(
         app_id=10,
@@ -58,14 +58,14 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
         principals=[
             ValvePrincipal.VALVE
         ],
-        query_port_offset=-1
+        distinct_query_port=True
     ),
     ValveGame.DayZMod: ValveGameConfig(
         app_id=224580,
         principals=[
             ValvePrincipal.VALVE
         ],
-        query_port_offset=-1
+        distinct_query_port=True
     ),
     ValveGame.DoD: ValveGameConfig(
         app_id=30,

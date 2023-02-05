@@ -175,5 +175,5 @@ class GamespyGameConfig:
 class ValveGameConfig:
     app_id: int
     principals: List[ValvePrincipal]
-    query_port_offset: Optional[int] = None
+    distinct_query_port: bool = False
     link_template_refs: Optional[Dict[Union[str, ValvePrincipal], List[str]]] = None
