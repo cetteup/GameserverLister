@@ -254,9 +254,6 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         principals=[
             GamespyPrincipal.SWAT4Stats_com
         ],
-        # The SWAT 4 principal is the only one which does not return servers if the list type byte is set to 1,
-        # so we need to set it to 0 (only possible using a modified version glist: https://github.com/cetteup/gslist)
-        list_type=0,
         info_query='\\hostname',
         link_template_refs={
             GamespyPrincipal.SWAT4Stats_com: ['swat4stats.com']
