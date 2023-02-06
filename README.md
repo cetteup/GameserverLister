@@ -59,6 +59,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Duke Nukem Forever                     | GameSpy              | 333networks.com                                                                                                   |
 | Forgotten Hope 2                       | GameSpy              | fh2.dev                                                                                                           |
 | James Bond 007: Nightfire              | GameSpy              | openspy.net, nightfirepc.com                                                                                      |
+| Left 4 Dead                            | Valve                | Valve ¹                                                                                                           |
 | Medal of Honor Warfighter              | Battlelog            | battlelog.com                                                                                                     |
 | Nexuiz                                 | Quake3               | deathmask.net                                                                                                     |
 | OpenArena                              | Quake3               | deathmask.net                                                                                                     |
