@@ -104,6 +104,13 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
             ValvePrincipal.VALVE
         ]
     ),
+    ValveGame.Squad: ValveGameConfig(
+        app_id=393380,
+        principals=[
+            ValvePrincipal.VALVE
+        ],
+        distinct_query_port=True
+    ),
     ValveGame.TFC: ValveGameConfig(
         app_id=20,
         principals=[

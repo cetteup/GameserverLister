@@ -139,6 +139,7 @@ class ValveGame(Game):
     RS2 = 'rs2'
     Rust = 'rust'
     SevenD2D = '7d2d'
+    Squad = 'squad'
     TFC = 'tfc'
     TF2 = 'tf2'
 

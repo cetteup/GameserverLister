@@ -74,6 +74,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Serious Sam: The First Encounter       | GameSpy              | 333networks.com, errorist.eu, newbiesplayground.net, oldunreal.com                                                |
 | Serious Sam: Second Encounter          | GameSpy              | 333networks.com, errorist.eu, newbiesplayground.net, oldunreal.com                                                |
 | Soldier of Fortune II: Double Helix    | Quake3               | Raven Software                                                                                                    |
+| Squad                                  | Valve                | Valve ¹                                                                                                           |
 | Star Wars Jedi Knight II: Jedi Outcast | Quake3               | Raven Software, jkhub.org                                                                                         |
 | Star Wars Jedi Knight: Jedi Academy    | Quake3               | Raven Software, jkhub.org                                                                                         |
 | SWAT 4                                 | GameSpy              | swat4stats.com                                                                                                    |
