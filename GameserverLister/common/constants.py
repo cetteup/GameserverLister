@@ -35,6 +35,7 @@ GAMETRACKER_GAME_KEYS: Dict[Game, str] = {
     ValveGame.DayZMod: 'dayzmod',
     ValveGame.DoD: 'dod',
     ValveGame.DoDS: 'dods',
+    ValveGame.Insurgency: 'ins',
     ValveGame.Left4Dead: 'l4d',
     ValveGame.Left4Dead2: 'left4dead2',
     MedalOfHonorGame.AA: 'mohaa',

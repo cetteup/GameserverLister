@@ -136,6 +136,7 @@ class ValveGame(Game):
     DayZMod = 'dayzmod'
     DoD = 'dod'
     DoDS = 'dods'
+    Insurgency = 'insurgency'
     Left4Dead = 'left4dead'
     Left4Dead2 = 'left4dead2'
     RS2 = 'rs2'
