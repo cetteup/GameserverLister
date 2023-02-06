@@ -92,6 +92,13 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
             ValvePrincipal.VALVE
         ]
     ),
+    ValveGame.InsurgencySandstorm: ValveGameConfig(
+        app_id=581320,
+        principals=[
+            ValvePrincipal.VALVE
+        ],
+        distinct_query_port=True
+    ),
     ValveGame.Left4Dead: ValveGameConfig(
         app_id=500,
         principals=[
