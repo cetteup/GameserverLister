@@ -137,6 +137,7 @@ class ValveGame(Game):
     DoD = 'dod'
     DoDS = 'dods'
     Left4Dead = 'left4dead'
+    Left4Dead2 = 'left4dead2'
     RS2 = 'rs2'
     Rust = 'rust'
     SevenD2D = '7d2d'

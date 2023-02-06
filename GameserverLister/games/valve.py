@@ -92,6 +92,12 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
             ValvePrincipal.VALVE
         ]
     ),
+    ValveGame.Left4Dead2: ValveGameConfig(
+        app_id=550,
+        principals=[
+            ValvePrincipal.VALVE
+        ]
+    ),
     ValveGame.RS2: ValveGameConfig(
         app_id=418460,
         principals=[

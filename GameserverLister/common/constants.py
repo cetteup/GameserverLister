@@ -36,6 +36,7 @@ GAMETRACKER_GAME_KEYS: Dict[Game, str] = {
     ValveGame.DoD: 'dod',
     ValveGame.DoDS: 'dods',
     ValveGame.Left4Dead: 'l4d',
+    ValveGame.Left4Dead2: 'left4dead2',
     MedalOfHonorGame.AA: 'mohaa',
     MedalOfHonorGame.BT: 'bt',
     MedalOfHonorGame.SH: 'sh',
