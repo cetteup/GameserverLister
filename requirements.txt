@@ -1,5 +1,5 @@
 gevent==22.10.2
-nslookup==1.6.1
+nslookup==1.7.0
 requests[socks]==2.28.2
 pyq3serverlist==0.3.2
 pyut2serverlist==0.1.1
