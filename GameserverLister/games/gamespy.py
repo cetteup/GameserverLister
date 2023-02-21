@@ -13,7 +13,7 @@ GAMESPY_PRINCIPAL_CONFIGS: Dict[GamespyPrincipal, GamespyPrincipalConfig] = {
         hostname='master.bf1942.org'
     ),
     GamespyPrincipal.BF2Hub_com: GamespyPrincipalConfig(
-        hostname='servers.bf2hub.com',
+        hostname='{0}.master.bf2hub.com',
         port_offset=1
     ),
     GamespyPrincipal.Crymp_net: GamespyPrincipalConfig(
