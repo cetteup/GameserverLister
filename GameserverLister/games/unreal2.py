@@ -16,6 +16,10 @@ UNREAL2_CONFIGS: Dict[Unreal2Game, dict] = {
             'openspy.net': {
                 'hostname': 'utmaster.openspy.net',
                 'port': 28902
+            },
+            '333networks.com': {
+                'hostname': 'ut2004master.333networks.com',
+                'port': 28902
             }
         }
     }
