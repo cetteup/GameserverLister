@@ -4,8 +4,7 @@ from typing import List, Tuple, Optional, Union
 
 import pyq3serverlist
 
-from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, guid_from_ip_port, \
-    is_server_listed_on_gametracker
+from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, guid_from_ip_port
 from GameserverLister.common.servers import ClassicServer, ViaStatus
 from GameserverLister.common.types import Quake3Game
 from GameserverLister.common.weblinks import WebLink, WEB_LINK_TEMPLATES
@@ -124,10 +123,6 @@ class Quake3ServerLister(ServerLister):
             *[WEB_LINK_TEMPLATES.get(ref) for ref in template_refs.get(self.principal, [])],
             *[WEB_LINK_TEMPLATES.get(ref) for ref in template_refs.get('_any', [])]
         ]
-
-        # Add GameTracker link if server is listed there
-        if is_server_listed_on_gametracker(self.game, ip, port):
-            templates.append(WEB_LINK_TEMPLATES['gametracker'])
 
         links = []
         for template in templates:

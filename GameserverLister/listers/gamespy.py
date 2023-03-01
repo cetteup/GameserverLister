@@ -7,8 +7,7 @@ from typing import List, Tuple, Optional, Union
 from nslookup import Nslookup
 
 from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, guid_from_ip_port, \
-    is_server_for_gamespy_game, \
-    is_server_listed_on_gametracker
+    is_server_for_gamespy_game
 from GameserverLister.common.servers import ClassicServer, ViaStatus
 from GameserverLister.common.types import GamespyGame, GamespyPrincipal, GamespyGameConfig
 from GameserverLister.common.weblinks import WebLink, WEB_LINK_TEMPLATES
@@ -187,10 +186,6 @@ class GameSpyServerLister(ServerLister):
             *[WEB_LINK_TEMPLATES.get(ref) for ref in template_refs.get(self.principal, [])],
             *[WEB_LINK_TEMPLATES.get(ref) for ref in template_refs.get('_any', [])]
         ]
-
-        # Add GameTracker link if server is listed there
-        if is_server_listed_on_gametracker(self.game, ip, port):
-            templates.append(WEB_LINK_TEMPLATES['gametracker'])
 
         links = []
         for template in templates:

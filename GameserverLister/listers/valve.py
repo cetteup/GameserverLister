@@ -1,13 +1,11 @@
 import logging
-from typing import List, Tuple, Optional, Union
+from typing import List, Tuple, Optional
 
 import pyvpsq
 
-from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, guid_from_ip_port, \
-    is_server_listed_on_gametracker
+from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, guid_from_ip_port
 from GameserverLister.common.servers import ClassicServer, ViaStatus
 from GameserverLister.common.types import ValveGame, ValvePrincipal, ValveGameConfig
-from GameserverLister.common.weblinks import WebLink, WEB_LINK_TEMPLATES
 from GameserverLister.games.valve import VALVE_PRINCIPAL_CONFIGS, VALVE_GAME_CONFIGS
 from GameserverLister.listers.common import ServerLister
 
@@ -121,15 +119,3 @@ class ValveServerLister(ServerLister):
             logging.debug(e)
             logging.debug(f'Failed to query server {server.uid}')
             return False, None
-
-    def build_server_links(
-            self,
-            uid: str,
-            ip: Optional[str] = None,
-            port: Optional[int] = None
-    ) -> Union[List[WebLink], WebLink]:
-        links = []
-        if is_server_listed_on_gametracker(self.game, ip, port):
-            links.append(WEB_LINK_TEMPLATES['gametracker'].render(self.game, uid, ip=ip, port=port))
-
-        return links

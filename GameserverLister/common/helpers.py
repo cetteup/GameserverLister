@@ -1,13 +1,10 @@
 import ipaddress
 import json
 import logging
-from typing import Callable, List, Dict
+from typing import Callable
 
 import gevent.subprocess
-import requests
-from nslookup import Nslookup
 
-from GameserverLister.common.constants import GAMETRACKER_GAME_KEYS
 from GameserverLister.common.servers import FrostbiteServer, BadCompany2Server
 from GameserverLister.common.types import GamespyGame
 
@@ -120,61 +117,3 @@ def guid_from_ip_port(ip: str, port: str) -> str:
                      (index, octet) in enumerate(ip.split('.'))])
 
     return guid
-
-
-def is_server_listed_on_gametracker(game: str, ip: str, port: int) -> bool:
-    # GameTracker uses different game names/keys for some game
-    game_key = GAMETRACKER_GAME_KEYS.get(game)
-
-    # If game is not tracked by GameTracker, there's no point in running the query
-    if game_key is None:
-        return False
-
-    page = 1
-    has_more = False
-    found = False
-    while not found and (page == 1 or has_more):
-        try:
-            # Fetch servers by ip only to improve cache hit rate
-            resp = requests.get(
-                'https://gametracker-check.cetteup.com/',
-                params={
-                    'game': game_key,
-                    'query': ip,
-                    'searchpge': page
-                },
-                timeout=2
-            )
-
-            if resp.ok:
-                parsed = resp.json()
-                found = is_server_in_search_results(ip, port, parsed['results'])
-                has_more = parsed['hasMore']
-        except requests.RequestException as e:
-            logging.debug(e)
-            logging.error(f'Failed to check if server is listed on gametracker ({ip}:{port})')
-
-        page += 1
-
-    return found
-
-
-def is_server_in_search_results(ip: str, port: int, search_results: List[Dict]) -> bool:
-    for result in search_results:
-        if port == result['port'] and ip == result['host']:
-            return True
-
-        # If port matches but host value is not a valid public ip, try to resolve it as a hostname
-        if port == result['port'] and not is_valid_public_ip(result['host']):
-            looker_upper = Nslookup()
-            dns_result = looker_upper.dns_lookup(result['host'])
-
-            if len(dns_result.answer) == 0:
-                logging.warning(f'Failed to resolve server hostname from GameTracker ({result["host"]})')
-                continue
-
-            # We already compared the port => return true if resolved IP matches
-            if ip == dns_result.answer[0]:
-                return True
-
-    return False

@@ -1,14 +1,13 @@
 import logging
 import sys
 from random import randint
-from typing import Tuple, Optional, Union, List
+from typing import Tuple
 
 import requests
 
-from GameserverLister.common.helpers import bfbc2_server_validator, guid_from_ip_port, is_server_listed_on_gametracker
+from GameserverLister.common.helpers import bfbc2_server_validator, guid_from_ip_port
 from GameserverLister.common.servers import BadCompany2Server
 from GameserverLister.common.types import TheaterGame
-from GameserverLister.common.weblinks import WebLink, WEB_LINK_TEMPLATES
 from .common import FrostbiteServerLister
 
 
@@ -92,18 +91,6 @@ class BadCompany2ServerLister(FrostbiteServerLister):
             check_ok = False
 
         return check_ok, found, checks_since_last_ok
-
-    def build_server_links(
-            self,
-            uid: str,
-            ip: Optional[str] = None,
-            port: Optional[int] = None
-    ) -> Union[List[WebLink], WebLink]:
-        links = []
-        if is_server_listed_on_gametracker(self.game, ip, port):
-            links.append(WEB_LINK_TEMPLATES['gametracker'].render(self.game, uid, ip=ip, port=port))
-
-        return links
 
     def build_port_to_try_list(self, game_port: int) -> list:
         """

@@ -147,7 +147,8 @@ class ServerLister:
             ip: Optional[str] = None,
             port: Optional[int] = None
     ) -> Union[List[WebLink], WebLink]:
-        pass
+        # Default to no links
+        return []
 
     def get_backoff_timeout(self, checks_since_last_ok: int) -> int:
         # Default to no backoff

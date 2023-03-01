@@ -138,11 +138,6 @@ WEB_LINK_TEMPLATES: Dict[str, WebLinkTemplate] = {
         'https://gametools.network/servers/{0}/gameid/{1}/pc',
         False
     ),
-    'gametracker': WebLinkTemplate(
-        'gametracker.com',
-        'https://www.gametracker.com/server_info/{2}:{3}/',
-        False
-    ),
     'swat4stats.com': WebLinkTemplate(
         'swat4stats.com',
         'https://swat4stats.com/servers/{2}:{3}/',
