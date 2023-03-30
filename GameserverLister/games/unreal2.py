@@ -20,6 +20,10 @@ UNREAL2_CONFIGS: Dict[Unreal2Game, dict] = {
             '333networks.com': {
                 'hostname': 'ut2004master.333networks.com',
                 'port': 28902
+            },
+            'errorist.eu': {
+                'hostname': 'ut2004master.errorist.eu',
+                'port': 28902
             }
         }
     }
