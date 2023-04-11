@@ -15,6 +15,28 @@ A Python 🐍 command line tool to retrieve game server lists for various games.
 - handle completely broken pagination on Battlelog
 - proxy support for requests to Battlelog
 
+## Documentation 
+
+After installing the tool through pip you can get some help for the command line options through
+
+```bash
+$ python3 -m GameserverLister --help
+Usage: python -m GameserverLister [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  battlelog
+  bfbc2
+  gamespy
+  gametools
+  medalofhonor
+  quake3
+  unreal2
+  valve
+```
+
 ## Required tools
 
 The server list retrieval for GameSpy-games requires an external tool. In order to retrieve GameSpy servers, you need to set up [gslist](http://aluigi.altervista.org/papers.htm#gslist). `gslist` was developed by Luigi Auriemma.
