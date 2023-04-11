@@ -15,9 +15,21 @@ A Python 🐍 command line tool to retrieve game server lists for various games.
 - handle completely broken pagination on Battlelog
 - proxy support for requests to Battlelog
 
-## Documentation 
+## Usage
 
-After installing the tool through pip you can get some help for the command line options through
+You can easily install GameserverLister via pip.
+
+```bash
+pip install GameserverLister
+```
+
+Upgrading from an older version is equally simple.
+
+```bash
+pip install --upgrade GameserverLister
+```
+
+After installing through pip, you can get some help for the command line options through
 
 ```bash
 $ python3 -m GameserverLister --help
