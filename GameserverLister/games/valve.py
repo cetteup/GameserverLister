@@ -86,6 +86,12 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
             ValvePrincipal.VALVE
         ]
     ),
+    ValveGame.GarrysMod: ValveGameConfig(
+        app_id=4000,
+        principals=[
+            ValvePrincipal.VALVE
+        ]
+    ),
     ValveGame.Insurgency: ValveGameConfig(
         app_id=222880,
         principals=[
