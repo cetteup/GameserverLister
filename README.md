@@ -92,6 +92,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Deus Ex                                | GameSpy              | 333networks.com, errorist.eu, newbiesplayground.net, oldunreal.com                                                |
 | Duke Nukem Forever                     | GameSpy              | 333networks.com                                                                                                   |
 | Forgotten Hope 2                       | GameSpy              | fh2.dev                                                                                                           |
+| Garry's Mod                            | Valve                | Valve ¹                                                                                                           |
 | Insurgency                             | Valve                | Valve ¹                                                                                                           |
 | Insurgency: Sandstorm                  | Valve                | Valve ¹                                                                                                           |
 | James Bond 007: Nightfire              | GameSpy              | openspy.net, nightfirepc.com                                                                                      |
