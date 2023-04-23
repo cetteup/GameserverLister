@@ -122,6 +122,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Tremulous                              | Quake3               | tremulous.net                                                                                                     |
 | Unreal                                 | GameSpy              | 333networks.com, errorist.eu, openspy.net, oldunreal.com, qtracker.com                                            |
 | Unreal Tournament                      | GameSpy              | 333networks.com, errorist.eu, openspy.net, oldunreal.com, qtracker.com                                            |
+| Unreal Tournament 2003 (Demo)                | Unreal2              | openspy.net                                                                                                       |
 | Unreal Tournament 2003                 | Unreal2              | openspy.net                                                                                                       |
 | Unreal Tournament 2004                 | Unreal2              | openspy.net, 333networks.com, errorist.eu                                                                         |
 | Unreal Tournament 3                    | GameSpy              | openspy.net                                                                                                       |
