@@ -1,9 +1,10 @@
 import ipaddress
 import json
 import logging
-from typing import Callable
+from typing import Callable, List
 
 import gevent.subprocess
+from nslookup import Nslookup
 
 from GameserverLister.common.servers import FrostbiteServer, BadCompany2Server
 from GameserverLister.common.types import GamespyGame
@@ -49,14 +50,30 @@ def find_query_port(gamedig_path: str, game: str, server: FrostbiteServer, ports
     return query_port
 
 
+def resolve_host(host: str) -> List[str]:
+    if is_valid_ip(host):
+        return [host]
+
+    looker_upper = Nslookup()
+    dns_result = looker_upper.dns_lookup(host)
+
+    return dns_result.answer
+
+
+def is_valid_ip(ip: str) -> bool:
+    try:
+        ipaddress.ip_address(ip)
+        return True
+    except ValueError:
+        return False
+
+
 def is_valid_public_ip(ip: str) -> bool:
     try:
         ip_address = ipaddress.ip_address(ip)
-        valid_public = ip_address.is_global
+        return ip_address.is_global
     except ValueError:
-        valid_public = False
-
-    return valid_public
+        return False
 
 
 def is_valid_port(port: int) -> bool:

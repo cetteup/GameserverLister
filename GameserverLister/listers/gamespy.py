@@ -4,10 +4,8 @@ import subprocess
 import sys
 from typing import List, Tuple, Optional, Union
 
-from nslookup import Nslookup
-
 from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, guid_from_ip_port, \
-    is_server_for_gamespy_game
+    is_server_for_gamespy_game, resolve_host
 from GameserverLister.common.servers import ClassicServer, ViaStatus
 from GameserverLister.common.types import GamespyGame, GamespyPrincipal, GamespyGameConfig
 from GameserverLister.common.weblinks import WebLink, WEB_LINK_TEMPLATES
@@ -95,11 +93,10 @@ class GameSpyServerLister(ServerLister):
         hostname = principal.hostname.format(self.config.game_name)
         # Combine game port and principal-specific port offset (defaults to an offset of 0)
         port = self.config.port + principal.get_port_offset()
-        # Manually look up hostname to be able to spread retried across servers
-        looker_upper = Nslookup()
-        dns_result = looker_upper.dns_lookup(hostname)
 
-        if len(dns_result.answer) == 0:
+        # Manually look up hostname to be able to spread retried across servers
+        ips = resolve_host(hostname)
+        if len(ips) == 0:
             logging.error(f'DNS lookup for {hostname} failed, exiting')
             sys.exit(1)
 
@@ -110,11 +107,11 @@ class GameSpyServerLister(ServerLister):
         gslist_result = None
         while not command_ok and tries < max_tries:
             # Alternate between first and last found A record
-            server_ip = dns_result.answer[0] if tries % 2 == 0 else dns_result.answer[-1]
+            ip = ips[0] if tries % 2 == 0 else ips[-1]
             try:
-                logging.info(f'Running gslist command against {server_ip}')
+                logging.info(f'Running gslist command against {ip}')
                 command = [self.gslist_bin_path, '-n', self.config.game_name, '-x',
-                           f'{server_ip}:{port}', '-Y', self.config.game_name, self.config.game_key,
+                           f'{ip}:{port}', '-Y', self.config.game_name, self.config.game_key,
                            '-t', str(self.config.enc_type), '-f', f'{self.gslist_filter}', '-o', '1']
                 timeout = self.gslist_timeout
                 # Some principals do not respond with the default query list type byte (1),
