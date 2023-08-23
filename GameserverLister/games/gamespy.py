@@ -62,7 +62,7 @@ GAMESPY_PRINCIPAL_CONFIGS: Dict[GamespyPrincipal, GamespyPrincipalConfig] = {
         hostname='master.swat4stats.com'
     ),
     GamespyPrincipal.Vietcong_tk: GamespyPrincipalConfig(
-        hostname='brvps.tk'
+        hostname='51.68.46.73' # From http://vcfiles.free.fr/r.php?r=files/patch_serverlist.bat, no hostname available
     ),
     GamespyPrincipal.Vietcong1_eu: GamespyPrincipalConfig(
         hostname='vietcong1.eu'
