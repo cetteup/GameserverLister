@@ -76,12 +76,16 @@ class GameSpyServerLister(ServerLister):
                                     f'({found_server.ip}:{found_server.query_port})')
                     continue
 
-                if responded and 'hostport' in query_response and self.add_links:
-                    found_server.add_links(self.build_server_links(
-                        found_server.uid,
-                        found_server.ip,
-                        int(query_response['hostport'])
-                    ))
+                if responded and self.add_links:
+                    if query_response.get('hostport', '').isnumeric():
+                        found_server.add_links(self.build_server_links(
+                            found_server.uid,
+                            found_server.ip,
+                            int(query_response['hostport'])
+                        ))
+                    elif 'hostport' in query_response:
+                        logging.warning(f'Server returned an invalid hostport (\'{query_response["hostport"]}\', ' 
+                                        f'not adding links ({found_server.ip}:{found_server.query_port})')
 
             found_servers.append(found_server)
 
