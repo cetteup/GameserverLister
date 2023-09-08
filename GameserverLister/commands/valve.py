@@ -3,7 +3,7 @@ import sys
 
 import click
 
-from GameserverLister.commands.options import common
+from GameserverLister.commands.options import common, gameport
 from GameserverLister.common.logger import logger
 from GameserverLister.common.types import ValveGame, ValvePrincipal
 from GameserverLister.games.valve import VALVE_GAME_CONFIGS
@@ -47,6 +47,7 @@ from GameserverLister.listers import ValveServerLister
     default=10,
     help='Maximum number of pages to retrieve from the server list (per region)'
 )
+@gameport.add
 @common.expired_ttl
 @common.list_dir
 @common.recover
@@ -59,6 +60,7 @@ def run(
         filters: str,
         timeout: int,
         max_pages: int,
+        add_game_port: bool,
         expired_ttl: int,
         recover: bool,
         add_links: bool,
@@ -82,6 +84,7 @@ def run(
         timeout,
         filters,
         max_pages,
+        add_game_port,
         expired_ttl,
         recover,
         add_links,

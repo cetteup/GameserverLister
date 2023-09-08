@@ -3,7 +3,7 @@ import sys
 
 import click
 
-from GameserverLister.commands.options import common
+from GameserverLister.commands.options import common, gameport
 from GameserverLister.common.logger import logger
 from GameserverLister.common.types import GamespyGame, GamespyPrincipal
 from GameserverLister.games.gamespy import GAMESPY_GAME_CONFIGS
@@ -64,6 +64,7 @@ from GameserverLister.listers import GameSpyServerLister
     is_flag=True,
     help='(Attempt to) verify game servers returned by principal are game servers for the current game'
 )
+@gameport.add
 @common.expired_ttl
 @common.list_dir
 @common.recover
@@ -78,6 +79,7 @@ def run(
         gslist_super_query: bool,
         gslist_timeout: int,
         verify: bool,
+        add_game_port: bool,
         expired_ttl: int,
         recover: bool,
         add_links: bool,
@@ -103,6 +105,7 @@ def run(
         gslist_super_query,
         gslist_timeout,
         verify,
+        add_game_port,
         expired_ttl,
         recover,
         add_links,

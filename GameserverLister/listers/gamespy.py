@@ -23,6 +23,7 @@ class GameSpyServerLister(ServerLister):
     gslist_super_query: bool
     gslist_timeout: int
     verify: bool
+    add_game_port: bool
 
     def __init__(
             self,
@@ -33,6 +34,7 @@ class GameSpyServerLister(ServerLister):
             gslist_super_query: bool,
             gslist_timeout: int,
             verify: bool,
+            add_game_port: bool,
             expired_ttl: float,
             recover: bool,
             add_links: bool,
@@ -47,6 +49,7 @@ class GameSpyServerLister(ServerLister):
         self.gslist_super_query = gslist_super_query
         self.gslist_timeout = gslist_timeout
         self.verify = verify
+        self.add_game_port = add_game_port
 
     def update_server_list(self):
         raw_servers = self.get_servers()
@@ -64,29 +67,33 @@ class GameSpyServerLister(ServerLister):
                 via
             )
 
-            if self.verify or self.add_links:
+            if self.verify or self.add_links or self.add_game_port:
                 # Attempt to query server in order to verify is a server for the current game
                 # (some principals return servers for other games than what we queried)
                 logging.debug(f'Querying server {found_server.uid}/{found_server.ip}:{found_server.query_port}')
                 responded, query_response = self.query_server(found_server)
                 logging.debug(f'Query {"was successful" if responded else "did not receive a response"}')
 
-                if responded and self.verify and \
-                        not is_server_for_gamespy_game(self.game, self.config.game_name, query_response):
-                    logging.warning(f'Server does not seem to be a {self.game} server, ignoring it '
-                                    f'({found_server.ip}:{found_server.query_port})')
-                    continue
+                if responded:
+                    if self.verify and not is_server_for_gamespy_game(self.game, self.config.game_name, query_response):
+                        logging.warning(f'Server does not seem to be a {self.game} server, ignoring it '
+                                        f'({found_server.ip}:{found_server.query_port})')
+                        continue
 
-                if responded and self.add_links:
-                    if query_response.get('hostport', '').isnumeric():
-                        found_server.add_links(self.build_server_links(
-                            found_server.uid,
-                            found_server.ip,
-                            int(query_response['hostport'])
-                        ))
-                    elif 'hostport' in query_response:
-                        logging.warning(f'Server returned an invalid hostport (\'{query_response["hostport"]}\', ' 
-                                        f'not adding links ({found_server.ip}:{found_server.query_port})')
+                    if self.add_links or self.add_game_port:
+                        if query_response.get('hostport', '').isnumeric():
+                            game_port = int(query_response['hostport'])
+                            if self.add_links:
+                                found_server.add_links(self.build_server_links(
+                                    found_server.uid,
+                                    found_server.ip,
+                                    game_port
+                                ))
+                            if self.add_game_port:
+                                found_server.game_port = game_port
+                        elif 'hostport' in query_response:
+                            logging.warning(f'Server returned an invalid hostport (\'{query_response["hostport"]}\', ' 
+                                            f'not adding links/game port ({found_server.ip}:{found_server.query_port})')
 
             found_servers.append(found_server)
 

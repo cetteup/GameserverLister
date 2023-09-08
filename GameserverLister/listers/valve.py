@@ -20,6 +20,8 @@ class ValveServerLister(ServerLister):
     filters: str
     max_pages: int
 
+    add_game_port: bool
+
     def __init__(
             self,
             game: ValveGame,
@@ -27,6 +29,7 @@ class ValveServerLister(ServerLister):
             principal_timeout: float,
             filters: str,
             max_pages: int,
+            add_game_port: bool,
             expired_ttl: float,
             recover: bool,
             add_links: bool,
@@ -39,6 +42,7 @@ class ValveServerLister(ServerLister):
         self.principal_timeout = principal_timeout
         self.filters = filters
         self.max_pages = max_pages
+        self.add_game_port = add_game_port
 
     def update_server_list(self):
         principal_config = VALVE_PRINCIPAL_CONFIGS[self.principal]
@@ -68,14 +72,17 @@ class ValveServerLister(ServerLister):
                 )
 
                 if found_server not in found_servers:
-                    if self.add_links:
+                    if self.add_links or self.add_game_port:
                         game_port = self.get_server_game_port(found_server)
                         if game_port is not None:
-                            found_server.add_links(self.build_server_links(
-                                found_server.uid,
-                                found_server.ip,
-                                game_port
-                            ))
+                            if self.add_links:
+                                found_server.add_links(self.build_server_links(
+                                    found_server.uid,
+                                    found_server.ip,
+                                    game_port
+                                ))
+                            if self.add_game_port:
+                                found_server.game_port = game_port
                     found_servers.append(found_server)
 
         self.add_update_servers(found_servers)
