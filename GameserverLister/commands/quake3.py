@@ -29,6 +29,7 @@ from GameserverLister.listers import Quake3ServerLister
 @common.list_dir
 @common.recover
 @common.add_links
+@common.txt
 @common.debug
 def run(
         game: Quake3Game,
@@ -36,6 +37,7 @@ def run(
         expired_ttl: int,
         recover: bool,
         add_links: bool,
+        txt: bool,
         list_dir: str,
         debug: bool
 ):
@@ -55,6 +57,7 @@ def run(
         expired_ttl,
         recover,
         add_links,
+        txt,
         list_dir
     )
 

@@ -67,6 +67,9 @@ class Server:
     def dump(self) -> dict:
         pass
 
+    def txt(self) -> str:
+        pass
+
     def __iter__(self):
         yield from self.dump().items()
 
@@ -108,6 +111,9 @@ class QueryableServer(Server):
     @staticmethod
     def is_json_repr(parsed: dict) -> bool:
         return 'guid' in parsed and 'ip' in parsed and 'queryPort' in parsed
+
+    def txt(self) -> str:
+        return f'{self.ip} {self.query_port}'
 
     def __eq__(self, other: Any) -> bool:
         return Server.__eq__(self, other) and other.ip == self.ip and other.query_port == self.query_port
@@ -173,6 +179,7 @@ class ClassicServer(QueryableServer):
     Server for "classic" games whose principals which return a server list
     containing ips and query ports of game servers (GameSpy, Quake3)
     """
+    game_port: int
     via: List[ViaStatus]
 
     def __init__(
@@ -181,11 +188,13 @@ class ClassicServer(QueryableServer):
             ip: str,
             query_port: int,
             via: Union[List[ViaStatus], ViaStatus],
+            game_port: int = -1,
             first_seen_at: Optional[datetime] = datetime.now().astimezone(),
             last_seen_at: datetime = datetime.now().astimezone()
     ):
         # Leave link list empty for now (query port is usually not sufficient to build any links)
         super().__init__(guid, ip, query_port, [], first_seen_at, last_seen_at)
+        self.game_port = game_port
         self.via = via if isinstance(via, list) else [via]
 
     def trim(self, expired_ttl: float) -> None:
@@ -194,6 +203,7 @@ class ClassicServer(QueryableServer):
 
     def update(self, updated: 'ClassicServer') -> None:
         QueryableServer.update(self, updated)
+        self.game_port = updated.game_port
         # Merge via statuses "manually"
         for via_status in updated.via:
             via_principals_self = [via_status.principal for via_status in self.via]
@@ -213,12 +223,21 @@ class ClassicServer(QueryableServer):
             if parsed.get('firstSeenAt') is not None else None
         last_seen_at = datetime.fromisoformat(parsed['lastSeenAt']) \
             if parsed.get('lastSeenAt') is not None else UNIX_EPOCH_START
+        game_port = parsed.get('gamePort', -1)
         via = [
             ViaStatus.load(via_parsed) for via_parsed in parsed.get('via', []) if
             ViaStatus.is_json_repr(via_parsed)
         ]
 
-        server = ClassicServer(parsed['guid'], parsed['ip'], parsed['queryPort'], via, first_seen_at, last_seen_at)
+        server = ClassicServer(
+            parsed['guid'],
+            parsed['ip'],
+            parsed['queryPort'],
+            via,
+            game_port,
+            first_seen_at,
+            last_seen_at
+        )
         server.links = [
             WebLink.load(link_parsed) for link_parsed in parsed.get('links', [])
             if WebLink.is_json_repr(link_parsed)
@@ -230,6 +249,7 @@ class ClassicServer(QueryableServer):
         return {
             'guid': self.uid,
             'ip': self.ip,
+            'gamePort': self.game_port,
             'queryPort': self.query_port,
             'firstSeenAt': self.first_seen_at.isoformat() if self.first_seen_at is not None else self.first_seen_at,
             'lastSeenAt': self.last_seen_at.isoformat(),
@@ -237,8 +257,13 @@ class ClassicServer(QueryableServer):
             'links': [link.dump() for link in self.links]
         }
 
+    def txt(self) -> str:
+        return f'{self.ip} {self.game_port} {self.query_port}'
+
     def __eq__(self, other):
-        return QueryableServer.__eq__(self, other) and all(via_status in self.via for via_status in other.via)
+        return QueryableServer.__eq__(self, other) and \
+            self.game_port == other.game_port and \
+            all(via_status in self.via for via_status in other.via)
 
 
 class FrostbiteServer(QueryableServer):
@@ -325,6 +350,9 @@ class FrostbiteServer(QueryableServer):
             'lastQueriedAt': self.last_queried_at.isoformat() if self.last_queried_at is not None else self.last_queried_at,
             'links': [link.dump() for link in self.links]
         }
+
+    def txt(self) -> str:
+        return f'{self.ip} {self.game_port} {self.query_port}'
 
 
 class BadCompany2Server(FrostbiteServer):
@@ -445,3 +473,6 @@ class GametoolsServer(Server):
             'lastSeenAt': self.last_seen_at.isoformat(),
             'links': [link.dump() for link in self.links]
         }
+
+    def txt(self) -> str:
+        return self.uid

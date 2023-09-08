@@ -14,8 +14,8 @@ from .common import FrostbiteServerLister
 class BadCompany2ServerLister(FrostbiteServerLister):
     game: TheaterGame
 
-    def __init__(self, expired_ttl: float, recover: bool, add_links: bool, list_dir: str, timeout: float):
-        super().__init__(TheaterGame.BFBC2, BadCompany2Server, expired_ttl, recover, add_links, list_dir, timeout)
+    def __init__(self, expired_ttl: float, recover: bool, add_links: bool, txt: bool, list_dir: str, timeout: float):
+        super().__init__(TheaterGame.BFBC2, BadCompany2Server, expired_ttl, recover, add_links, txt, list_dir, timeout)
         self.server_validator = bfbc2_server_validator
 
     def update_server_list(self):

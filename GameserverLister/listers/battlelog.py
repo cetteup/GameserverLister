@@ -22,12 +22,13 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
             expired_ttl: float,
             recover: bool,
             add_links: bool,
+            txt: bool,
             list_dir: str,
             sleep: float,
             max_attempts: int,
             proxy: str = None
     ):
-        super().__init__(game, FrostbiteServer, page_limit, 60, expired_ttl, recover, add_links, list_dir, sleep, max_attempts)
+        super().__init__(game, FrostbiteServer, page_limit, 60, expired_ttl, recover, add_links, txt, list_dir, sleep, max_attempts)
         # Medal of Honor: Warfighter servers return the query port as part of the connect string, not the game port
         # => use different validator
         if self.game is BattlelogGame.MOHWF:

@@ -21,8 +21,16 @@ class MedalOfHonorServerLister(ServerLister):
     """
     game: MedalOfHonorGame
 
-    def __init__(self, game: MedalOfHonorGame, expired_ttl: float, recover: bool, add_links: bool, list_dir: str):
-        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, list_dir)
+    def __init__(
+            self,
+            game: MedalOfHonorGame,
+            expired_ttl: float,
+            recover: bool,
+            add_links: bool,
+            txt: bool,
+            list_dir: str
+    ):
+        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
 
     def update_server_list(self):
         request_ok = False
@@ -72,15 +80,15 @@ class MedalOfHonorServerLister(ServerLister):
                 guid_from_ip_port(ip, query_port),
                 ip,
                 int(query_port),
-                via
+                via,
+                int(query_port) # query port = game port for MOH games
             )
 
             if self.add_links:
-                # query port = game port for MOH games, so we can use that here to build links
                 found_server.add_links(self.build_server_links(
                     found_server.uid,
                     found_server.ip,
-                    found_server.query_port
+                    found_server.game_port
                 ))
 
             found_servers.append(found_server)

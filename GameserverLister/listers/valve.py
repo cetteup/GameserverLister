@@ -30,9 +30,10 @@ class ValveServerLister(ServerLister):
             expired_ttl: float,
             recover: bool,
             add_links: bool,
+            txt: bool,
             list_dir: str
     ):
-        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, list_dir)
+        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
         self.principal = principal
         self.config = VALVE_GAME_CONFIGS[self.game]
         self.principal_timeout = principal_timeout

@@ -21,8 +21,17 @@ class Quake3ServerLister(ServerLister):
     keywords: str
     server_entry_prefix: bytes
 
-    def __init__(self, game: Quake3Game, principal: str, expired_ttl: float, recover: bool, add_links: bool, list_dir: str):
-        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, list_dir)
+    def __init__(
+            self,
+            game: Quake3Game,
+            principal: str,
+            expired_ttl: float,
+            recover: bool,
+            add_links: bool,
+            txt: bool,
+            list_dir: str
+    ):
+        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
         # Merge default config with given principal config
         default_config = {
             'keywords': 'full empty',
@@ -59,7 +68,8 @@ class Quake3ServerLister(ServerLister):
                     guid_from_ip_port(raw_server.ip, str(raw_server.port)),
                     raw_server.ip,
                     raw_server.port,
-                    via
+                    via,
+                    raw_server.port
                 )
 
                 if self.add_links:

@@ -22,13 +22,25 @@ class GametoolsServerLister(HttpServerLister):
             expired_ttl: float,
             recover: bool,
             add_links: bool,
+            txt: bool,
             list_dir: str,
             sleep: float,
             max_attempts: int,
             include_official: bool
     ):
-        super().__init__(game, GametoolsServer, page_limit, 100, expired_ttl, recover, add_links, list_dir, sleep,
-                         max_attempts)
+        super().__init__(
+            game,
+            GametoolsServer,
+            page_limit,
+            100,
+            expired_ttl,
+            recover,
+            add_links,
+            txt,
+            list_dir,
+            sleep,
+            max_attempts
+        )
         # Allow non-ascii characters in server list (mostly used by server names for Asia servers)
         self.ensure_ascii = False
         self.include_official = include_official

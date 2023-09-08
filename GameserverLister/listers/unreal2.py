@@ -27,9 +27,10 @@ class Unreal2ServerLister(ServerLister):
             expired_ttl: float,
             recover: bool,
             add_links: bool,
+            txt: bool,
             list_dir: str
     ):
-        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, list_dir)
+        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
         self.principal = principal
         self.cd_key = cd_key
         self.principal_timeout = principal_timeout
@@ -59,7 +60,8 @@ class Unreal2ServerLister(ServerLister):
                 guid_from_ip_port(raw_server.ip, str(raw_server.query_port)),
                 raw_server.ip,
                 raw_server.query_port,
-                via
+                via,
+                raw_server.game_port
             )
 
             if self.add_links:

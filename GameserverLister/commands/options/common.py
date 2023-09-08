@@ -28,6 +28,12 @@ list_dir = click.option(
     default='lists',
     help='Path to directory in which servers lists will be stored'
 )
+txt = click.option(
+    '--txt',
+    default=False,
+    is_flag=True,
+    help='Additionally output plain text server list in format "[ip] [game port] [[query port]]\n"'
+)
 debug = click.option(
     '--debug',
     default=False,
