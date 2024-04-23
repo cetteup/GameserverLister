@@ -68,7 +68,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Battlefield Vietnam                    | GameSpy              | openspy.net, qtracker.com                                                                                         |
 | Battlefield 2                          | GamsSpy              | bf2hub.com, playbf2.ru                                                                                            |
 | Battlefield 2142                       | GameSpy              | novgames.ru, openspy.net, play2142.ru                                                                             |
-| Battlefield: Bad Company 2             | fesl/theater         | Electronic Arts                                                                                                   |
+| Battlefield: Bad Company 2             | fesl/theater         | Project Rome (emulatornexus.com)                                                                                  |
 | Battlefield 3                          | Battlelog            | battlelog.com                                                                                                     |
 | Battlefield 4                          | Battlelog            | battlelog.com                                                                                                     |
 | Battlefield Hardline                   | Battlelog            | battlelog.com                                                                                                     |
