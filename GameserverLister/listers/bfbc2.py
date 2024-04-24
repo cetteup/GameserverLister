@@ -26,7 +26,7 @@ class BadCompany2ServerLister(FrostbiteServerLister):
         while not request_ok and attempt < max_attempts:
             try:
                 logging.info('Fetching server list from Project Rome API')
-                resp = self.session.get('http://api.emulatornexus.com/v1/rome/servers', timeout=self.request_timeout)
+                resp = self.session.get('https://fesl.cetteup.com/v1/bfbc2/servers/rome-pc', timeout=self.request_timeout)
 
                 if resp.ok:
                     servers = resp.json()
@@ -47,12 +47,12 @@ class BadCompany2ServerLister(FrostbiteServerLister):
         found_servers = []
         for server in servers:
             found_server = BadCompany2Server(
-                guid_from_ip_port(server['remote_ip'], server['remote_port']),
-                server['hostname'],
-                257, # Project Rome only uses 257, but will return all servers regardless of the given LID
-                server['id'],
-                server['remote_ip'],
-                server['remote_port']
+                guid_from_ip_port(server['I'], server['P']),
+                server['N'],
+                server['LID'],
+                server['GID'],
+                server['I'],
+                server['P']
             )
 
             if self.add_links:
@@ -70,7 +70,7 @@ class BadCompany2ServerLister(FrostbiteServerLister):
         check_ok = True
         found = False
         try:
-            response = self.session.get(f'http://api.emulatornexus.com/v1/rome/server/{server.gid}',
+            response = self.session.get(f'https://fesl.cetteup.com/v1/bfbc2/servers/rome-pc/{server.lid}/{server.gid}',
                                         timeout=self.request_timeout)
 
             if response.ok:
