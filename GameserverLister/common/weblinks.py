@@ -96,11 +96,6 @@ WEB_LINK_TEMPLATES: Dict[str, WebLinkTemplate] = {
         'https://arena.sh/game/{ip}:{port}/',
         False
     ),
-    'battlefieldtracker': WebLinkTemplate(
-        'battlefieldtracker.com',
-        'https://battlefieldtracker.com/bf1/servers/pc/{uid}',
-        False
-    ),
     'battlelog': WebLinkTemplate(
         'battlelog.com',
         'https://battlelog.battlefield.com/{game}/servers/show/{platform}/{uid}',

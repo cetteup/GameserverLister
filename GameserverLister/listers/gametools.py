@@ -112,9 +112,4 @@ class GametoolsServerLister(HttpServerLister):
             ip: Optional[str] = None,
             port: Optional[int] = None
     ) -> Union[List[WebLink], WebLink]:
-        links = [WEB_LINK_TEMPLATES['gametools'].render(self.game, self.platform, uid)]
-        # BF1 servers are also listed on battlefieldtracker.com
-        if self.game is GametoolsGame.BF1:
-            links.append(WEB_LINK_TEMPLATES['battlefieldtracker'].render(self.game, self.platform, uid))
-
-        return links
+        return [WEB_LINK_TEMPLATES['gametools'].render(self.game, self.platform, uid)]
