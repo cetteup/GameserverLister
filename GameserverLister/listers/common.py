@@ -161,7 +161,7 @@ class ServerLister:
         return 0
 
     def build_server_list_file_path(self, extension: str) -> str:
-        return os.path.join(self.server_list_dir_path, f'{self.game}-{self.platform}-servers.{extension}')
+        return os.path.join(self.server_list_dir_path, f'{self.game}-servers-{self.platform}.{extension}')
 
     def write_to_file(self):
         logging.info(f'Writing {len(self.servers)} servers to output file')
