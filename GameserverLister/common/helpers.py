@@ -84,10 +84,6 @@ def battlelog_server_validator(server: FrostbiteServer, used_query_port: int, pa
     return parsed_result.get('connect') == f'{server.ip}:{server.game_port}'
 
 
-def mohwf_server_validator(server: FrostbiteServer, used_query_port: int, parsed_result: dict) -> bool:
-    return parsed_result.get('connect') == f'{server.ip}:{used_query_port}'
-
-
 def bfbc2_server_validator(server: BadCompany2Server, used_query_port: int, parsed_result: dict) -> bool:
     return battlelog_server_validator(server, used_query_port, parsed_result) or \
            parsed_result.get('connect') == f'0.0.0.0:{server.game_port}' or \

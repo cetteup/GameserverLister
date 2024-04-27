@@ -1,7 +1,7 @@
 import unittest
 
 from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, battlelog_server_validator, \
-    mohwf_server_validator, bfbc2_server_validator, guid_from_ip_port
+    bfbc2_server_validator, guid_from_ip_port
 from GameserverLister.common.servers import FrostbiteServer, BadCompany2Server
 
 
@@ -60,34 +60,6 @@ class ServerValidatorTest(unittest.TestCase):
         server = FrostbiteServer('a-guid', 'a-server-name', ip, game_port, 47200)
         parsed_result = {}
         valid = battlelog_server_validator(server, -1, parsed_result)
-        self.assertFalse(valid)
-
-    def test_mohwf_valid(self):
-        ip, query_port = '1.1.1.1', 47200
-        server = FrostbiteServer('a-guid', 'a-server-name', ip, 25200, query_port)
-        parsed_result = {'connect': f'{ip}:{query_port}'}
-        valid = mohwf_server_validator(server, query_port, parsed_result)
-        self.assertTrue(valid)
-
-    def test_mohwf_ip_mismatch(self):
-        ip, query_port = '1.1.1.1', 47200
-        server = FrostbiteServer('a-guid', 'a-server-name', ip, 25200, query_port)
-        parsed_result = {'connect': f'1.0.0.1:{query_port}'}
-        valid = mohwf_server_validator(server, query_port, parsed_result)
-        self.assertFalse(valid)
-
-    def test_mohwf_port_mismatch(self):
-        ip, query_port = '1.1.1.1', 47200
-        server = FrostbiteServer('a-guid', 'a-server-name', ip, 25200, query_port)
-        parsed_result = {'connect': f'{ip}:{query_port}'}
-        valid = mohwf_server_validator(server, -1, parsed_result)
-        self.assertFalse(valid)
-
-    def test_mohwf_invalid_result(self):
-        ip, query_port = '1.1.1.1', 47200
-        server = FrostbiteServer('a-guid', 'a-server-name', ip, 25200, query_port)
-        parsed_result = {}
-        valid = battlelog_server_validator(server, query_port, parsed_result)
         self.assertFalse(valid)
 
     def test_bfbcb2_valid_battlelog(self):

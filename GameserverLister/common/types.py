@@ -157,7 +157,6 @@ class BattlelogGame(Game):
     BF3 = 'bf3'
     BF4 = 'bf4'
     BFH = 'bfh'
-    MOHWF = 'mohwf'
 
 
 class GametoolsGame(Game):

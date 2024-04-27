@@ -4,7 +4,7 @@ from typing import List, Tuple, Optional, Union
 
 import requests
 
-from GameserverLister.common.helpers import mohwf_server_validator, battlelog_server_validator
+from GameserverLister.common.helpers import battlelog_server_validator
 from GameserverLister.common.servers import FrostbiteServer
 from GameserverLister.common.types import BattlelogGame, BattlelogPlatform
 from GameserverLister.common.weblinks import WEB_LINK_TEMPLATES, WebLink
@@ -30,12 +30,7 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
             proxy: str = None
     ):
         super().__init__(game, platform, FrostbiteServer, page_limit, 60, expired_ttl, recover, add_links, txt, list_dir, sleep, max_attempts)
-        # Medal of Honor: Warfighter servers return the query port as part of the connect string, not the game port
-        # => use different validator
-        if self.game is BattlelogGame.MOHWF:
-            self.server_validator = mohwf_server_validator
-        else:
-            self.server_validator = battlelog_server_validator
+        self.server_validator = battlelog_server_validator
 
         # Set up headers
         self.session.headers = {
@@ -117,9 +112,7 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
             ip: Optional[str] = None,
             port: Optional[int] = None
     ) -> Union[List[WebLink], WebLink]:
-        # Medal of Honor: Warfighter (mohwf) is just called "mohw" on Battlelog
-        game = 'mohw' if self.game is BattlelogGame.MOHWF else self.game
-        links = [WEB_LINK_TEMPLATES['battlelog'].render(game, self.platform, uid)]
+        links = [WEB_LINK_TEMPLATES['battlelog'].render(self.game, self.platform, uid)]
 
         # Gametools uses the guid as the "gameid" for BF3 and BFH, so we can add links for those
         # (BF4 uses the real gameid, so we need to handle those links separately)
