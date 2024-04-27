@@ -5,7 +5,7 @@ import click
 
 from GameserverLister.commands.options import common, http
 from GameserverLister.common.logger import logger
-from GameserverLister.common.types import GametoolsGame
+from GameserverLister.common.types import GametoolsGame, GametoolsPlatform
 from GameserverLister.listers import GametoolsServerLister
 
 
@@ -16,6 +16,14 @@ from GameserverLister.listers import GametoolsServerLister
     type=click.Choice(GametoolsGame),
     required=True,
     help='Game to list servers for'
+)
+@click.option(
+    '-pf',
+    '--platform',
+    type=click.Choice(GametoolsPlatform),
+    required=True,
+    help='Platform to list servers for',
+    default=GametoolsPlatform.PC
 )
 @click.option(
     '--include-official',
@@ -34,6 +42,7 @@ from GameserverLister.listers import GametoolsServerLister
 @common.debug
 def run(
         game: GametoolsGame,
+        platform: GametoolsPlatform,
         page_limit: int,
         sleep: float,
         max_attempts: int,
@@ -51,6 +60,7 @@ def run(
 
     lister = GametoolsServerLister(
         game,
+        platform,
         page_limit,
         expired_ttl,
         recover,

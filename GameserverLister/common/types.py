@@ -203,6 +203,8 @@ class BattlelogPlatform(Platform):
 
 class GametoolsPlatform(Platform):
     PC = 'pc'
+    PS4 = 'ps4'
+    XboxOne = 'xboxone'
 
 
 @dataclass
