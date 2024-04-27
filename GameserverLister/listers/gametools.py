@@ -49,7 +49,7 @@ class GametoolsServerLister(HttpServerLister):
         self.include_official = include_official
 
     def get_server_list_url(self, per_page: int) -> str:
-        return f'{GAMETOOLS_BASE_URI}/{self.game}/servers/?platform={self.platform}&name=&limit={per_page}' \
+        return f'{GAMETOOLS_BASE_URI}/{self.game}/servers/?platform={self.platform}&region=all&name=&limit={per_page}' \
                f'&nocache={datetime.now().timestamp()}'
 
     def add_page_found_servers(self, found_servers: List[GametoolsServer], page_response_data: dict) -> List[GametoolsServer]:
