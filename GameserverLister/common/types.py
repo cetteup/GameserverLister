@@ -165,6 +165,46 @@ class GametoolsGame(Game):
     BFV = 'bfv'
 
 
+class Platform(str, ExtendedEnum):
+    pass
+
+
+class GamespyPlatform(Platform):
+    PC = 'pc'
+
+
+class Quake3Platform(Platform):
+    PC = 'pc'
+
+
+class MedalOfHonorPlatform(Platform):
+    PC = 'pc'
+
+
+class Unreal2Platform(Platform):
+    PC = 'pc'
+
+
+class ValvePlatform(Platform):
+    PC = 'pc'
+
+
+class TheaterPlatform(Platform):
+    PC = 'pc'
+
+
+class BattlelogPlatform(Platform):
+    PC = 'pc'
+    PS3 = 'ps3'
+    PS4 = 'ps4'
+    Xbox360 = 'xbox360'
+    XboxOne = 'xboxone'
+
+
+class GametoolsPlatform(Platform):
+    PC = 'pc'
+
+
 @dataclass
 class GamespyGameConfig:
     game_name: str

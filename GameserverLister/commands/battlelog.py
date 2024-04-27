@@ -6,7 +6,7 @@ import click
 
 from GameserverLister.commands.options import common, http, queryport
 from GameserverLister.common.logger import logger
-from GameserverLister.common.types import BattlelogGame
+from GameserverLister.common.types import BattlelogGame, BattlelogPlatform
 from GameserverLister.listers import BattlelogServerLister
 
 
@@ -17,6 +17,14 @@ from GameserverLister.listers import BattlelogServerLister
     type=click.Choice(BattlelogGame),
     required=True,
     help='Game to list servers for'
+)
+@click.option(
+    '-pf',
+    '--platform',
+    type=click.Choice(BattlelogPlatform),
+    required=True,
+    help='Platform to list servers for',
+    default=BattlelogPlatform.PC
 )
 @http.page_limit
 @http.sleep
@@ -33,6 +41,7 @@ from GameserverLister.listers import BattlelogServerLister
 @common.debug
 def run(
         game: BattlelogGame,
+        platform: BattlelogPlatform,
         page_limit: int,
         sleep: float,
         max_attempts: int,
@@ -49,10 +58,15 @@ def run(
 ):
     logging.basicConfig(level=logging.DEBUG if debug else logging.INFO, stream=sys.stdout,
                         format='%(asctime)s %(levelname)-8s %(message)s')
-    logger.info(f'Listing servers for {game} via battlelog')
 
+    if game is BattlelogGame.BF3 and platform is not BattlelogPlatform.PC:
+        logger.warning(f'Platform {platform} is not available for {game}, defaulting to {BattlelogPlatform.PC} instead')
+        platform = BattlelogPlatform.PC
+
+    logger.info(f'Listing servers for {game} on {platform} via battlelog')
     lister = BattlelogServerLister(
         game,
+        platform,
         page_limit,
         expired_ttl,
         recover,
@@ -63,6 +77,8 @@ def run(
         max_attempts,
         proxy
     )
+
+
 
     before = len(lister.servers)
     lister.update_server_list()

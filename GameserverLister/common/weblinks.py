@@ -75,10 +75,10 @@ class WebLinkTemplate:
         self.url_template = url_template
         self.official = official
 
-    def render(self, game: str, uid: str, ip: Optional[str] = None, port: Optional[int] = None) -> WebLink:
+    def render(self, game: str, platform: str, uid: str, ip: Optional[str] = None, port: Optional[int] = None) -> WebLink:
         return WebLink(
             self.site,
-            self.url_template.format(game, uid, ip, port),
+            self.url_template.format(game=game, platform=platform, uid=uid, ip=ip, port=port),
             self.official
         )
 
@@ -93,54 +93,54 @@ For URL templates:
 WEB_LINK_TEMPLATES: Dict[str, WebLinkTemplate] = {
     'arena.sh': WebLinkTemplate(
         'arena.sh',
-        'https://arena.sh/game/{2}:{3}/',
+        'https://arena.sh/game/{ip}:{port}/',
         False
     ),
     'battlefieldtracker': WebLinkTemplate(
         'battlefieldtracker.com',
-        'https://battlefieldtracker.com/bf1/servers/pc/{1}',
+        'https://battlefieldtracker.com/bf1/servers/pc/{uid}',
         False
     ),
     'battlelog': WebLinkTemplate(
         'battlelog.com',
-        'https://battlelog.battlefield.com/{0}/servers/show/pc/{1}',
+        'https://battlelog.battlefield.com/{game}/servers/show/{platform}/{uid}',
         True
     ),
     'bf2.tv': WebLinkTemplate(
         'bf2.tv',
-        'https://bf2.tv/servers/{2}:{3}',
+        'https://bf2.tv/servers/{ip}:{port}',
         False
     ),
     'bf2hub': WebLinkTemplate(
         'bf2hub.com',
-        'https://www.bf2hub.com/server/{2}:{3}/',
+        'https://www.bf2hub.com/server/{ip}:{port}/',
         True
     ),
     'cod.pm': WebLinkTemplate(
       'cod.pm',
-      'https://cod.pm/server/{2}/{3}',
+      'https://cod.pm/server/{ip}/{port}',
       False
     ),
     # deathmask.net shows servers from their own as well as other masters,
     # so they are not the official source for all servers
     'deathmask.net-official': WebLinkTemplate(
         'deathmask.net',
-        'https://dpmaster.deathmask.net/?game={0}&server={2}:{3}',
+        'https://dpmaster.deathmask.net/?game={game}&server={ip}:{port}',
         True
     ),
     'deathmask.net-unofficial': WebLinkTemplate(
         'deathmask.net',
-        'https://dpmaster.deathmask.net/?game={0}&server={2}:{3}',
+        'https://dpmaster.deathmask.net/?game={game}&server={ip}:{port}',
         False
     ),
     'gametools': WebLinkTemplate(
         'gametools.network',
-        'https://gametools.network/servers/{0}/gameid/{1}/pc',
+        'https://gametools.network/servers/{game}/gameid/{uid}/{platform}',
         False
     ),
     'swat4stats.com': WebLinkTemplate(
         'swat4stats.com',
-        'https://swat4stats.com/servers/{2}:{3}/',
+        'https://swat4stats.com/servers/{ip}:{port}/',
         False
     )
 }

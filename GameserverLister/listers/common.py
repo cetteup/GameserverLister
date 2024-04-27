@@ -13,12 +13,13 @@ from gevent.pool import Pool
 
 from GameserverLister.common.helpers import is_valid_port, find_query_port
 from GameserverLister.common.servers import Server, ObjectJSONEncoder, FrostbiteServer
-from GameserverLister.common.types import Game
+from GameserverLister.common.types import Game, Platform
 from GameserverLister.common.weblinks import WebLink
 
 
 class ServerLister:
     game: Game
+    platform: Platform
     server_list_dir_path: str
     server_list_file_path: str
     expired_ttl: float
@@ -35,6 +36,7 @@ class ServerLister:
     def __init__(
             self,
             game: Game,
+            platform: Platform,
             server_class: Type[Server],
             expired_ttl: float,
             recover: bool,
@@ -44,6 +46,7 @@ class ServerLister:
             request_timeout: float = 5.0
     ):
         self.game = game
+        self.platform = platform
         self.server_list_dir_path = os.path.realpath(list_dir)
         self.server_list_file_path = self.build_server_list_file_path('json')
 
@@ -158,7 +161,7 @@ class ServerLister:
         return 0
 
     def build_server_list_file_path(self, extension: str) -> str:
-        return os.path.join(self.server_list_dir_path, f'{self.game}-servers.{extension}')
+        return os.path.join(self.server_list_dir_path, f'{self.game}-{self.platform}-servers.{extension}')
 
     def write_to_file(self):
         logging.info(f'Writing {len(self.servers)} servers to output file')
@@ -178,6 +181,7 @@ class FrostbiteServerLister(ServerLister):
     def __init__(
             self,
             game: Game,
+            platform: Platform,
             server_class: Type[Server],
             expired_ttl: float,
             recover: bool,
@@ -186,7 +190,7 @@ class FrostbiteServerLister(ServerLister):
             list_dir: str,
             request_timeout: float = 5.0
     ):
-        super().__init__(game, server_class, expired_ttl, recover, add_links, txt, list_dir, request_timeout)
+        super().__init__(game, platform, server_class, expired_ttl, recover, add_links, txt, list_dir, request_timeout)
 
     def find_query_ports(self, gamedig_bin_path: str, gamedig_concurrency: int, expired_ttl: float):
         logging.info(f'Searching query port for {len(self.servers)} servers')
@@ -243,6 +247,7 @@ class HttpServerLister(ServerLister):
     def __init__(
             self,
             game: Game,
+            platform: Platform,
             server_class: Type[Server],
             page_limit: int,
             per_page: int,
@@ -254,7 +259,7 @@ class HttpServerLister(ServerLister):
             sleep: float,
             max_attempts: int
     ):
-        super().__init__(game, server_class, expired_ttl, recover, add_links, txt, list_dir, request_timeout=10)
+        super().__init__(game, platform, server_class, expired_ttl, recover, add_links, txt, list_dir, request_timeout=10)
         self.page_limit = page_limit
         self.per_page = per_page
         self.sleep = sleep

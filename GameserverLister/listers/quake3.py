@@ -6,7 +6,7 @@ import pyq3serverlist
 
 from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, guid_from_ip_port
 from GameserverLister.common.servers import ClassicServer, ViaStatus
-from GameserverLister.common.types import Quake3Game
+from GameserverLister.common.types import Quake3Game, Quake3Platform
 from GameserverLister.common.weblinks import WebLink, WEB_LINK_TEMPLATES
 from GameserverLister.games.quake3 import QUAKE3_CONFIGS
 from .common import ServerLister
@@ -14,6 +14,7 @@ from .common import ServerLister
 
 class Quake3ServerLister(ServerLister):
     game: Quake3Game
+    platform: Quake3Platform
     principal: str
     protocols: List[int]
     network_protocol: int
@@ -31,7 +32,7 @@ class Quake3ServerLister(ServerLister):
             txt: bool,
             list_dir: str
     ):
-        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
+        super().__init__(game, Quake3Platform.PC, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
         # Merge default config with given principal config
         default_config = {
             'keywords': 'full empty',
@@ -136,6 +137,6 @@ class Quake3ServerLister(ServerLister):
 
         links = []
         for template in templates:
-            links.append(template.render(self.game, uid, ip=ip, port=port))
+            links.append(template.render(self.game, self.platform, uid, ip=ip, port=port))
 
         return links

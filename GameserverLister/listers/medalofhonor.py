@@ -7,7 +7,7 @@ import requests
 
 from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, guid_from_ip_port
 from GameserverLister.common.servers import ClassicServer, ViaStatus
-from GameserverLister.common.types import MedalOfHonorGame
+from GameserverLister.common.types import MedalOfHonorGame, MedalOfHonorPlatform
 from .common import ServerLister
 
 
@@ -20,6 +20,7 @@ class MedalOfHonorServerLister(ServerLister):
     that to query servers with the information we have.
     """
     game: MedalOfHonorGame
+    platform: MedalOfHonorPlatform
 
     def __init__(
             self,
@@ -30,7 +31,7 @@ class MedalOfHonorServerLister(ServerLister):
             txt: bool,
             list_dir: str
     ):
-        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
+        super().__init__(game, MedalOfHonorPlatform.PC, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
 
     def update_server_list(self):
         request_ok = False

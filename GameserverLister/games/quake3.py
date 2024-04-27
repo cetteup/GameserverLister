@@ -12,9 +12,18 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             5,  # version 1.4
             6,  # version 1.5
         ],
+        'keywords': '',
         'servers': {
             'activision': {
                 'hostname': 'codmaster.activision.com',
+                'port': 20510
+            },
+            'cod.pm': {
+                'hostname': 'master.cod.pm',
+                'port': 20510
+            },
+            'comu-mvzg.com': {
+                'hostname': 'codmaster.comu-mvzg.com',
                 'port': 20510
             }
         },

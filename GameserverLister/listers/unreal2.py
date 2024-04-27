@@ -5,7 +5,7 @@ import pyut2serverlist
 
 from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, guid_from_ip_port
 from GameserverLister.common.servers import ClassicServer, ViaStatus
-from GameserverLister.common.types import Unreal2Game
+from GameserverLister.common.types import Unreal2Game, Unreal2Platform
 from GameserverLister.common.weblinks import WebLink, WEB_LINK_TEMPLATES
 from GameserverLister.games.unreal2 import UNREAL2_CONFIGS
 from .common import ServerLister
@@ -13,6 +13,7 @@ from .common import ServerLister
 
 class Unreal2ServerLister(ServerLister):
     game: Unreal2Game
+    platform: Unreal2Platform
     principal: str
     cd_key: str
 
@@ -30,7 +31,7 @@ class Unreal2ServerLister(ServerLister):
             txt: bool,
             list_dir: str
     ):
-        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
+        super().__init__(game, Unreal2Platform.PC, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
         self.principal = principal
         self.cd_key = cd_key
         self.principal_timeout = principal_timeout
@@ -127,6 +128,6 @@ class Unreal2ServerLister(ServerLister):
 
         links = []
         for template in templates:
-            links.append(template.render(self.game, uid, ip=ip, port=port))
+            links.append(template.render(self.game, self.platform, uid, ip=ip, port=port))
 
         return links

@@ -5,13 +5,14 @@ import pyvpsq
 
 from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, guid_from_ip_port
 from GameserverLister.common.servers import ClassicServer, ViaStatus
-from GameserverLister.common.types import ValveGame, ValvePrincipal, ValveGameConfig
+from GameserverLister.common.types import ValveGame, ValvePrincipal, ValveGameConfig, ValvePlatform
 from GameserverLister.games.valve import VALVE_PRINCIPAL_CONFIGS, VALVE_GAME_CONFIGS
 from GameserverLister.listers.common import ServerLister
 
 
 class ValveServerLister(ServerLister):
     game: ValveGame
+    platform: ValvePlatform
     servers: List[ClassicServer]
     principal: ValvePrincipal
     config: ValveGameConfig
@@ -36,7 +37,7 @@ class ValveServerLister(ServerLister):
             txt: bool,
             list_dir: str
     ):
-        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
+        super().__init__(game, ValvePlatform.PC, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
         self.principal = principal
         self.config = VALVE_GAME_CONFIGS[self.game]
         self.principal_timeout = principal_timeout

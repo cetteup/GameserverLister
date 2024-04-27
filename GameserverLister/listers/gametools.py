@@ -5,7 +5,7 @@ from typing import List, Tuple, Optional, Union
 import requests
 
 from GameserverLister.common.servers import GametoolsServer
-from GameserverLister.common.types import GametoolsGame
+from GameserverLister.common.types import GametoolsGame, GametoolsPlatform
 from GameserverLister.common.weblinks import WebLink, WEB_LINK_TEMPLATES
 from GameserverLister.games.gametools import GAMETOOLS_BASE_URI
 from .common import HttpServerLister
@@ -13,6 +13,7 @@ from .common import HttpServerLister
 
 class GametoolsServerLister(HttpServerLister):
     game: GametoolsGame
+    platform: GametoolsPlatform
     include_official: bool
 
     def __init__(
@@ -30,6 +31,7 @@ class GametoolsServerLister(HttpServerLister):
     ):
         super().__init__(
             game,
+            GametoolsPlatform.PC,
             GametoolsServer,
             page_limit,
             100,
@@ -109,9 +111,9 @@ class GametoolsServerLister(HttpServerLister):
             ip: Optional[str] = None,
             port: Optional[int] = None
     ) -> Union[List[WebLink], WebLink]:
-        links = [WEB_LINK_TEMPLATES['gametools'].render(self.game, uid)]
+        links = [WEB_LINK_TEMPLATES['gametools'].render(self.game, self.platform, uid)]
         # BF1 servers are also listed on battlefieldtracker.com
         if self.game is GametoolsGame.BF1:
-            links.append(WEB_LINK_TEMPLATES['battlefieldtracker'].render(self.game, uid))
+            links.append(WEB_LINK_TEMPLATES['battlefieldtracker'].render(self.game, self.platform, uid))
 
         return links

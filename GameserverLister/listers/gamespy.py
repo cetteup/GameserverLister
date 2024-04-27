@@ -7,7 +7,7 @@ from typing import List, Tuple, Optional, Union
 from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, guid_from_ip_port, \
     is_server_for_gamespy_game, resolve_host
 from GameserverLister.common.servers import ClassicServer, ViaStatus
-from GameserverLister.common.types import GamespyGame, GamespyPrincipal, GamespyGameConfig
+from GameserverLister.common.types import GamespyGame, GamespyPrincipal, GamespyGameConfig, GamespyPlatform
 from GameserverLister.common.weblinks import WebLink, WEB_LINK_TEMPLATES
 from GameserverLister.games.gamespy import GAMESPY_PRINCIPAL_CONFIGS, GAMESPY_GAME_CONFIGS
 from .common import ServerLister
@@ -15,6 +15,7 @@ from .common import ServerLister
 
 class GameSpyServerLister(ServerLister):
     game: GamespyGame
+    platform: GamespyPlatform
     servers: List[ClassicServer]
     principal: GamespyPrincipal
     config: GamespyGameConfig
@@ -41,7 +42,7 @@ class GameSpyServerLister(ServerLister):
             txt: bool,
             list_dir: str
     ):
-        super().__init__(game, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
+        super().__init__(game, GamespyPlatform.PC, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
         self.principal = principal.lower()
         self.config = GAMESPY_GAME_CONFIGS[self.game]
         self.gslist_bin_path = gslist_bin_path
@@ -198,7 +199,7 @@ class GameSpyServerLister(ServerLister):
 
         links = []
         for template in templates:
-            links.append(template.render(self.game, uid, ip=ip, port=port))
+            links.append(template.render(self.game, self.platform, uid, ip=ip, port=port))
 
         return links
 

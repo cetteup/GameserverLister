@@ -6,7 +6,7 @@ import requests
 
 from GameserverLister.common.helpers import mohwf_server_validator, battlelog_server_validator
 from GameserverLister.common.servers import FrostbiteServer
-from GameserverLister.common.types import BattlelogGame
+from GameserverLister.common.types import BattlelogGame, BattlelogPlatform
 from GameserverLister.common.weblinks import WEB_LINK_TEMPLATES, WebLink
 from GameserverLister.games.battlelog import BATTLELOG_GAME_BASE_URIS
 from .common import HttpServerLister, FrostbiteServerLister
@@ -18,6 +18,7 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
     def __init__(
             self,
             game: BattlelogGame,
+            platform: BattlelogPlatform,
             page_limit: int,
             expired_ttl: float,
             recover: bool,
@@ -28,7 +29,7 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
             max_attempts: int,
             proxy: str = None
     ):
-        super().__init__(game, FrostbiteServer, page_limit, 60, expired_ttl, recover, add_links, txt, list_dir, sleep, max_attempts)
+        super().__init__(game, platform, FrostbiteServer, page_limit, 60, expired_ttl, recover, add_links, txt, list_dir, sleep, max_attempts)
         # Medal of Honor: Warfighter servers return the query port as part of the connect string, not the game port
         # => use different validator
         if self.game is BattlelogGame.MOHWF:
@@ -48,7 +49,7 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
             }
 
     def get_server_list_url(self, per_page: int) -> str:
-        return f'{BATTLELOG_GAME_BASE_URIS[self.game]}?count={per_page}&offset=0'
+        return f'{BATTLELOG_GAME_BASE_URIS[self.game]}/{self.platform}/?count={per_page}&offset=0'
 
     def add_page_found_servers(self, found_servers: List[FrostbiteServer], page_response_data: dict) -> List[FrostbiteServer]:
         for server in page_response_data['data']:
@@ -63,7 +64,7 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
                 found_server.add_links(self.build_server_links(found_server.uid))
                 # Gametools uses the gameid for BF4 server URLs, so add that separately
                 if self.game is BattlelogGame.BF4:
-                    found_server.add_links(WEB_LINK_TEMPLATES['gametools'].render(self.game, server['gameId']))
+                    found_server.add_links(WEB_LINK_TEMPLATES['gametools'].render(self.game, self.platform, server['gameId']))
 
             # Add non-private servers (servers with an IP) that are new
             server_uids = [s.uid for s in found_servers]
@@ -84,7 +85,7 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
         found = False
         try:
             response = self.session.get(f'https://battlelog.battlefield.com/{self.game}/'
-                                        f'servers/show/pc/{server.uid}?json=1',
+                                        f'servers/show/{self.platform}/{server.uid}?json=1',
                                         timeout=self.request_timeout)
             if response.status_code == 200:
                 # Server was found on Battlelog => make sure it is still public
@@ -118,12 +119,12 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
     ) -> Union[List[WebLink], WebLink]:
         # Medal of Honor: Warfighter (mohwf) is just called "mohw" on Battlelog
         game = 'mohw' if self.game is BattlelogGame.MOHWF else self.game
-        links = [WEB_LINK_TEMPLATES['battlelog'].render(game, uid)]
+        links = [WEB_LINK_TEMPLATES['battlelog'].render(game, self.platform, uid)]
 
         # Gametools uses the guid as the "gameid" for BF3 and BFH, so we can add links for those
         # (BF4 uses the real gameid, so we need to handle those links separately)
         if self.game in ['bf3', 'bfh']:
-            links.append(WEB_LINK_TEMPLATES['gametools'].render(self.game, uid))
+            links.append(WEB_LINK_TEMPLATES['gametools'].render(self.game, self.platform, uid))
 
         return links
 
