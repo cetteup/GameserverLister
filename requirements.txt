@@ -1,6 +1,6 @@
 gevent==24.2.1
 nslookup==1.7.0
-requests[socks]==2.31.0
+requests[socks]==2.32.0
 pyq3serverlist==0.3.2
 pyut2serverlist==0.2.0
 pyvpsq==0.1.2
