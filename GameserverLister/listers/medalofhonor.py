@@ -25,13 +25,24 @@ class MedalOfHonorServerLister(ServerLister):
     def __init__(
             self,
             game: MedalOfHonorGame,
+            expire: bool,
             expired_ttl: float,
             recover: bool,
             add_links: bool,
             txt: bool,
             list_dir: str
     ):
-        super().__init__(game, MedalOfHonorPlatform.PC, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
+        super().__init__(
+            game,
+            MedalOfHonorPlatform.PC,
+            ClassicServer,
+            expire,
+            expired_ttl,
+            recover,
+            add_links,
+            txt,
+            list_dir
+        )
 
     def update_server_list(self):
         request_ok = False

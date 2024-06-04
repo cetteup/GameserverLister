@@ -25,13 +25,24 @@ class Unreal2ServerLister(ServerLister):
             principal: str,
             cd_key: str,
             principal_timeout: float,
+            expire: bool,
             expired_ttl: float,
             recover: bool,
             add_links: bool,
             txt: bool,
             list_dir: str
     ):
-        super().__init__(game, Unreal2Platform.PC, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
+        super().__init__(
+            game,
+            Unreal2Platform.PC,
+            ClassicServer,
+            expire,
+            expired_ttl,
+            recover,
+            add_links,
+            txt,
+            list_dir
+        )
         self.principal = principal
         self.cd_key = cd_key
         self.principal_timeout = principal_timeout

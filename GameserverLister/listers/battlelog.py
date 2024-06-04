@@ -20,6 +20,7 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
             game: BattlelogGame,
             platform: BattlelogPlatform,
             page_limit: int,
+            expire: bool,
             expired_ttl: float,
             recover: bool,
             add_links: bool,
@@ -29,7 +30,21 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
             max_attempts: int,
             proxy: str = None
     ):
-        super().__init__(game, platform, FrostbiteServer, page_limit, 60, expired_ttl, recover, add_links, txt, list_dir, sleep, max_attempts)
+        super().__init__(
+            game,
+            platform,
+            FrostbiteServer,
+            page_limit,
+            60,
+            expire,
+            expired_ttl,
+            recover,
+            add_links,
+            txt,
+            list_dir,
+            sleep,
+            max_attempts
+        )
         self.server_validator = battlelog_server_validator
 
         # Set up headers

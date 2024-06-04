@@ -26,13 +26,24 @@ class Quake3ServerLister(ServerLister):
             self,
             game: Quake3Game,
             principal: str,
+            expire: bool,
             expired_ttl: float,
             recover: bool,
             add_links: bool,
             txt: bool,
             list_dir: str
     ):
-        super().__init__(game, Quake3Platform.PC, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
+        super().__init__(
+            game,
+            Quake3Platform.PC,
+            ClassicServer,
+            expire,
+            expired_ttl,
+            recover,
+            add_links,
+            txt,
+            list_dir
+        )
         # Merge default config with given principal config
         default_config = {
             'keywords': 'full empty',

@@ -36,13 +36,24 @@ class GameSpyServerLister(ServerLister):
             gslist_timeout: int,
             verify: bool,
             add_game_port: bool,
+            expire: bool,
             expired_ttl: float,
             recover: bool,
             add_links: bool,
             txt: bool,
             list_dir: str
     ):
-        super().__init__(game, GamespyPlatform.PC, ClassicServer, expired_ttl, recover, add_links, txt, list_dir)
+        super().__init__(
+            game,
+            GamespyPlatform.PC,
+            ClassicServer,
+            expire,
+            expired_ttl,
+            recover,
+            add_links,
+            txt,
+            list_dir
+        )
         self.principal = principal.lower()
         self.config = GAMESPY_GAME_CONFIGS[self.game]
         self.gslist_bin_path = gslist_bin_path

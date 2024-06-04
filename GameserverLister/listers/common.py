@@ -22,6 +22,7 @@ class ServerLister:
     platform: Platform
     server_list_dir_path: str
     server_list_file_path: str
+    expire: bool
     expired_ttl: float
     recover: bool
     add_links: bool
@@ -38,6 +39,7 @@ class ServerLister:
             game: Game,
             platform: Platform,
             server_class: Type[Server],
+            expire: bool,
             expired_ttl: float,
             recover: bool,
             add_links: bool,
@@ -50,6 +52,7 @@ class ServerLister:
         self.server_list_dir_path = os.path.realpath(list_dir)
         self.server_list_file_path = self.build_server_list_file_path('json')
 
+        self.expire = expire
         self.expired_ttl = expired_ttl
         self.recover = recover
         self.add_links = add_links
@@ -107,6 +110,11 @@ class ServerLister:
                 self.servers.append(found_server)
 
     def remove_expired_servers(self) -> tuple:
+        # Skip removal if expiration is disabled
+        if not self.expire:
+            logging.info('Skipping expiration ttl check')
+            return 0, 0
+
         # Iterate over copy of server list and remove any expired servers from the (actual) server list
         logging.info(f'Checking expiration ttl for {len(self.servers)} servers')
         checks_since_last_ok = 0
@@ -183,6 +191,7 @@ class FrostbiteServerLister(ServerLister):
             game: Game,
             platform: Platform,
             server_class: Type[Server],
+            expire: bool,
             expired_ttl: float,
             recover: bool,
             add_links: bool,
@@ -190,7 +199,7 @@ class FrostbiteServerLister(ServerLister):
             list_dir: str,
             request_timeout: float = 5.0
     ):
-        super().__init__(game, platform, server_class, expired_ttl, recover, add_links, txt, list_dir, request_timeout)
+        super().__init__(game, platform, server_class, expire, expired_ttl, recover, add_links, txt, list_dir, request_timeout)
 
     def find_query_ports(self, gamedig_bin_path: str, gamedig_concurrency: int, expired_ttl: float):
         logging.info(f'Searching query port for {len(self.servers)} servers')
@@ -251,6 +260,7 @@ class HttpServerLister(ServerLister):
             server_class: Type[Server],
             page_limit: int,
             per_page: int,
+            expire: bool,
             expired_ttl: float,
             recover: bool,
             add_links: bool,
@@ -259,7 +269,18 @@ class HttpServerLister(ServerLister):
             sleep: float,
             max_attempts: int
     ):
-        super().__init__(game, platform, server_class, expired_ttl, recover, add_links, txt, list_dir, request_timeout=10)
+        super().__init__(
+            game,
+            platform,
+            server_class,
+            expire,
+            expired_ttl,
+            recover,
+            add_links,
+            txt,
+            list_dir,
+            request_timeout=10
+        )
         self.page_limit = page_limit
         self.per_page = per_page
         self.sleep = sleep

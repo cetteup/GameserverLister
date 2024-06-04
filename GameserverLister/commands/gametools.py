@@ -34,6 +34,7 @@ from GameserverLister.listers import GametoolsServerLister
 @http.page_limit
 @http.sleep
 @http.max_attempts
+@common.expire
 @common.expired_ttl
 @common.list_dir
 @common.recover
@@ -47,6 +48,7 @@ def run(
         sleep: float,
         max_attempts: int,
         include_official: bool,
+        expire: bool,
         expired_ttl: int,
         recover: bool,
         add_links: bool,
@@ -62,6 +64,7 @@ def run(
         game,
         platform,
         page_limit,
+        expire,
         expired_ttl,
         recover,
         add_links,

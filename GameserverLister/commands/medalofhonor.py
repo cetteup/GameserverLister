@@ -17,6 +17,7 @@ from GameserverLister.listers import MedalOfHonorServerLister
     required=True,
     help='Game to list servers for'
 )
+@common.expire
 @common.expired_ttl
 @common.list_dir
 @common.recover
@@ -25,6 +26,7 @@ from GameserverLister.listers import MedalOfHonorServerLister
 @common.debug
 def run(
         game: MedalOfHonorGame,
+        expire: bool,
         expired_ttl: int,
         recover: bool,
         add_links: bool,
@@ -38,6 +40,7 @@ def run(
 
     lister = MedalOfHonorServerLister(
         game,
+        expire,
         expired_ttl,
         recover,
         add_links,

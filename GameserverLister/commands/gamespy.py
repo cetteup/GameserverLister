@@ -65,6 +65,7 @@ from GameserverLister.listers import GameSpyServerLister
     help='(Attempt to) verify game servers returned by principal are game servers for the current game'
 )
 @gameport.add
+@common.expire
 @common.expired_ttl
 @common.list_dir
 @common.recover
@@ -80,6 +81,7 @@ def run(
         gslist_timeout: int,
         verify: bool,
         add_game_port: bool,
+        expire: bool,
         expired_ttl: int,
         recover: bool,
         add_links: bool,
@@ -106,6 +108,7 @@ def run(
         gslist_timeout,
         verify,
         add_game_port,
+        expire,
         expired_ttl,
         recover,
         add_links,

@@ -48,6 +48,7 @@ from GameserverLister.listers import ValveServerLister
     help='Maximum number of pages to retrieve from the server list (per region)'
 )
 @gameport.add
+@common.expire
 @common.expired_ttl
 @common.list_dir
 @common.recover
@@ -61,6 +62,7 @@ def run(
         timeout: int,
         max_pages: int,
         add_game_port: bool,
+        expire: bool,
         expired_ttl: int,
         recover: bool,
         add_links: bool,
@@ -85,6 +87,7 @@ def run(
         filters,
         max_pages,
         add_game_port,
+        expire,
         expired_ttl,
         recover,
         add_links,

@@ -33,6 +33,7 @@ from GameserverLister.listers import BattlelogServerLister
 @queryport.find
 @queryport.gamedig_bin
 @queryport.gamedig_concurrency
+@common.expire
 @common.expired_ttl
 @common.list_dir
 @common.recover
@@ -49,6 +50,7 @@ def run(
         find_query_port: bool,
         gamedig_bin: str,
         gamedig_concurrency: int,
+        expire: bool,
         expired_ttl: int,
         recover: bool,
         add_links: bool,
@@ -68,6 +70,7 @@ def run(
         game,
         platform,
         page_limit,
+        expire,
         expired_ttl,
         recover,
         add_links,
