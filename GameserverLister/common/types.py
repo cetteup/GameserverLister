@@ -17,6 +17,7 @@ class Principal(str, ExtendedEnum):
 class GamespyPrincipal(Principal):
     TripleThreeNetworks_com_1 = '333networks.com-1'
     TripleThreeNetworks_com_2 = '333networks.com-2'
+    B2BF2_net = 'b2bf2.net'
     BF1942_org = 'bf1942.org'
     BF2Hub_com = 'bf2hub.com'
     Crymp_net = 'crymp.net'
