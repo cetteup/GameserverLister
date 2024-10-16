@@ -30,7 +30,6 @@ class GamespyPrincipal(Principal):
     OldUnreal_com_1 = 'oldunreal.com-1'
     OldUnreal_com_2 = 'oldunreal.com-2'
     OpenSpy_net = 'openspy.net'
-    PhoenixNetwork_net = 'phoenixnetwork.net'
     Play2142_ru = 'play2142.ru'
     PlayBF2_ru = 'playbf2.ru'
     Qtracker_com = 'qtracker.com'

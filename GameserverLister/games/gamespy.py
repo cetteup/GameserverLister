@@ -49,9 +49,6 @@ GAMESPY_PRINCIPAL_CONFIGS: Dict[GamespyPrincipal, GamespyPrincipalConfig] = {
     GamespyPrincipal.OpenSpy_net: GamespyPrincipalConfig(
         hostname='{0}.master.openspy.net'
     ),
-    GamespyPrincipal.PhoenixNetwork_net: GamespyPrincipalConfig(
-        hostname='master.phoenixnetwork.net'
-    ),
     GamespyPrincipal.Play2142_ru: GamespyPrincipalConfig(
         hostname='{0}.ms.play2142.ru'
     ),
@@ -105,7 +102,6 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.B2BF2_net,
             GamespyPrincipal.BF2Hub_com,
             GamespyPrincipal.OpenSpy_net,
-            GamespyPrincipal.PhoenixNetwork_net,
             GamespyPrincipal.PlayBF2_ru
         ],
         link_template_refs={
