@@ -108,7 +108,10 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             '_any': ['bf2.tv'],
             GamespyPrincipal.B2BF2_net: ['b2bf2'],
             GamespyPrincipal.BF2Hub_com: ['bf2hub']
-        }
+        },
+        # BF2Hub recently stopped responding to "plain" queries, making info queries a requirement
+        # Luckily, all other providers are compatible with info queries
+        info_query='\\hostname'
     ),
     GamespyGame.FH2: GamespyGameConfig(
         game_name='battlefield2',
