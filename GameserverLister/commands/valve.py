@@ -72,13 +72,14 @@ def run(
 ):
     logging.basicConfig(level=logging.DEBUG if debug else logging.INFO, stream=sys.stdout,
                         format='%(asctime)s %(levelname)-8s %(message)s')
-    logger.info(f'Listing servers for {game} via valve/{principal}')
 
     # Set principal
     available_principals = VALVE_GAME_CONFIGS[game].principals
     if principal not in VALVE_GAME_CONFIGS[game].principals:
         # Given principal is invalid => use default principal
         principal = available_principals[0]
+
+    logger.info(f'Listing servers for {game} via valve/{principal}')
 
     lister = ValveServerLister(
         game,

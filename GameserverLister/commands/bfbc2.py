@@ -41,7 +41,8 @@ def run(
 ):
     logging.basicConfig(level=logging.DEBUG if debug else logging.INFO, stream=sys.stdout,
                         format='%(asctime)s %(levelname)-8s %(message)s')
-    logger.info('Listing servers for bfbc2')
+
+    logger.info('Listing servers for bfbc2 via fesl.cetteup.com')
 
     lister = BadCompany2ServerLister(
         expire,

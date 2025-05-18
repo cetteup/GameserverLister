@@ -36,6 +36,7 @@ def run(
 ):
     logging.basicConfig(level=logging.DEBUG if debug else logging.INFO, stream=sys.stdout,
                         format='%(asctime)s %(levelname)-8s %(message)s')
+
     logger.info(f'Listing servers for {game} via mohaaservers.tk')
 
     lister = MedalOfHonorServerLister(

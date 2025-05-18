@@ -45,13 +45,14 @@ def run(
 ):
     logging.basicConfig(level=logging.DEBUG if debug else logging.INFO, stream=sys.stdout,
                         format='%(asctime)s %(levelname)-8s %(message)s')
-    logger.info(f'Listing servers for {game} via quake3/{principal}')
 
     # Set principal
     available_principals = list(QUAKE3_CONFIGS[game]['servers'].keys())
     if principal.lower() not in available_principals:
         # Given principal is invalid => use default principal
         principal = available_principals[0]
+
+    logger.info(f'Listing servers for {game} via quake3/{principal}')
 
     lister = Quake3ServerLister(
         game,

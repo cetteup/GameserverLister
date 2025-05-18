@@ -92,13 +92,14 @@ def run(
 ):
     logging.basicConfig(level=logging.DEBUG if debug else logging.INFO, stream=sys.stdout,
                         format='%(asctime)s %(levelname)-8s %(message)s')
-    logger.info(f'Listing servers for {game} via gamespy/{principal}')
 
     # Set principal
     available_principals = GAMESPY_GAME_CONFIGS[game].principals
     if principal not in GAMESPY_GAME_CONFIGS[game].principals:
         # Given principal is invalid => use default principal
         principal = available_principals[0]
+
+    logger.info(f'Listing servers for {game} via gamespy/{principal}')
 
     # Determine which provider to use
     if principal is GamespyPrincipal.Crymp_org:
