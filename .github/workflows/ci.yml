@@ -15,7 +15,7 @@ jobs:
     name: lint
     strategy:
       matrix:
-        python-version: [ "3.8", "3.10" ]
+        python-version: [ "3.9", "3.13" ]
         os: [ ubuntu-latest ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -43,7 +43,7 @@ jobs:
     name: unit-test
     strategy:
       matrix:
-        python-version: [ "3.8", "3.10" ]
+        python-version: [ "3.9", "3.13" ]
         os: [ ubuntu-latest ]
     runs-on: ${{ matrix.os }}
     steps:
