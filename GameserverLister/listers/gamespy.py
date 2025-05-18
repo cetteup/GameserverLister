@@ -1,23 +1,22 @@
 import logging
-import os
 import subprocess
-import sys
 from typing import List, Tuple, Optional, Union
 
-from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, guid_from_ip_port, \
-    is_server_for_gamespy_game, resolve_host
-from GameserverLister.common.servers import ClassicServer, ViaStatus
+from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, is_server_for_gamespy_game
+from GameserverLister.common.servers import ClassicServer
 from GameserverLister.common.types import GamespyGame, GamespyPrincipal, GamespyGameConfig, GamespyPlatform
 from GameserverLister.common.weblinks import WebLink, WEB_LINK_TEMPLATES
-from GameserverLister.games.gamespy import GAMESPY_PRINCIPAL_CONFIGS, GAMESPY_GAME_CONFIGS
-from .common import ServerLister
+from GameserverLister.games.gamespy import GAMESPY_GAME_CONFIGS
+from GameserverLister.listers.common import ServerLister
+from GameserverLister.providers import GamespyProvider
 
 
-class GameSpyServerLister(ServerLister):
+class GamespyServerLister(ServerLister):
     game: GamespyGame
     platform: GamespyPlatform
     servers: List[ClassicServer]
     principal: GamespyPrincipal
+    provider: GamespyProvider
     config: GamespyGameConfig
     gslist_bin_path: str
     gslist_filter: str
@@ -30,6 +29,7 @@ class GameSpyServerLister(ServerLister):
             self,
             game: GamespyGame,
             principal: GamespyPrincipal,
+            provider: GamespyProvider,
             gslist_bin_path: str,
             gslist_filter: str,
             gslist_super_query: bool,
@@ -54,7 +54,8 @@ class GameSpyServerLister(ServerLister):
             txt,
             list_dir
         )
-        self.principal = principal.lower()
+        self.principal = principal
+        self.provider = provider
         self.config = GAMESPY_GAME_CONFIGS[self.game]
         self.gslist_bin_path = gslist_bin_path
         self.gslist_filter = gslist_filter
@@ -64,123 +65,54 @@ class GameSpyServerLister(ServerLister):
         self.add_game_port = add_game_port
 
     def update_server_list(self):
-        raw_servers = self.get_servers()
         found_servers = []
-        for ip, query_port in raw_servers:
-            if not is_valid_public_ip(ip) or not is_valid_port(int(query_port)):
-                logging.warning(f'Principal returned invalid server entry ({ip}:{query_port}), skipping it')
+        for server in self.get_servers():
+            if not is_valid_public_ip(server.ip) or not is_valid_port(server.query_port):
+                logging.warning(f'Ignoring invalid server entry ({server.ip}:{server.query_port})')
                 continue
-
-            via = ViaStatus(self.principal)
-            found_server = ClassicServer(
-                guid_from_ip_port(ip, str(query_port)),
-                ip,
-                query_port,
-                via
-            )
 
             if self.verify or self.add_links or self.add_game_port:
                 # Attempt to query server in order to verify is a server for the current game
                 # (some principals return servers for other games than what we queried)
-                logging.debug(f'Querying server {found_server.uid}/{found_server.ip}:{found_server.query_port}')
-                responded, query_response = self.query_server(found_server)
+                logging.debug(f'Querying server {server.uid}/{server.ip}:{server.query_port}')
+                responded, query_response = self.query_server(server)
                 logging.debug(f'Query {"was successful" if responded else "did not receive a response"}')
 
                 if responded:
                     if self.verify and not is_server_for_gamespy_game(self.game, self.config.game_name, query_response):
                         logging.warning(f'Server does not seem to be a {self.game} server, ignoring it '
-                                        f'({found_server.ip}:{found_server.query_port})')
+                                        f'({server.ip}:{server.query_port})')
                         continue
 
                     if self.add_links or self.add_game_port:
                         if query_response.get('hostport', '').isnumeric():
                             game_port = int(query_response['hostport'])
                             if self.add_links:
-                                found_server.add_links(self.build_server_links(
-                                    found_server.uid,
-                                    found_server.ip,
+                                server.add_links(self.build_server_links(
+                                    server.uid,
+                                    server.ip,
                                     game_port
                                 ))
                             if self.add_game_port:
-                                found_server.game_port = game_port
+                                server.game_port = game_port
                         elif 'hostport' in query_response:
                             logging.warning(f'Server returned an invalid hostport (\'{query_response["hostport"]}\', ' 
-                                            f'not adding links/game port ({found_server.ip}:{found_server.query_port})')
+                                            f'not adding links/game port ({server.ip}:{server.query_port})')
 
-            found_servers.append(found_server)
+            found_servers.append(server)
 
         self.add_update_servers(found_servers)
 
-    def get_servers(self) -> List[Tuple[str, int]]:
-        principal = GAMESPY_PRINCIPAL_CONFIGS[self.principal]
-        # Format hostname using game name (following old GameSpy format [game].master.gamespy.com)
-        hostname = principal.hostname.format(self.config.game_name)
-        # Combine game port and principal-specific port offset (defaults to an offset of 0)
-        port = self.config.port + principal.get_port_offset()
-
-        # Manually look up hostname to be able to spread retried across servers
-        ips = resolve_host(hostname)
-        if len(ips) == 0:
-            logging.error(f'DNS lookup for {hostname} failed, exiting')
-            sys.exit(1)
-
-        # Run gslist and capture output
-        command_ok = False
-        tries = 0
-        max_tries = 3
-        gslist_result = None
-        while not command_ok and tries < max_tries:
-            # Alternate between first and last found A record
-            ip = ips[0] if tries % 2 == 0 else ips[-1]
-            try:
-                logging.info(f'Running gslist command against {ip}')
-                command = [self.gslist_bin_path, '-n', self.config.game_name, '-x',
-                           f'{ip}:{port}', '-Y', self.config.game_name, self.config.game_key,
-                           '-t', str(self.config.enc_type), '-f', f'{self.gslist_filter}', '-o', '1']
-                timeout = self.gslist_timeout
-                # Some principals do not respond with the default query list type byte (1),
-                # so we need to explicitly set a different type byte
-                if self.config.list_type is not None:
-                    command.extend(['-T', str(self.config.list_type)])
-                # Some principals do not respond unless an info query is sent (e.g. FH2 principal)
-                if self.config.info_query is not None:
-                    command.extend(['-X', self.config.info_query])
-                # Add super query argument if requested
-                if self.gslist_super_query:
-                    command.extend(['-Q', str(self.config.query_type)])
-                    # Extend timeout to account for server queries
-                    timeout += 10
-                gslist_result = subprocess.run(
-                    command, capture_output=True,
-                    cwd=self.server_list_dir_path, timeout=timeout
-                )
-                command_ok = True
-            except subprocess.TimeoutExpired as e:
-                logging.debug(e)
-                logging.error(f'gslist timed out, try {tries + 1}/{max_tries}')
-                tries += 1
-
-        # Make sure any server were found
-        # (gslist sends all output to stderr so check there)
-        if gslist_result is None or 'servers found' not in str(gslist_result.stderr):
-            logging.error('gslist could not retrieve any servers, exiting')
-            sys.exit(1)
-
-        # Read gslist output file
-        logging.info('Reading gslist output file')
-        with open(os.path.join(self.server_list_dir_path, f'{self.config.game_name}.gsl'), 'r') as gslist_file:
-            raw_server_list = gslist_file.read()
-
-        # Parse server list
-        # List format: [ip-address]:[port]
-        logging.info(f'Parsing server list{" and verifying servers" if self.verify else ""}')
-        servers: List[Tuple[str, int]] = []
-        for line in raw_server_list.splitlines():
-            connect, *_ = line.split(' ', 1)
-            ip, query_port = connect.strip().split(':', 1)
-            servers.append((ip, int(query_port)))
-
-        return servers
+    def get_servers(self) -> List[ClassicServer]:
+        return self.provider.list(
+            self.principal,
+            self.game,
+            self.platform,
+            filter=self.gslist_filter,
+            super_query=self.gslist_super_query,
+            cwd=self.server_list_dir_path,
+            timeout=self.gslist_timeout
+        )
 
     def check_if_server_still_exists(self, server: ClassicServer, checks_since_last_ok: int) -> Tuple[bool, bool, int]:
         # Since we query the server directly, there is no way of handling HTTP server errors differently then

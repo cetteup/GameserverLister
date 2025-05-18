@@ -18,8 +18,8 @@ GAMESPY_PRINCIPAL_CONFIGS: Dict[GamespyPrincipal, GamespyPrincipalConfig] = {
     GamespyPrincipal.BF2Hub_com: GamespyPrincipalConfig(
         hostname='{0}.master.bf2hub.com'
     ),
-    GamespyPrincipal.Crymp_net: GamespyPrincipalConfig(
-        hostname='master.crymp.net'
+    GamespyPrincipal.Crymp_org: GamespyPrincipalConfig(
+        hostname='crymp.org'
     ),
     GamespyPrincipal.Errorist_eu: GamespyPrincipalConfig(
         hostname='master.errorist.eu'
@@ -142,7 +142,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         query_type=8,
         port=28910,
         principals=[
-            GamespyPrincipal.Crymp_net
+            GamespyPrincipal.Crymp_org
         ]
     ),
     GamespyGame.CrysisWars: GamespyGameConfig(

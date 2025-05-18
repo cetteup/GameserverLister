@@ -20,7 +20,7 @@ class GamespyPrincipal(Principal):
     B2BF2_net = 'b2bf2.net'
     BF1942_org = 'bf1942.org'
     BF2Hub_com = 'bf2hub.com'
-    Crymp_net = 'crymp.net'
+    Crymp_org = 'crymp.org'
     Errorist_eu = 'errorist.eu'
     FH2_dev = 'fh2.dev'
     Jedi95_us = 'jedi95.us'

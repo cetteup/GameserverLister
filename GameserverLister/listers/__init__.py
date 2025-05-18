@@ -1,6 +1,6 @@
 from .battlelog import BattlelogServerLister
 from .bfbc2 import BadCompany2ServerLister
-from .gamespy import GameSpyServerLister
+from .gamespy import GamespyServerLister
 from .gametools import GametoolsServerLister
 from .medalofhonor import MedalOfHonorServerLister
 from .quake3 import Quake3ServerLister
@@ -10,7 +10,7 @@ from .valve import ValveServerLister
 __all__ = [
     'BadCompany2ServerLister',
     'BattlelogServerLister',
-    'GameSpyServerLister',
+    'GamespyServerLister',
     'GametoolsServerLister',
     'MedalOfHonorServerLister',
     'Quake3ServerLister',

@@ -7,7 +7,8 @@ from GameserverLister.commands.options import common, gameport
 from GameserverLister.common.logger import logger
 from GameserverLister.common.types import GamespyGame, GamespyPrincipal
 from GameserverLister.games.gamespy import GAMESPY_GAME_CONFIGS
-from GameserverLister.listers import GameSpyServerLister
+from GameserverLister.listers import GamespyServerLister
+from GameserverLister.providers import GamespyListProtocolProvider, CrympAPIProvider
 
 
 @click.command
@@ -30,7 +31,7 @@ from GameserverLister.listers import GameSpyServerLister
     '--gslist',
     'gslist_path',
     type=str,
-    required=True,
+    default='gslist',
     help='Path to gslist binary'
 )
 @click.option(
@@ -99,9 +100,16 @@ def run(
         # Given principal is invalid => use default principal
         principal = available_principals[0]
 
-    lister = GameSpyServerLister(
+    # Determine which provider to use
+    if principal is GamespyPrincipal.Crymp_org:
+        provider = CrympAPIProvider()
+    else:
+        provider = GamespyListProtocolProvider(gslist_path)
+
+    lister = GamespyServerLister(
         game,
         principal,
+        provider,
         gslist_path,
         gslist_filter,
         gslist_super_query,
@@ -117,7 +125,13 @@ def run(
     )
 
     before = len(lister.servers)
-    lister.update_server_list()
+
+    try:
+        lister.update_server_list()
+    except Exception as e:
+        logging.critical(f'Failed to update server list: {e}')
+        sys.exit(1)
+
     removed, recovered = lister.remove_expired_servers()
     lister.write_to_file()
 
