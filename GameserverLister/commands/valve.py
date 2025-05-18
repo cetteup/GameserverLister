@@ -77,6 +77,8 @@ def run(
     available_principals = VALVE_GAME_CONFIGS[game].principals
     if principal not in VALVE_GAME_CONFIGS[game].principals:
         # Given principal is invalid => use default principal
+        logging.warning(f'Principal {principal} is not available for {game}, '
+                        f'defaulting to {available_principals[0]} instead')
         principal = available_principals[0]
 
     logger.info(f'Listing servers for {game} via valve/{principal}')

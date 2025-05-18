@@ -66,6 +66,10 @@ def run(
     available_principals = list(UNREAL2_CONFIGS[game]['servers'].keys())
     if principal.lower() not in available_principals:
         # Given principal is invalid => use default principal
+        logging.warning(
+            f'Principal {principal} is not available for {game}, '
+            f'defaulting to {available_principals[0]} instead'
+            )
         principal = available_principals[0]
 
     logger.info(f'Listing servers for {game} via unreal2/{principal}')
