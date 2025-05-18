@@ -1,4 +1,4 @@
-gevent==24.2.1
+gevent==24.11.1
 nslookup==1.8.1
 requests[socks]==2.32.3
 pyq3serverlist==0.3.2
