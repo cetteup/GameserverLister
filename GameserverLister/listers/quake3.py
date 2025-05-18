@@ -54,14 +54,20 @@ class Quake3ServerLister(ServerLister):
         principal_config = {key: value for (key, value) in QUAKE3_CONFIGS[self.game].items()
                             if key in default_config.keys()}
         self.principal = principal
-        self.keywords, self.game_name, \
-            self.network_protocol, self.server_entry_prefix = {**default_config, **principal_config}.values()
+        # TODO Move network protocol to server
+        self.keywords, self.game_name, self.network_protocol, self.server_entry_prefix = {**default_config, **principal_config}.values()
         self.protocols = QUAKE3_CONFIGS[self.game]['protocols']
 
     def update_server_list(self):
         # Use same connection to principal for all queries
-        hostname, port = QUAKE3_CONFIGS[self.game]['servers'][self.principal].values()
-        principal = pyq3serverlist.PrincipalServer(hostname, port, self.network_protocol)
+        config = QUAKE3_CONFIGS[self.game]['servers'][self.principal]
+        reader = config.get('reader', pyq3serverlist.EOFReader)
+        principal = pyq3serverlist.PrincipalServer(
+            config['hostname'],
+            config['port'],
+            reader=reader(),
+            network_protocol=self.network_protocol
+        )
 
         # Fetch servers for all protocols
         found_servers = []

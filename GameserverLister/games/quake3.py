@@ -1,6 +1,8 @@
 import socket
 from typing import Dict
 
+import pyq3serverlist
+
 from GameserverLister.common.types import Quake3Game
 
 QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
@@ -160,7 +162,8 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
         'servers': {
             'quake3arena.com': {
                 'hostname': 'master.quake3arena.com',
-                'port': 27950
+                'port': 27950,
+                'reader': pyq3serverlist.TimeoutReader
             },
             'urbanterror.info-1': {
                 'hostname': 'master.urbanterror.info',
@@ -199,7 +202,8 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
         'servers': {
             'idsoftware': {
                 'hostname': 'wolfmaster.idsoftware.com',
-                'port': 27950
+                'port': 27950,
+                'reader': pyq3serverlist.TimeoutReader
             }
         }
     },
@@ -255,7 +259,8 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
         'servers': {
             'tremulous.net': {
                 'hostname': 'master.tremulous.net',
-                'port': 30710
+                'port': 30710,
+                'reader': pyq3serverlist.TimeoutReader
             }
         },
         'linkTemplateRefs': {
@@ -313,7 +318,8 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
         'servers': {
             'idsoftware': {
                 'hostname': 'etmaster.idsoftware.com',
-                'port': 27950
+                'port': 27950,
+                'reader': pyq3serverlist.TimeoutReader
             },
             'etlegacy.com': {
                 'hostname': 'master.etlegacy.com',
@@ -321,7 +327,8 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
             },
             'etmaster.net': {
                 'hostname': 'master0.etmaster.net',
-                'port': 27950
+                'port': 27950,
+                'reader': pyq3serverlist.TimeoutReader
             }
         }
     },
