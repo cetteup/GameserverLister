@@ -377,6 +377,11 @@ class BadCompany2Server(FrostbiteServer):
         self.lid = lid
         self.gid = gid
 
+    def update(self, updated: 'BadCompany2Server') -> None:
+        super().update(updated)
+        self.lid = updated.lid
+        self.gid = updated.gid
+
     @staticmethod
     def load(parsed: dict) -> Union['BadCompany2Server', dict]:
         # Will change to own validation in future
