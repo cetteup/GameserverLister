@@ -9,6 +9,9 @@ class ExtendedEnum(Enum):
     def list(cls):
         return list(map(lambda c: c.value, cls))
 
+    def __str__(self):
+        return self.value
+
 
 class Principal(str, ExtendedEnum):
     pass
