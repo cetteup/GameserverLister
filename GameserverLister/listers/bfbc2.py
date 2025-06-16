@@ -1,11 +1,11 @@
 import logging
 import sys
 from random import randint
-from typing import Tuple
+from typing import Tuple, Callable
 
 import requests
 
-from GameserverLister.common.helpers import bfbc2_server_validator, guid_from_ip_port
+from GameserverLister.common.helpers import guid_from_ip_port
 from GameserverLister.common.servers import BadCompany2Server
 from GameserverLister.common.types import TheaterGame, TheaterPlatform
 from .common import FrostbiteServerLister
@@ -37,7 +37,6 @@ class BadCompany2ServerLister(FrostbiteServerLister):
             list_dir,
             timeout
         )
-        self.server_validator = bfbc2_server_validator
 
     def update_server_list(self):
         request_ok = False
@@ -139,3 +138,19 @@ class BadCompany2ServerLister(FrostbiteServerLister):
                         randint(48601, 48605), randint(19567, 48888), randint(game_port, game_port + 29321)]
 
         return ports_to_try
+
+    def get_validator(self) -> Callable[[BadCompany2Server, dict], bool]:
+        def validator(server: BadCompany2Server, parsed_result: dict) -> bool:
+            # Consider server valid if game port matches
+            if parsed_result.get('connect', '').endswith(f':{server.game_port}'):
+                return True
+
+            # Consider server valid if (unique) name matches
+            names = [s.name for s in self.servers if s.name == server.name]
+            if parsed_result.get('name') == server.name and len(names) == 1:
+                return True
+
+            return False
+
+        return validator
+

@@ -1,10 +1,9 @@
 import logging
 from datetime import datetime
-from typing import List, Tuple, Optional, Union
+from typing import List, Tuple, Optional, Union, Callable
 
 import requests
 
-from GameserverLister.common.helpers import battlelog_server_validator
 from GameserverLister.common.servers import FrostbiteServer
 from GameserverLister.common.types import BattlelogGame, BattlelogPlatform
 from GameserverLister.common.weblinks import WEB_LINK_TEMPLATES, WebLink
@@ -45,7 +44,6 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
             sleep,
             max_attempts
         )
-        self.server_validator = battlelog_server_validator
 
         # Set up headers
         self.session.headers = {
@@ -158,3 +156,9 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
                         game_port - 23000]
 
         return ports_to_try
+
+    def get_validator(self) -> Callable[[FrostbiteServer, dict], bool]:
+        def validator(server: FrostbiteServer, parsed_result: dict) -> bool:
+            return parsed_result.get('connect') == f'{server.ip}:{server.game_port}'
+
+        return validator

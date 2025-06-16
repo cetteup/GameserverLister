@@ -10,7 +10,13 @@ from GameserverLister.common.servers import FrostbiteServer, BadCompany2Server
 from GameserverLister.common.types import GamespyGame
 
 
-def find_query_port(gamedig_path: str, game: str, server: FrostbiteServer, ports_to_try: list, validator: Callable) -> int:
+def find_query_port(
+        gamedig_path: str,
+        game: str,
+        server: FrostbiteServer,
+        ports_to_try: list,
+        validator: Callable[[FrostbiteServer, dict], bool]
+) -> int:
     query_port = -1
     for port_to_try in ports_to_try:
         if not is_valid_port(port_to_try):
@@ -37,8 +43,7 @@ def find_query_port(gamedig_path: str, game: str, server: FrostbiteServer, ports
 
         # Stop searching if query was successful and response came from the correct server
         # (some servers run on the same IP, so make sure ip and game_port match)
-        if not parsed_result.get('error', '').startswith('Failed all') and \
-                validator(server, port_to_try, parsed_result):
+        if not parsed_result.get('error', '').startswith('Failed all') and validator(server, parsed_result):
             query_port = port_to_try
             break
 
@@ -73,16 +78,6 @@ def is_valid_public_ip(ip: str) -> bool:
 
 def is_valid_port(port: int) -> bool:
     return 0 < port < 65536
-
-
-def battlelog_server_validator(server: FrostbiteServer, used_query_port: int, parsed_result: dict) -> bool:
-    return parsed_result.get('connect') == f'{server.ip}:{server.game_port}'
-
-
-def bfbc2_server_validator(server: BadCompany2Server, used_query_port: int, parsed_result: dict) -> bool:
-    return battlelog_server_validator(server, used_query_port, parsed_result) or \
-           parsed_result.get('connect') == f'0.0.0.0:{server.game_port}' or \
-           parsed_result.get('name') == server.name
 
 
 def is_server_for_gamespy_game(game: GamespyGame, game_name: str, parsed_result: dict) -> bool:

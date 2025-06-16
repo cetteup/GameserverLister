@@ -184,7 +184,6 @@ class ServerLister:
 
 class FrostbiteServerLister(ServerLister):
     servers: List[FrostbiteServer]
-    server_validator: Callable
 
     def __init__(
             self,
@@ -233,7 +232,7 @@ class FrostbiteServerLister(ServerLister):
             ports_to_try = ports_to_try[:6]
 
             jobs.append(
-                pool.spawn(find_query_port, gamedig_bin_path, self.game, server, ports_to_try, self.server_validator)
+                pool.spawn(find_query_port, gamedig_bin_path, self.game, server, ports_to_try, self.get_validator())
             )
         # Wait for all jobs to complete
         gevent.joinall(jobs)
@@ -256,6 +255,9 @@ class FrostbiteServerLister(ServerLister):
 
     # Function has to be public to overrideable by derived classes
     def build_port_to_try_list(self, game_port: int) -> list:
+        pass
+
+    def get_validator(self) -> Callable[[FrostbiteServer, dict], bool]:
         pass
 
 
