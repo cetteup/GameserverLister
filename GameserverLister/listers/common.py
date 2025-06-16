@@ -4,7 +4,7 @@ import os
 import sys
 import time
 from datetime import datetime, timedelta
-from random import choices
+from random import shuffle
 from typing import Type, List, Tuple, Optional, Union, Callable
 
 import gevent
@@ -214,11 +214,23 @@ class FrostbiteServerLister(ServerLister):
         for server in self.servers:
             ports_to_try = self.build_port_to_try_list(server.game_port)
 
-            # Remove any invalid ports
-            ports_to_try = [p for p in ports_to_try if is_valid_port(p)]
+            # Shuffle all but the first port (which should be the default port)
+            shuffled = ports_to_try[1:]
+            shuffle(shuffled)
+            ports_to_try[1:] = shuffled
 
-            # Get default port (first in list) and 5 random ports from selection
-            ports_to_try = [ports_to_try[0], *choices(ports_to_try[1:], k=5)]
+            # Add current query port at index 0 if valid
+            if server.query_port != -1:
+                ports_to_try.insert(0, server.query_port)
+
+            # Remove any invalid/duplicate ports (not using set() to dedup as it changes the order of elements)
+            ports_to_try = [
+                p for [i, p] in enumerate(ports_to_try)
+                if is_valid_port(p) and i == ports_to_try.index(p)
+            ]
+
+            # Get six candidates from the selection ([current], default, random...)
+            ports_to_try = ports_to_try[:6]
 
             jobs.append(
                 pool.spawn(find_query_port, gamedig_bin_path, self.game, server, ports_to_try, self.server_validator)

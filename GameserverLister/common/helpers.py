@@ -12,12 +12,7 @@ from GameserverLister.common.types import GamespyGame
 
 def find_query_port(gamedig_path: str, game: str, server: FrostbiteServer, ports_to_try: list, validator: Callable) -> int:
     query_port = -1
-
-    # Add current query port add index 0 if valid
-    if server.query_port != -1:
-        ports_to_try.insert(0, server.query_port)
-    # Try all unique ports
-    for port_to_try in list(set(ports_to_try)):
+    for port_to_try in ports_to_try:
         if not is_valid_port(port_to_try):
             logging.warning(f'Skipping query port to try which is outside of valid port range ({port_to_try})')
             continue
