@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from random import randint
 from typing import List, Tuple, Optional, Union, Callable
 
 import requests
@@ -135,27 +136,27 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
         return links
 
     def build_port_to_try_list(self, game_port: int) -> list:
-        """
-                Order of ports to try:
-                1. default query port
-                2. game port + default port offset (mirror gamedig behavior)
-                3. game port (some servers use same port for game + query)
-                4. game port + 100 (nitrado)
-                5. game port + 5 (several hosters)
-                6. 48888 (gamed)
-                7. game port + 50
-                8. game port + 6 (i3D)
-                9. game port + 8 (i3D)
-                10. game port + 15 (i3D)
-                11. game port - 5 (i3D)
-                12. game port - 15 (i3D)
-                13. game port - 23000 (G4G.pl)
-                """
-        ports_to_try = [47200, game_port + 22000, game_port, game_port + 100, game_port + 5, game_port + 1,
-                        48888, game_port + 6, game_port + 8, game_port + 15, game_port - 5, game_port - 15,
-                        game_port - 23000]
-
-        return ports_to_try
+        return [
+            47200,  # default query port
+            game_port + 22000,  # default port offset (mirror gamedig behavior)
+            game_port,  # some servers use the same port for game + query
+            game_port + 100,  # nitrado
+            game_port + 5,  # several hosters
+            game_port + 1,
+            48888,  # gamed
+            game_port + 6,  # i3D
+            game_port + 8,  # i3D
+            game_port + 10,  # Servers.com/4netplayers
+            game_port + 15,  # i3D
+            game_port + 50,
+            game_port - 5,  # i3D
+            game_port - 15,  # i3D
+            game_port - 23000,  # G4G.pl
+            randint(47190, 47210),  # random port around default query port
+            25200 + randint(0, 22000),  # random port between default game port and default query port
+            randint(game_port - 10, game_port + 10),  # random port around default game port
+            game_port + randint(0, 22000),  # random port between game port and game port + default offset
+        ]
 
     def get_validator(self) -> Callable[[FrostbiteServer, dict], bool]:
         def validator(server: FrostbiteServer, parsed_result: dict) -> bool:
