@@ -213,6 +213,12 @@ class FrostbiteServerLister(ServerLister):
         for server in self.servers:
             ports_to_try = self.build_port_to_try_list(server.game_port)
 
+            # Add ports to try based on offsets used by other servers on the same ip
+            for s in self.servers:
+                if s.ip == server.ip and s.game_port != server.game_port and s.query_port != -1:
+                    offset = s.query_port - s.game_port
+                    ports_to_try.insert(1, server.game_port + offset)
+
             # Shuffle all but the first port (which should be the default port)
             shuffled = ports_to_try[1:]
             shuffle(shuffled)

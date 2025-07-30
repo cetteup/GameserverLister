@@ -1,7 +1,7 @@
 import logging
 import sys
 from random import randint
-from typing import Tuple, Callable
+from typing import Tuple, Callable, List
 
 import requests
 
@@ -112,32 +112,28 @@ class BadCompany2ServerLister(FrostbiteServerLister):
 
         return check_ok, found, checks_since_last_ok
 
-    def build_port_to_try_list(self, game_port: int) -> list:
+    def build_port_to_try_list(self, game_port: int) -> List[int]:
         """
         Most Bad Company 2 server seem to be hosted directly by members of the community, resulting in pretty random
         query ports as well as strange/incorrect server configurations. So, try a bunch of ports and validate found
         query ports using the connect property OR the server name
-        Order of ports to try:
-        1. default query port
-        2. game port + default port offset (mirror gamedig behavior)
-        3. game port (some servers use same port for game + query)
-        4. game port + 100 (nitrado)
-        5. game port + 10
-        6. game port + 5 (several hosters)
-        7. game port + 1
-        8. game port + 29233 (i3D.net)
-        9. game port + 29000
-        10. game port + 29323
-        11. random port around default query port
-        12. random port around 48600
-        13. random port between default game port and default query port
-        14. random port between game port and game port + default offset
         """
-        ports_to_try = [48888, game_port + 29321, game_port, game_port + 100, game_port + 10, game_port + 5,
-                        game_port + 1, game_port + 29233, game_port + 29000, game_port + 29323, randint(48880, 48890),
-                        randint(48601, 48605), randint(19567, 48888), randint(game_port, game_port + 29321)]
-
-        return ports_to_try
+        return [
+            48888,  # default query port
+            game_port + 29321,  # game port + default port offset (mirror gamedig behavior)
+            game_port,  # game port (some servers use same port for game + query)
+            game_port + 100,  # game port + 100 (nitrado)
+            game_port + 10,  # game port + 10
+            game_port + 5,  # game port + 5 (several hosters)
+            game_port + 1,  # game port + 1
+            game_port + 29233,  # game port + 29233 (i3D.net)
+            game_port + 29000,  # game port + 29000
+            game_port + 29323,  # game port + 29323
+            randint(48880, 48890),  # random port around default query port
+            randint(48601, 48605),  # random port around 48600
+            randint(19567, 48888),  # random port between default game port and default query port
+            randint(game_port, game_port + 29321)  # random port between game port and game port + default offset
+        ]
 
     def get_validator(self) -> Callable[[BadCompany2Server, dict], bool]:
         def validator(server: BadCompany2Server, parsed_result: dict) -> bool:

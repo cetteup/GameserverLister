@@ -135,7 +135,7 @@ class BattlelogServerLister(HttpServerLister, FrostbiteServerLister):
 
         return links
 
-    def build_port_to_try_list(self, game_port: int) -> list:
+    def build_port_to_try_list(self, game_port: int) -> List[int]:
         return [
             47200,  # default query port
             game_port + 22000,  # default port offset (mirror gamedig behavior)
