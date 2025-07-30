@@ -29,11 +29,11 @@ def find_query_port(
                 *gamedig_path.split(' '),
                 '--type',
                 game,
+                f'{server.ip}:{port_to_try}',
                 '--maxAttempts 2',
                 '--socketTimeout 2000',
                 '--givenPortOnly',
                 '--checkOldIDs',
-                f'{server.ip}:{port_to_try}',
             ],
             capture_output=True
         )
