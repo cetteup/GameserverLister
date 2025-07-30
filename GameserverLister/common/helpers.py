@@ -24,8 +24,17 @@ def find_query_port(
             continue
 
         gamedig_result = gevent.subprocess.run(
-            args=[gamedig_path, '--type', game, f'{server.ip}:{port_to_try}',
-                  '--maxAttempts 2', '--socketTimeout 2000', '--givenPortOnly', '--checkOldIDs'],
+            args=[
+                # split path to allow commands to be passed (e.g. "mise x -- gamedig")
+                *gamedig_path.split(' '),
+                '--type',
+                game,
+                '--maxAttempts 2',
+                '--socketTimeout 2000',
+                '--givenPortOnly',
+                '--checkOldIDs',
+                f'{server.ip}:{port_to_try}',
+            ],
             capture_output=True
         )
 
