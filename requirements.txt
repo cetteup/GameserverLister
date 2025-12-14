@@ -4,4 +4,4 @@ requests[socks]==2.32.5
 pyq3serverlist==0.4.0
 pyut2serverlist==0.2.0
 pyvpsq==0.1.2
-click==8.1.7
+click==8.3.1
