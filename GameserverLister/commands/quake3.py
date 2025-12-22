@@ -4,6 +4,7 @@ import sys
 import click
 
 from GameserverLister.commands.options import common
+from GameserverLister.commands.options.types import EnumChoice
 from GameserverLister.common.logger import logger
 from GameserverLister.common.types import Quake3Game
 from GameserverLister.games.quake3 import QUAKE3_CONFIGS
@@ -14,7 +15,7 @@ from GameserverLister.listers import Quake3ServerLister
 @click.option(
     '-g',
     '--game',
-    type=click.Choice(Quake3Game),
+    type=EnumChoice(Quake3Game),
     required=True,
     help='Game to list servers for'
 )

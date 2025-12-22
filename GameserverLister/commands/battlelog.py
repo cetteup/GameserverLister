@@ -5,6 +5,7 @@ from typing import Optional
 import click
 
 from GameserverLister.commands.options import common, http, queryport
+from GameserverLister.commands.options.types import EnumChoice
 from GameserverLister.common.logger import logger
 from GameserverLister.common.types import BattlelogGame, BattlelogPlatform
 from GameserverLister.listers import BattlelogServerLister
@@ -14,14 +15,14 @@ from GameserverLister.listers import BattlelogServerLister
 @click.option(
     '-g',
     '--game',
-    type=click.Choice(BattlelogGame),
+    type=EnumChoice(BattlelogGame),
     required=True,
     help='Game to list servers for'
 )
 @click.option(
     '-pf',
     '--platform',
-    type=click.Choice(BattlelogPlatform),
+    type=EnumChoice(BattlelogPlatform),
     required=True,
     help='Platform to list servers for',
     default=BattlelogPlatform.PC

@@ -4,6 +4,7 @@ import sys
 import click
 
 from GameserverLister.commands.options import common
+from GameserverLister.commands.options.types import EnumChoice
 from GameserverLister.common.logger import logger
 from GameserverLister.common.types import Unreal2Game
 from GameserverLister.games.unreal2 import UNREAL2_CONFIGS
@@ -14,7 +15,7 @@ from GameserverLister.listers import Unreal2ServerLister
 @click.option(
     '-g',
     '--game',
-    type=click.Choice(Unreal2Game),
+    type=EnumChoice(Unreal2Game),
     required=True,
     help='Game to list servers for'
 )

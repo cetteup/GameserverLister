@@ -4,6 +4,7 @@ import sys
 import click
 
 from GameserverLister.commands.options import common
+from GameserverLister.commands.options.types import EnumChoice
 from GameserverLister.common.logger import logger
 from GameserverLister.common.types import MedalOfHonorGame
 from GameserverLister.listers import MedalOfHonorServerLister
@@ -13,7 +14,7 @@ from GameserverLister.listers import MedalOfHonorServerLister
 @click.option(
     '-g',
     '--game',
-    type=click.Choice(MedalOfHonorGame),
+    type=EnumChoice(MedalOfHonorGame),
     required=True,
     help='Game to list servers for'
 )

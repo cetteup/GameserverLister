@@ -4,6 +4,7 @@ import sys
 import click
 
 from GameserverLister.commands.options import common, gameport
+from GameserverLister.commands.options.types import EnumChoice
 from GameserverLister.common.logger import logger
 from GameserverLister.common.types import GamespyGame, GamespyPrincipal
 from GameserverLister.games.gamespy import GAMESPY_GAME_CONFIGS
@@ -15,14 +16,14 @@ from GameserverLister.providers import GamespyListProtocolProvider, CrympAPIProv
 @click.option(
     '-g',
     '--game',
-    type=click.Choice(GamespyGame),
+    type=EnumChoice(GamespyGame),
     required=True,
     help='Game to list servers for'
 )
 @click.option(
     '-p',
     '--principal',
-    type=click.Choice(GamespyPrincipal),
+    type=EnumChoice(GamespyPrincipal),
     required=True,
     help='Principal server to query'
 )

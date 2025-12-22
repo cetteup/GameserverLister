@@ -4,6 +4,7 @@ import sys
 import click
 
 from GameserverLister.commands.options import common, gameport
+from GameserverLister.commands.options.types import EnumChoice
 from GameserverLister.common.logger import logger
 from GameserverLister.common.types import ValveGame, ValvePrincipal
 from GameserverLister.games.valve import VALVE_GAME_CONFIGS
@@ -14,14 +15,14 @@ from GameserverLister.listers import ValveServerLister
 @click.option(
     '-g',
     '--game',
-    type=click.Choice(ValveGame),
+    type=EnumChoice(ValveGame),
     required=True,
     help='Game to list servers for'
 )
 @click.option(
     '-p',
     '--principal',
-    type=click.Choice(ValvePrincipal),
+    type=EnumChoice(ValvePrincipal),
     default=ValvePrincipal.VALVE,
     help='Principal server to query'
 )

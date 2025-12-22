@@ -4,6 +4,7 @@ import sys
 import click
 
 from GameserverLister.commands.options import common, http
+from GameserverLister.commands.options.types import EnumChoice
 from GameserverLister.common.logger import logger
 from GameserverLister.common.types import GametoolsGame, GametoolsPlatform
 from GameserverLister.listers import GametoolsServerLister
@@ -13,14 +14,14 @@ from GameserverLister.listers import GametoolsServerLister
 @click.option(
     '-g',
     '--game',
-    type=click.Choice(GametoolsGame),
+    type=EnumChoice(GametoolsGame),
     required=True,
     help='Game to list servers for'
 )
 @click.option(
     '-pf',
     '--platform',
-    type=click.Choice(GametoolsPlatform),
+    type=EnumChoice(GametoolsPlatform),
     required=True,
     help='Platform to list servers for',
     default=GametoolsPlatform.PC
