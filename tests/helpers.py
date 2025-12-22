@@ -31,10 +31,14 @@ class IsValidPortTest(unittest.TestCase):
         self.assertFalse(is_valid_port(65536))
 
 
-class GuidTest(unittest.TestCase):
-    def test_guid_from_ip_port(self):
+class GuidFromIpPortTest(unittest.TestCase):
+    def test_normal(self):
         actual = guid_from_ip_port('1.1.1.1', '443')
         self.assertEqual('1f2-1f2-1f2-1f2', actual)
+
+    def test_zero(self):
+        actual = guid_from_ip_port('0.0.0.0', '0')
+        self.assertEqual('0-0-0-0', actual)
 
 
 if __name__ == '__main__':

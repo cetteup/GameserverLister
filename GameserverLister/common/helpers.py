@@ -124,8 +124,9 @@ def is_server_for_gamespy_game(game: GamespyGame, game_name: str, parsed_result:
 
 
 def guid_from_ip_port(ip: str, port: str) -> str:
-    int_port = int(port)
-    guid = '-'.join([f'{int((pow(int(octet) + 2, 2)*pow(int_port, 2))/(int_port*8)):0>x}' for
-                     (index, octet) in enumerate(ip.split('.'))])
-
-    return guid
+    # Avoid division by zero (no server can listen on ports <1, so we aren't causing any conflicts)
+    int_port = max(int(port), 1)
+    return '-'.join([
+        f'{int((pow(int(octet) + 2, 2) * pow(int_port, 2)) / (int_port * 8)):0>x}'
+        for octet in ip.split('.')
+    ])
