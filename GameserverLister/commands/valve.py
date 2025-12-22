@@ -14,14 +14,14 @@ from GameserverLister.listers import ValveServerLister
 @click.option(
     '-g',
     '--game',
-    type=click.Choice(ValveGame, case_sensitive=False),
+    type=click.Choice(ValveGame),
     required=True,
     help='Game to list servers for'
 )
 @click.option(
     '-p',
     '--principal',
-    type=click.Choice(ValvePrincipal, case_sensitive=False),
+    type=click.Choice(ValvePrincipal),
     default=ValvePrincipal.VALVE,
     help='Principal server to query'
 )

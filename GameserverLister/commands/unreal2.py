@@ -14,14 +14,14 @@ from GameserverLister.listers import Unreal2ServerLister
 @click.option(
     '-g',
     '--game',
-    type=click.Choice(Unreal2Game, case_sensitive=False),
+    type=click.Choice(Unreal2Game),
     required=True,
     help='Game to list servers for'
 )
 @click.option(
     '-p',
     '--principal',
-    type=click.Choice([p for g in UNREAL2_CONFIGS for p in UNREAL2_CONFIGS[g]['servers'].keys()], case_sensitive=False),
+    type=click.Choice([p for g in UNREAL2_CONFIGS for p in UNREAL2_CONFIGS[g]['servers'].keys()]),
     required=True,
     help='Principal server to query'
 )
