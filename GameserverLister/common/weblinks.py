@@ -106,6 +106,11 @@ WEB_LINK_TEMPLATES: Dict[str, WebLinkTemplate] = {
         'https://b2bf2.net/server?sid={ip}:{port}',
         True
     ),
+    'bf2.cx': WebLinkTemplate(
+        'bf2.cx',
+        'https://bf2.cx/servers/{ip}:{port}',
+        False
+    ),
     'bf2.tv': WebLinkTemplate(
         'bf2.tv',
         'https://bf2.tv/servers/{ip}:{port}',

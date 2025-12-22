@@ -104,7 +104,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.PlayBF2_ru
         ],
         link_template_refs={
-            '_any': ['bf2.tv'],
+            '_any': ['bf2.cx', 'bf2.tv'],
             GamespyPrincipal.B2BF2_net: ['b2bf2'],
             GamespyPrincipal.BF2Hub_com: ['bf2hub']
         },
