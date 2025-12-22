@@ -26,6 +26,7 @@ class GamespyPrincipal(Principal):
     Crymp_org = 'crymp.org'
     Errorist_eu = 'errorist.eu'
     FH2_dev = 'fh2.dev'
+    Gameppy_com = 'gameppy.com'
     Jedi95_us = 'jedi95.us'
     Newbiesplayground_net = 'newbiesplayground.net'
     NightfirePC_com = 'nightfirepc.com'

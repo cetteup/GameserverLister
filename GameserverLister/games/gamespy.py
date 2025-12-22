@@ -27,6 +27,9 @@ GAMESPY_PRINCIPAL_CONFIGS: Dict[GamespyPrincipal, GamespyPrincipalConfig] = {
     GamespyPrincipal.FH2_dev: GamespyPrincipalConfig(
         hostname='ms.fh2.dev'
     ),
+    GamespyPrincipal.Gameppy_com: GamespyPrincipalConfig(
+        hostname='{0}.master.gameppy.com'
+    ),
     GamespyPrincipal.Jedi95_us: GamespyPrincipalConfig(
         hostname='master.g.jedi95.us'
     ),
@@ -100,6 +103,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         principals=[
             GamespyPrincipal.B2BF2_net,
             GamespyPrincipal.BF2Hub_com,
+            GamespyPrincipal.Gameppy_com,
             GamespyPrincipal.OpenSpy_net,
             GamespyPrincipal.PlayBF2_ru
         ],
