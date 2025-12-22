@@ -13,14 +13,14 @@ from GameserverLister.listers import GametoolsServerLister
 @click.option(
     '-g',
     '--game',
-    type=click.Choice(GametoolsGame),
+    type=click.Choice(GametoolsGame, case_sensitive=False),
     required=True,
     help='Game to list servers for'
 )
 @click.option(
     '-pf',
     '--platform',
-    type=click.Choice(GametoolsPlatform),
+    type=click.Choice(GametoolsPlatform, case_sensitive=False),
     required=True,
     help='Platform to list servers for',
     default=GametoolsPlatform.PC

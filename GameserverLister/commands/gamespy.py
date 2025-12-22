@@ -15,14 +15,14 @@ from GameserverLister.providers import GamespyListProtocolProvider, CrympAPIProv
 @click.option(
     '-g',
     '--game',
-    type=click.Choice(GamespyGame),
+    type=click.Choice(GamespyGame, case_sensitive=False),
     required=True,
     help='Game to list servers for'
 )
 @click.option(
     '-p',
     '--principal',
-    type=click.Choice(GamespyPrincipal),
+    type=click.Choice(GamespyPrincipal, case_sensitive=False),
     required=True,
     help='Principal server to query'
 )

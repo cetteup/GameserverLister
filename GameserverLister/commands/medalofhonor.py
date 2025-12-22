@@ -13,7 +13,7 @@ from GameserverLister.listers import MedalOfHonorServerLister
 @click.option(
     '-g',
     '--game',
-    type=click.Choice(MedalOfHonorGame),
+    type=click.Choice(MedalOfHonorGame, case_sensitive=False),
     required=True,
     help='Game to list servers for'
 )

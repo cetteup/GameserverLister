@@ -14,14 +14,14 @@ from GameserverLister.listers import BattlelogServerLister
 @click.option(
     '-g',
     '--game',
-    type=click.Choice(BattlelogGame),
+    type=click.Choice(BattlelogGame, case_sensitive=False),
     required=True,
     help='Game to list servers for'
 )
 @click.option(
     '-pf',
     '--platform',
-    type=click.Choice(BattlelogPlatform),
+    type=click.Choice(BattlelogPlatform, case_sensitive=False),
     required=True,
     help='Platform to list servers for',
     default=BattlelogPlatform.PC
