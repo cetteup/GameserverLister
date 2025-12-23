@@ -79,6 +79,8 @@ class GamespyGame(Game):
     DukeNukemForever = 'dnf'
     JBNightfire = 'jbnightfire'
     MOHAA = 'mohaa'
+    MOHAAB = 'mohaab'
+    MOHAAS = 'mohaas'
     Paraworld = 'paraworld'
     Postal2 = 'postal2'
     Rune = 'rune'
@@ -114,13 +116,6 @@ class Quake3Game(Game):
     Warsow = 'warsow'
     WolfensteinET = 'wolfensteinet'
     Xonotic = 'xonotic'
-
-
-class MedalOfHonorGame(Game):
-    AA = 'mohaa'
-    BT = 'mohbt'
-    PA = 'mohpa'
-    SH = 'mohsh'
 
 
 class Unreal2Game(Game):

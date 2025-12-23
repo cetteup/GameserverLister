@@ -208,6 +208,34 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.Qtracker_com
         ]
     ),
+    GamespyGame.MOHAAB: GamespyGameConfig(
+        game_name='mohaab',
+        game_key='y32FDc',
+        enc_type=0,
+        query_type=0,
+        port=28900,
+        principals=[
+            GamespyPrincipal.TripleThreeNetworks_com_1,
+            GamespyPrincipal.Errorist_eu,
+            GamespyPrincipal.Newbiesplayground_net,
+            GamespyPrincipal.OpenSpy_net,
+            GamespyPrincipal.Qtracker_com
+        ]
+    ),
+    GamespyGame.MOHAAS: GamespyGameConfig(
+        game_name='mohaas',
+        game_key='h2P1c9',
+        enc_type=0,
+        query_type=0,
+        port=28900,
+        principals=[
+            GamespyPrincipal.TripleThreeNetworks_com_1,
+            GamespyPrincipal.Errorist_eu,
+            GamespyPrincipal.Newbiesplayground_net,
+            GamespyPrincipal.OpenSpy_net,
+            GamespyPrincipal.Qtracker_com
+        ]
+    ),
     GamespyGame.Paraworld: GamespyGameConfig(
         game_name='paraworld',
         game_key='EUZpQF',
