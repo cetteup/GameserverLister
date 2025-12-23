@@ -78,6 +78,7 @@ class GamespyGame(Game):
     DeusEx = 'deusex'
     DukeNukemForever = 'dnf'
     JBNightfire = 'jbnightfire'
+    MOHAA = 'mohaa'
     Paraworld = 'paraworld'
     Postal2 = 'postal2'
     Rune = 'rune'

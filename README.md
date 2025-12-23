@@ -43,7 +43,6 @@ Commands:
   bfbc2
   gamespy
   gametools
-  medalofhonor
   quake3
   unreal2
   valve
@@ -99,6 +98,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Left 4 Dead                            | PC                               | Valve                | Valve ¹                                                                                                           |
 | Left 4 Dead 2                          | PC                               | Valve                | Valve ¹                                                                                                           |
 | Nexuiz                                 | PC                               | Quake3               | deathmask.net                                                                                                     |
+| Medal of Honor: Allied Assault         | PC                               | GameSpy              | 333networks.com, errorist.eu, newbiesplayground.net, openspy.net, qtracker.com                                    |
 | OpenArena                              | PC                               | Quake3               | deathmask.net                                                                                                     |
 | ParaWorld                              | PC                               | GameSpy              | openspy.net                                                                                                       |
 | Postal 2                               | PC                               | GameSpy              | 333networks.com                                                                                                   |

@@ -70,6 +70,7 @@ GAMESPY_PRINCIPAL_CONFIGS: Dict[GamespyPrincipal, GamespyPrincipalConfig] = {
         hostname='vietcong1.eu'
     )
 }
+
 GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
     GamespyGame.BF1942: GamespyGameConfig(
         game_name='bfield1942',
@@ -191,6 +192,20 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         principals=[
             GamespyPrincipal.OpenSpy_net,
             GamespyPrincipal.NightfirePC_com
+        ]
+    ),
+    GamespyGame.MOHAA: GamespyGameConfig(
+        game_name='mohaa',
+        game_key='M5Fdwc',
+        enc_type=0,
+        query_type=0,
+        port=28900,
+        principals=[
+            GamespyPrincipal.TripleThreeNetworks_com_1,
+            GamespyPrincipal.Errorist_eu,
+            GamespyPrincipal.Newbiesplayground_net,
+            GamespyPrincipal.OpenSpy_net,
+            GamespyPrincipal.Qtracker_com
         ]
     ),
     GamespyGame.Paraworld: GamespyGameConfig(
