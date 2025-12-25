@@ -185,10 +185,6 @@ QUAKE3_CONFIGS: Dict[Quake3Game, dict] = {
                 'hostname': 'master.huxxer.de',
                 'port': 27950
             },
-            'maverickservers.com': {
-                'hostname': 'master.maverickservers.com',
-                'port': 27950
-            },
             'deathmask.net': {
                 'hostname': 'dpmaster.deathmask.net',
                 'port': 27950
