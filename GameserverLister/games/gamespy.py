@@ -39,11 +39,8 @@ GAMESPY_PRINCIPAL_CONFIGS: Dict[GamespyPrincipal, GamespyPrincipalConfig] = {
     GamespyPrincipal.NovGames_ru: GamespyPrincipalConfig(
         hostname='2142.novgames.ru'
     ),
-    GamespyPrincipal.OldUnreal_com_1: GamespyPrincipalConfig(
+    GamespyPrincipal.OldUnreal_com: GamespyPrincipalConfig(
         hostname='master.oldunreal.com'
-    ),
-    GamespyPrincipal.OldUnreal_com_2: GamespyPrincipalConfig(
-        hostname='master2.oldunreal.com'
     ),
     GamespyPrincipal.OpenSpy_net: GamespyPrincipalConfig(
         hostname='{0}.master.openspy.net'
@@ -167,7 +164,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.TripleThreeNetworks_com,
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.Newbiesplayground_net,
-            GamespyPrincipal.OldUnreal_com_1
+            GamespyPrincipal.OldUnreal_com
         ]
     ),
     GamespyGame.DukeNukemForever: GamespyGameConfig(
@@ -263,7 +260,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.TripleThreeNetworks_com,
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.Newbiesplayground_net,
-            GamespyPrincipal.OldUnreal_com_1
+            GamespyPrincipal.OldUnreal_com
         ]
     ),
     GamespyGame.SeriousSam: GamespyGameConfig(
@@ -276,7 +273,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.TripleThreeNetworks_com,
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.Newbiesplayground_net,
-            GamespyPrincipal.OldUnreal_com_1
+            GamespyPrincipal.OldUnreal_com
         ]
     ),
     GamespyGame.SeriousSamSE: GamespyGameConfig(
@@ -289,7 +286,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.TripleThreeNetworks_com,
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.Newbiesplayground_net,
-            GamespyPrincipal.OldUnreal_com_1
+            GamespyPrincipal.OldUnreal_com
         ]
     ),
     GamespyGame.SWAT4: GamespyGameConfig(
@@ -314,7 +311,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         port=28900,
         principals=[
             GamespyPrincipal.TripleThreeNetworks_com,
-            GamespyPrincipal.OldUnreal_com_1,
+            GamespyPrincipal.OldUnreal_com,
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.OpenSpy_net,
             GamespyPrincipal.Qtracker_com
@@ -328,7 +325,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         port=28900,
         principals=[
             GamespyPrincipal.TripleThreeNetworks_com,
-            GamespyPrincipal.OldUnreal_com_1,
+            GamespyPrincipal.OldUnreal_com,
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.OpenSpy_net,
             GamespyPrincipal.Qtracker_com
@@ -376,7 +373,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
             GamespyPrincipal.TripleThreeNetworks_com,
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.Newbiesplayground_net,
-            GamespyPrincipal.OldUnreal_com_1
+            GamespyPrincipal.OldUnreal_com
         ]
     ),
 }
