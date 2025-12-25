@@ -3,11 +3,8 @@ from typing import Dict
 from GameserverLister.common.types import GamespyPrincipal, GamespyPrincipalConfig, GamespyGame, GamespyGameConfig
 
 GAMESPY_PRINCIPAL_CONFIGS: Dict[GamespyPrincipal, GamespyPrincipalConfig] = {
-    GamespyPrincipal.TripleThreeNetworks_com_1: GamespyPrincipalConfig(
+    GamespyPrincipal.TripleThreeNetworks_com: GamespyPrincipalConfig(
         hostname='master.333networks.com'
-    ),
-    GamespyPrincipal.TripleThreeNetworks_com_2: GamespyPrincipalConfig(
-        hostname='rhea.333networks.com'
     ),
     GamespyPrincipal.B2BF2_net: GamespyPrincipalConfig(
         hostname='gsapi.b2bf2.net'
@@ -167,7 +164,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         query_type=0,
         port=28900,
         principals=[
-            GamespyPrincipal.TripleThreeNetworks_com_1,
+            GamespyPrincipal.TripleThreeNetworks_com,
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.Newbiesplayground_net,
             GamespyPrincipal.OldUnreal_com_1
@@ -180,7 +177,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         query_type=0,
         port=28900,
         principals=[
-            GamespyPrincipal.TripleThreeNetworks_com_1
+            GamespyPrincipal.TripleThreeNetworks_com
         ]
     ),
     GamespyGame.JBNightfire: GamespyGameConfig(
@@ -201,7 +198,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         query_type=0,
         port=28900,
         principals=[
-            GamespyPrincipal.TripleThreeNetworks_com_1,
+            GamespyPrincipal.TripleThreeNetworks_com,
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.Newbiesplayground_net,
             GamespyPrincipal.OpenSpy_net,
@@ -215,7 +212,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         query_type=0,
         port=28900,
         principals=[
-            GamespyPrincipal.TripleThreeNetworks_com_1,
+            GamespyPrincipal.TripleThreeNetworks_com,
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.Newbiesplayground_net,
             GamespyPrincipal.OpenSpy_net,
@@ -229,7 +226,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         query_type=0,
         port=28900,
         principals=[
-            GamespyPrincipal.TripleThreeNetworks_com_1,
+            GamespyPrincipal.TripleThreeNetworks_com,
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.Newbiesplayground_net,
             GamespyPrincipal.OpenSpy_net,
@@ -253,7 +250,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         query_type=0,
         port=28900,
         principals=[
-            GamespyPrincipal.TripleThreeNetworks_com_1
+            GamespyPrincipal.TripleThreeNetworks_com
         ]
     ),
     GamespyGame.Rune: GamespyGameConfig(
@@ -263,7 +260,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         query_type=0,
         port=28900,
         principals=[
-            GamespyPrincipal.TripleThreeNetworks_com_1,
+            GamespyPrincipal.TripleThreeNetworks_com,
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.Newbiesplayground_net,
             GamespyPrincipal.OldUnreal_com_1
@@ -276,7 +273,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         query_type=0,
         port=28900,
         principals=[
-            GamespyPrincipal.TripleThreeNetworks_com_1,
+            GamespyPrincipal.TripleThreeNetworks_com,
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.Newbiesplayground_net,
             GamespyPrincipal.OldUnreal_com_1
@@ -289,7 +286,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         query_type=0,
         port=28900,
         principals=[
-            GamespyPrincipal.TripleThreeNetworks_com_1,
+            GamespyPrincipal.TripleThreeNetworks_com,
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.Newbiesplayground_net,
             GamespyPrincipal.OldUnreal_com_1
@@ -316,7 +313,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         query_type=0,
         port=28900,
         principals=[
-            GamespyPrincipal.TripleThreeNetworks_com_1,
+            GamespyPrincipal.TripleThreeNetworks_com,
             GamespyPrincipal.OldUnreal_com_1,
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.OpenSpy_net,
@@ -330,7 +327,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         query_type=0,
         port=28900,
         principals=[
-            GamespyPrincipal.TripleThreeNetworks_com_1,
+            GamespyPrincipal.TripleThreeNetworks_com,
             GamespyPrincipal.OldUnreal_com_1,
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.OpenSpy_net,
@@ -376,7 +373,7 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         query_type=0,
         port=28900,
         principals=[
-            GamespyPrincipal.TripleThreeNetworks_com_1,
+            GamespyPrincipal.TripleThreeNetworks_com,
             GamespyPrincipal.Errorist_eu,
             GamespyPrincipal.Newbiesplayground_net,
             GamespyPrincipal.OldUnreal_com_1
