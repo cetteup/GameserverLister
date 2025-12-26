@@ -1,6 +1,7 @@
 import ipaddress
 import json
 import logging
+import re
 from typing import Callable, List
 
 import gevent.subprocess
@@ -8,6 +9,9 @@ from nslookup import Nslookup
 
 from GameserverLister.common.servers import FrostbiteServer, BadCompany2Server
 from GameserverLister.common.types import GamespyGame
+
+
+SWAT4_GAME_VARIANT_REGEX = re.compile(r'^SWAT 4(?:X| REMAKE \d+\.\d+)?|FR(?:TE|&BFHLR)?|SEF$')
 
 
 def find_query_port(
@@ -115,7 +119,7 @@ def is_server_for_gamespy_game(game: GamespyGame, game_name: str, parsed_result:
         return parsed_result.get('gamename') == game_name and parsed_result.get('gamevariant') == 'fh2'
     elif game is GamespyGame.SWAT4:
         # SWAT 4 has a very limited set of keys, so we need to look at values
-        return parsed_result.get('gamevariant') in ['SWAT 4', 'SWAT 4X', 'SEF', 'FR', 'FRTE']
+        return SWAT4_GAME_VARIANT_REGEX.match(parsed_result.get('gamevariant', '')) is not None
     elif game is GamespyGame.UT3:
         # UT3 has some *very* unique keys, see https://github.com/gamedig/node-gamedig/blob/master/protocols/ut3.js#L7
         return 'p1073741825' in parsed_result and 'p1073741826' in parsed_result
