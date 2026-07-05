@@ -200,11 +200,9 @@ class FrostbiteServerLister(ServerLister):
     def find_query_ports(self, gamedig_bin_path: str, gamedig_concurrency: int, expired_ttl: float):
         logging.info(f'Searching query port for {len(self.servers)} servers')
 
-        search_stats = {
-            'totalSearches': len(self.servers),
-            'queryPortFound': 0,
-            'queryPortReset': 0
-        }
+        found = 0
+        reset = 0
+
         pool = Pool(gamedig_concurrency)
         jobs = []
         for server in self.servers:
@@ -246,15 +244,16 @@ class FrostbiteServerLister(ServerLister):
                 logging.debug(f'Query port found ({job.value}), updating server')
                 server.query_port = job.value
                 server.last_queried_at = datetime.now().astimezone()
-                search_stats['queryPortFound'] += 1
+                found += 1
             elif server.query_port != -1 and \
                     (server.last_queried_at is None or
                      datetime.now().astimezone() > server.last_queried_at + timedelta(hours=expired_ttl)):
                 logging.debug(f'Query port expired, resetting to -1 (was {server.query_port})')
                 server.query_port = -1
                 # TODO Reset last queried at here?
-                search_stats['queryPortReset'] += 1
-        logging.info(f'Query port search stats: {search_stats}')
+                reset += 1
+
+        logging.info(f'Query ports updated (total: {len(self.servers)}, found: {found}, reset: {reset})')
 
     # Function has to be public to overrideable by derived classes
     def build_port_to_try_list(self, game_port: int) -> list:
