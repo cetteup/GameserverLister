@@ -78,7 +78,7 @@ class ServerLister:
         if os.path.isfile(self.server_list_file_path):
             try:
                 with open(self.server_list_file_path, 'r') as serverListFile:
-                    logging.info('Loading existing server list')
+                    logging.debug('Loading existing server list')
                     self.servers = json.load(serverListFile, object_hook=self.server_class.load)
             except IOError as e:
                 logging.error(f'Failed to read existing server list file: {e}')
@@ -109,7 +109,7 @@ class ServerLister:
     def remove_expired_servers(self) -> tuple:
         # Skip removal if expiration is disabled
         if not self.expire:
-            logging.info('Skipping expiration ttl check')
+            logging.debug('Skipping expiration ttl check')
             return 0, 0
 
         # Iterate over copy of server list and remove any expired servers from the (actual) server list
@@ -169,7 +169,7 @@ class ServerLister:
         return os.path.join(self.server_list_dir_path, f'{self.game}-servers-{self.platform}.{extension}')
 
     def write_to_file(self):
-        logging.info(f'Writing {len(self.servers)} servers to output file')
+        logging.debug(f'Writing {len(self.servers)} servers to output file')
         with open(self.server_list_file_path, 'w') as output_file:
             json.dump(self.servers, output_file, indent=2, ensure_ascii=self.ensure_ascii, cls=ObjectJSONEncoder)
 
@@ -316,7 +316,7 @@ class HttpServerLister(ServerLister):
         no servers have been found in [args.page_limit] "pages".
         """
         found_servers = []
-        logging.info('Starting server list retrieval')
+        logging.debug('Starting server list retrieval')
         while pages_since_last_unique_server < self.page_limit and attempt < self.max_attempts:
             # Sleep when requesting anything but offset 0 (use increased sleep when retrying)
             if offset > 0:
@@ -343,10 +343,10 @@ class HttpServerLister(ServerLister):
                 found_servers = self.add_page_found_servers(found_servers, parsed)
                 if len(found_servers) == server_total_before:
                     pages_since_last_unique_server += 1
-                    logging.info(f'Got nothing but duplicates (page: {int(offset / self.per_page)},'
+                    logging.debug(f'Got nothing but duplicates (page: {int(offset / self.per_page)},'
                                  f' pages since last unique: {pages_since_last_unique_server})')
                 else:
-                    logging.info(f'Got {len(found_servers) - server_total_before} new servers')
+                    logging.debug(f'Got {len(found_servers) - server_total_before} new servers')
                     # Found new unique server, reset
                     pages_since_last_unique_server = 0
                 offset += self.per_page
