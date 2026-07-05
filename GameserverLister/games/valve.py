@@ -123,6 +123,13 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
             ValvePrincipal.VALVE
         ]
     ),
+    ValveGame.Mordhau: ValveGameConfig(
+        app_id=629760,
+        principals=[
+            ValvePrincipal.VALVE
+        ],
+        distinct_query_port=True
+    ),
     ValveGame.RS2: ValveGameConfig(
         app_id=418460,
         principals=[

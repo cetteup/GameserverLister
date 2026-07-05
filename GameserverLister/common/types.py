@@ -139,6 +139,7 @@ class ValveGame(Game):
     InsurgencySandstorm = 'insurgency-sandstorm'
     Left4Dead = 'left4dead'
     Left4Dead2 = 'left4dead2'
+    Mordhau = 'mordhau'
     RS2 = 'rs2'
     Rust = 'rust'
     SevenD2D = '7d2d'

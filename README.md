@@ -102,6 +102,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Medal of Honor: Allied Assault              | PC                | GameSpy              | 333networks.com, errorist.eu, newbiesplayground.net, openspy.net, qtracker.com               |
 | Medal of Honor: Allied Assault Breakthrough | PC                | GameSpy              | 333networks.com, errorist.eu, newbiesplayground.net, openspy.net, qtracker.com               |
 | Medal of Honor: Allied Assault Spearhead    | PC                | GameSpy              | 333networks.com, errorist.eu, newbiesplayground.net, openspy.net, qtracker.com               |
+| Mordhau                                     | PC                | Valve                | Valve ¹                                                                                      |
 | OpenArena                                   | PC                | Quake3               | deathmask.net                                                                                |
 | ParaWorld                                   | PC                | GameSpy              | openspy.net                                                                                  |
 | Postal 2                                    | PC                | GameSpy              | 333networks.com                                                                              |
