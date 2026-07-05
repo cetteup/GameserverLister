@@ -125,6 +125,7 @@ class ValveGame(Game):
     ARKSurvivalEvolved = 'arkse'
     Arma2 = 'arma2'
     Arma3 = 'arma3'
+    Contagion = 'Contagion'
     CounterStrike  = 'cs'
     CounterStrikeConditionZero = 'cscz'
     CounterStrikeSource = 'css'

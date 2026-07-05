@@ -36,6 +36,12 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
         ],
         distinct_query_port=True
     ),
+    ValveGame.Contagion: ValveGameConfig(
+        app_id=238430,
+        principals=[
+            ValvePrincipal.VALVE
+        ]
+    ),
     ValveGame.CounterStrike: ValveGameConfig(
         app_id=10,
         principals=[
