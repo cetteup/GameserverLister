@@ -158,6 +158,11 @@ class CrympAPIProvider(GamespyProvider):
 
         servers: List[ClassicServer] = []
         for server in resp.json():
+            # Not all servers have the GameSpy port set
+            # see https://github.com/crymp-net/master-server-v2/blob/3f6c29dc271acabd6a9126a2e0772c0bb8ba458f/web_api.lua#L140
+            if 'gamespy_port' not in server:
+                continue
+
             servers.append(
                 ClassicServer(
                     guid_from_ip_port(server['ip'], str(server['gamespy_port'])),
