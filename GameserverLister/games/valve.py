@@ -159,5 +159,12 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
         principals=[
             ValvePrincipal.VALVE
         ]
+    ),
+    ValveGame.Valheim: ValveGameConfig(
+        app_id=892970,
+        principals=[
+            ValvePrincipal.VALVE
+        ],
+        distinct_query_port=True
     )
 }

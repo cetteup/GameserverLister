@@ -128,6 +128,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Unreal Tournament 2004                      | PC                | Unreal2              | openspy.net, 333networks.com, errorist.eu                                                    |
 | Unreal Tournament 3                         | PC                | GameSpy              | openspy.net                                                                                  |
 | UrbanTerror                                 | PC                | Quake3               | FrozenSand                                                                                   |
+| Valheim                                     | PC                | Valve                | Valve ¹                                                                                      |
 | Vietcong                                    | PC                | GameSpy              | vietcong.tk, vietcong1.eu, qtracker.com                                                      |
 | Vietcong 2                                  | PC                | GameSpy              | openspy.net                                                                                  |
 | Warfork                                     | PC                | Quake3               | deathmask.net                                                                                |

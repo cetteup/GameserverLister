@@ -145,6 +145,7 @@ class ValveGame(Game):
     Squad = 'squad'
     TFC = 'tfc'
     TF2 = 'tf2'
+    Valheim = 'valheim'
 
 
 class TheaterGame(Game):
