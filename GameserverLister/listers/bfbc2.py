@@ -45,7 +45,6 @@ class BadCompany2ServerLister(FrostbiteServerLister):
         servers = None
         while not request_ok and attempt < max_attempts:
             try:
-                logging.info('Fetching server list from Project Rome API')
                 resp = self.session.get('https://fesl.cetteup.com/v1/bfbc2/servers/rome-pc', timeout=self.request_timeout)
 
                 if resp.ok:
