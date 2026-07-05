@@ -6,9 +6,6 @@ GAMESPY_PRINCIPAL_CONFIGS: Dict[GamespyPrincipal, GamespyPrincipalConfig] = {
     GamespyPrincipal.TripleThreeNetworks_com: GamespyPrincipalConfig(
         hostname='master.333networks.com'
     ),
-    GamespyPrincipal.B2BF2_net: GamespyPrincipalConfig(
-        hostname='gsapi.b2bf2.net'
-    ),
     GamespyPrincipal.BF1942_org: GamespyPrincipalConfig(
         hostname='master.bf1942.org'
     ),
@@ -96,7 +93,6 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         query_type=8,
         port=28910,
         principals=[
-            GamespyPrincipal.B2BF2_net,
             GamespyPrincipal.BF2Hub_com,
             GamespyPrincipal.Gameppy_com,
             GamespyPrincipal.OpenSpy_net,
@@ -104,7 +100,6 @@ GAMESPY_GAME_CONFIGS: Dict[GamespyGame, GamespyGameConfig] = {
         ],
         link_template_refs={
             '_any': ['bf2.cx', 'bf2.tv'],
-            GamespyPrincipal.B2BF2_net: ['b2bf2'],
             GamespyPrincipal.BF2Hub_com: ['bf2hub']
         },
         # BF2Hub recently stopped responding to "plain" queries, making info queries a requirement

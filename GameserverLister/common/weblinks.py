@@ -101,11 +101,6 @@ WEB_LINK_TEMPLATES: Dict[str, WebLinkTemplate] = {
         'https://battlelog.battlefield.com/{game}/servers/show/{platform}/{uid}',
         True
     ),
-    'b2bf2': WebLinkTemplate(
-        'b2bf2.net',
-        'https://b2bf2.net/server?sid={ip}:{port}',
-        True
-    ),
     'bf2.cx': WebLinkTemplate(
         'bf2.cx',
         'https://bf2.cx/servers/{ip}:{port}',
