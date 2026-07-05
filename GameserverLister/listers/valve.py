@@ -3,11 +3,12 @@ from typing import List, Tuple, Optional
 
 import pyvpsq
 
-from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port, guid_from_ip_port
-from GameserverLister.common.servers import ClassicServer, ViaStatus
+from GameserverLister.common.helpers import is_valid_public_ip, is_valid_port
+from GameserverLister.common.servers import ClassicServer
 from GameserverLister.common.types import ValveGame, ValvePrincipal, ValveGameConfig, ValvePlatform
-from GameserverLister.games.valve import VALVE_PRINCIPAL_CONFIGS, VALVE_GAME_CONFIGS
+from GameserverLister.games.valve import VALVE_GAME_CONFIGS
 from GameserverLister.listers.common import ServerLister
+from GameserverLister.providers.valve import ValveProvider
 
 
 class ValveServerLister(ServerLister):
@@ -15,6 +16,7 @@ class ValveServerLister(ServerLister):
     platform: ValvePlatform
     servers: List[ClassicServer]
     principal: ValvePrincipal
+    provider: ValveProvider
     config: ValveGameConfig
 
     principal_timeout: float
@@ -27,6 +29,7 @@ class ValveServerLister(ServerLister):
             self,
             game: ValveGame,
             principal: ValvePrincipal,
+            provider: ValveProvider,
             principal_timeout: float,
             filters: str,
             max_pages: int,
@@ -50,6 +53,7 @@ class ValveServerLister(ServerLister):
             list_dir
         )
         self.principal = principal
+        self.provider = provider
         self.config = VALVE_GAME_CONFIGS[self.game]
         self.principal_timeout = principal_timeout
         self.filters = filters
@@ -57,66 +61,40 @@ class ValveServerLister(ServerLister):
         self.add_game_port = add_game_port
 
     def update_server_list(self):
-        principal_config = VALVE_PRINCIPAL_CONFIGS[self.principal]
-        principal = pyvpsq.PrincipalServer(
-            principal_config.hostname,
-            principal_config.port,
-            timeout=self.principal_timeout
-        )
-
         found_servers = []
         # Try to reduce the consecutive number of requests by iterating over regions
         for region in pyvpsq.Region:
-            for raw_server in self.get_servers(principal, self.config.app_id, region, self.filters, self.max_pages):
-                if not is_valid_public_ip(raw_server.ip) or not is_valid_port(raw_server.query_port):
-                    logging.warning(
-                        f'Principal returned invalid server entry '
-                        f'({raw_server.ip}:{raw_server.query_port}), skipping it'
-                    )
+            for server in self.get_servers(region):
+                if not is_valid_public_ip(server.ip) or not is_valid_port(server.query_port):
+                    logging.warning(f'Ignoring invalid server entry ({server.ip}:{server.query_port})')
                     continue
 
-                via = ViaStatus(self.principal)
-                found_server = ClassicServer(
-                    guid_from_ip_port(raw_server.ip, str(raw_server.query_port)),
-                    raw_server.ip,
-                    raw_server.query_port,
-                    via
-                )
-
-                if found_server not in found_servers:
+                if server not in found_servers:
                     if self.add_links or self.add_game_port:
-                        game_port = self.get_server_game_port(found_server)
+                        game_port = self.get_server_game_port(server)
                         if game_port is not None:
                             if self.add_links:
-                                found_server.add_links(self.build_server_links(
-                                    found_server.uid,
-                                    found_server.ip,
+                                server.add_links(self.build_server_links(
+                                    server.uid,
+                                    server.ip,
                                     game_port
                                 ))
                             if self.add_game_port:
-                                found_server.game_port = game_port
-                    found_servers.append(found_server)
+                                server.game_port = game_port
+                    found_servers.append(server)
 
         self.add_update_servers(found_servers)
 
-    @staticmethod
-    def get_servers(
-            principal: pyvpsq.PrincipalServer,
-            app_id: int,
-            region: pyvpsq.Region,
-            filters: str,
-            max_pages: int
-    ) -> List[pyvpsq.Server]:
-        servers = []
-        try:
-            for server in principal.get_servers(fr'\appid\{app_id}{filters}', region, max_pages):
-                servers.append(server)
-        except pyvpsq.TimeoutError:
-            logging.error('Principal server query timed out')
-        except pyvpsq.Error as e:
-            logging.error(f'Failed to query principal server: {e}')
+    def get_servers(self, region: int) -> List[ClassicServer]:
+        return self.provider.list(
+            self.principal,
+            self.game,
+            self.platform,
+            filters=self.filters,
+            region=region,
+            timeout=self.principal_timeout,
+        )
 
-        return servers
 
     def get_server_game_port(self, server: ClassicServer) -> Optional[int]:
         if not self.config.distinct_query_port:
