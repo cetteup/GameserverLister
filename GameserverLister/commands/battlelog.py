@@ -62,7 +62,8 @@ def run(
     logging.basicConfig(level=logging.DEBUG if debug else logging.INFO, stream=sys.stdout,
                         format='%(asctime)s %(levelname)-8s %(message)s')
 
-    if game is BattlelogGame.BF3 and platform is not BattlelogPlatform.PC:
+    # Both BF3 and BFH only remain playable on PC (console servers have been shut down)
+    if game in [BattlelogGame.BF3, BattlelogGame.BFH] and platform is not BattlelogPlatform.PC:
         logger.warning(f'Platform {platform} is not available for {game}, defaulting to {BattlelogPlatform.PC} instead')
         platform = BattlelogPlatform.PC
 

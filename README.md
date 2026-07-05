@@ -70,7 +70,7 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Battlefield: Bad Company 2                  | PC                | fesl/theater         | Project Rome (emulatornexus.com)                                                             |
 | Battlefield 3                               | PC                | Battlelog            | battlelog.com                                                                                |
 | Battlefield 4                               | PC, PS4, Xbox One | Battlelog            | battlelog.com                                                                                |
-| Battlefield Hardline                        | PC, PS4, Xbox One | Battlelog            | battlelog.com                                                                                |
+| Battlefield Hardline                        | PC                | Battlelog            | battlelog.com                                                                                |
 | Battlefield 1                               | PC                | Gametools API        | api.gametools.network                                                                        |
 | Battlefield 5                               | PC                | Gametools API        | api.gametools.network                                                                        |
 | Call of Duty                                | PC                | Quake3               | Activision                                                                                   |
