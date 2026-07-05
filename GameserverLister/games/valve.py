@@ -60,7 +60,7 @@ VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {
             ValvePrincipal.VALVE
         ]
     ),
-    ValveGame.CounterStrikeGlobalOffensive: ValveGameConfig(
+    ValveGame.CounterStrike2: ValveGameConfig(
         app_id=730,
         principals=[
             ValvePrincipal.VALVE

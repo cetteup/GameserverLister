@@ -79,10 +79,10 @@ The scripts support retrieval for following games from the listed sources. If yo
 | Call of Duty 4: Modern Warfare              | PC                | Quake3               | Activision                                                                                   |
 | CoD4x Mod                                   | PC                | Quake3               | cod4x.ovh                                                                                    |
 | Contagion                                   | PC                | Valve                | Valve ¹                                                                                      |
-| Counter Strike                              | PC                | Valve                | Valve ¹                                                                                      |
-| Counter Strike: Condition Zero              | PC                | Valve                | Valve ¹                                                                                      |
-| Counter Strike: Source                      | PC                | Valve                | Valve ¹                                                                                      |
-| Counter Strike: Global Offensive            | PC                | Valve                | Valve ¹                                                                                      |
+| Counter-Strike                              | PC                | Valve                | Valve ¹                                                                                      |
+| Counter-Strike: Condition Zero              | PC                | Valve                | Valve ¹                                                                                      |
+| Counter-Strike: Source                      | PC                | Valve                | Valve ¹                                                                                      |
+| Counter-Strike 2                            | PC                | Valve                | Valve ¹                                                                                      |
 | Crysis                                      | PC                | CryMP.org API        | crymp.org                                                                                    |
 | Crysis Wars                                 | PC                | GameSpy              | jedi95.us                                                                                    |
 | Day of Defeat                               | PC                | Valve                | Valve ¹                                                                                      |
