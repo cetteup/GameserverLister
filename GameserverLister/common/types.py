@@ -146,6 +146,7 @@ class ValveGame(Game):
     Squad = 'squad'
     TFC = 'tfc'
     TF2 = 'tf2'
+    Unturned = 'unturned'
     Valheim = 'valheim'
 
 
