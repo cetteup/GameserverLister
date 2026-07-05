@@ -54,8 +54,7 @@ class BadCompany2ServerLister(FrostbiteServerLister):
                 else:
                     attempt += 1
             except requests.exceptions.RequestException as e:
-                logging.debug(e)
-                logging.error(f'Failed to fetch servers from API, attempt {attempt + 1}/{max_attempts}')
+                logging.error(f'Failed to fetch servers from API, attempt {attempt + 1}/{max_attempts}: {e}')
                 attempt += 1
 
         # Make sure any servers were found
@@ -106,8 +105,7 @@ class BadCompany2ServerLister(FrostbiteServerLister):
             else:
                 checks_since_last_ok += 1
         except requests.RequestException as e:
-            logging.debug(e)
-            logging.error(f'Failed to fetch server {server.uid} for expiration check')
+            logging.error(f'Failed to fetch server {server.uid} for expiration check: {e}')
             check_ok = False
 
         return check_ok, found, checks_since_last_ok

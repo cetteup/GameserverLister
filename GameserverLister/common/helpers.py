@@ -50,8 +50,7 @@ def find_query_port(
         try:
             parsed_result = json.loads(gamedig_result.stdout)
         except json.JSONDecodeError as e:
-            logging.debug(e)
-            logging.error('Failed to parse gamedig command output')
+            logging.error(f'Failed to parse gamedig command output: {e}')
             continue
 
         # Stop searching if query was successful and response came from the correct server

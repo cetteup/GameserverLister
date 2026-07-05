@@ -115,9 +115,8 @@ class Quake3ServerLister(ServerLister):
                               f'attempt {attempt + 1}/{max_attempts}')
                 attempt += 1
             except pyq3serverlist.PyQ3SLError as e:
-                logging.debug(e)
                 logging.error(f'Failed to query principal server using protocol {protocol}, '
-                              f'attempt {attempt + 1}/{max_attempts}')
+                              f'attempt {attempt + 1}/{max_attempts}: {e}')
                 attempt += 1
 
         return servers
@@ -134,8 +133,7 @@ class Quake3ServerLister(ServerLister):
             # so this will only be reached if the query succeeds
             found = True
         except pyq3serverlist.PyQ3SLError as e:
-            logging.debug(e)
-            logging.debug(f'Failed to query server {server.uid} for expiration check')
+            logging.debug(f'Failed to query server {server.uid} for expiration check: {e}')
 
         return check_ok, found, checks_since_last_ok
 

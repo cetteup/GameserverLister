@@ -101,8 +101,7 @@ class Unreal2ServerLister(ServerLister):
                 logging.error(f'Principal server query timed out, attempt {attempt + 1}/{max_attempts}')
                 attempt += 1
             except pyut2serverlist.Error as e:
-                logging.debug(e)
-                logging.error(f'Failed to query principal server, attempt {attempt + 1}/{max_attempts}')
+                logging.error(f'Failed to query principal server, attempt {attempt + 1}/{max_attempts}: {e}')
                 attempt += 1
 
         return servers
@@ -119,8 +118,7 @@ class Unreal2ServerLister(ServerLister):
             # so this will only be reached if the query succeeds
             found = True
         except pyut2serverlist.Error as e:
-            logging.debug(e)
-            logging.debug(f'Failed to query server {server.uid} for expiration check')
+            logging.debug(f'Failed to query server {server.uid} for expiration check: {e}')
 
         return check_ok, found, checks_since_last_ok
 

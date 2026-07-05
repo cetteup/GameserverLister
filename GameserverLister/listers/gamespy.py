@@ -163,7 +163,6 @@ class GamespyServerLister(ServerLister):
                     parsed[key.lower()] = value
                 return True, parsed
         except subprocess.TimeoutExpired as e:
-            logging.debug(e)
-            logging.error(f'Failed to query server {server.uid} for expiration check')
+            logging.error(f'Failed to query server {server.uid} for expiration check: {e}')
 
         return False, {}

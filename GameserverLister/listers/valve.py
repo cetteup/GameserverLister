@@ -113,8 +113,8 @@ class ValveServerLister(ServerLister):
                 servers.append(server)
         except pyvpsq.TimeoutError:
             logging.error('Principal server query timed out')
-        except pyvpsq.Error:
-            logging.error('Failed to query principal server')
+        except pyvpsq.Error as e:
+            logging.error(f'Failed to query principal server: {e}')
 
         return servers
 
@@ -136,6 +136,5 @@ class ValveServerLister(ServerLister):
             info = pyvpsq.Server(server.ip, server.query_port).get_info()
             return True, info
         except pyvpsq.Error as e:
-            logging.debug(e)
-            logging.debug(f'Failed to query server {server.uid}')
+            logging.debug(f'Failed to query server {server.uid}: {e}')
             return False, None

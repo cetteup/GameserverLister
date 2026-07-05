@@ -71,8 +71,7 @@ class ServerLister:
             try:
                 os.mkdir(self.server_list_dir_path)
             except IOError as e:
-                logging.debug(e)
-                logging.error(f'Failed to create missing server list directory at {self.server_list_dir_path}')
+                logging.error(f'Failed to create missing server list directory at {self.server_list_dir_path}: {e}')
                 sys.exit(1)
 
         # Init server list with servers from existing list or empty one
@@ -82,12 +81,10 @@ class ServerLister:
                     logging.info('Loading existing server list')
                     self.servers = json.load(serverListFile, object_hook=self.server_class.load)
             except IOError as e:
-                logging.debug(e)
-                logging.error('Failed to read existing server list file')
+                logging.error(f'Failed to read existing server list file: {e}')
                 sys.exit(1)
             except json.decoder.JSONDecodeError as e:
-                logging.debug(e)
-                logging.error('Failed to parse existing server list file contents')
+                logging.error(f'Failed to parse existing server list file contents: {e}')
                 sys.exit(1)
 
     def update_server_list(self):
@@ -332,8 +329,7 @@ class HttpServerLister(ServerLister):
                     timeout=self.request_timeout
                 )
             except requests.exceptions.RequestException as e:
-                logging.debug(e)
-                logging.error(f'Request failed, retrying {attempt + 1}/{self.max_attempts}')
+                logging.error(f'Request failed, retrying {attempt + 1}/{self.max_attempts}: {e}')
                 # Count try and start over
                 attempt += 1
                 continue
