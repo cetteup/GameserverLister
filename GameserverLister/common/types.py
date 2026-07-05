@@ -192,9 +192,7 @@ class TheaterPlatform(Platform):
 
 class BattlelogPlatform(Platform):
     PC = 'pc'
-    PS3 = 'ps3'
     PS4 = 'ps4'
-    Xbox360 = 'xbox360'
     XboxOne = 'xboxone'
 
 
