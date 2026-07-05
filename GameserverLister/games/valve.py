@@ -4,8 +4,8 @@ from GameserverLister.common.types import ValvePrincipal, ValvePrincipalConfig, 
 
 VALVE_PRINCIPAL_CONFIGS: Dict[ValvePrincipal, ValvePrincipalConfig] = {
     ValvePrincipal.VALVE: ValvePrincipalConfig(
-        hostname='hl2master.steampowered.com',
-        port=27011
+        hostname='api.steampowered.com',
+        port=443
     )
 }
 VALVE_GAME_CONFIGS: Dict[ValveGame, ValveGameConfig] = {

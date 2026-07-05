@@ -9,6 +9,7 @@ from GameserverLister.common.logger import logger
 from GameserverLister.common.types import ValveGame, ValvePrincipal
 from GameserverLister.games.valve import VALVE_GAME_CONFIGS
 from GameserverLister.listers import ValveServerLister
+from GameserverLister.providers.valve import ValveGameServersServiceProvider
 
 
 @click.command
@@ -48,6 +49,14 @@ from GameserverLister.listers import ValveServerLister
     default=10,
     help='Maximum number of pages to retrieve from the server list (per region)'
 )
+@click.option(
+    '--web-api-key',
+    type=str,
+    required=True,
+    envvar='STEAM_WEB_API_KEY',
+    show_envvar=True,
+    help='Steam Web API key to use for authentication'
+)
 @gameport.add
 @common.expire
 @common.expired_ttl
@@ -62,6 +71,7 @@ def run(
         filters: str,
         timeout: int,
         max_pages: int,
+        web_api_key: str,
         add_game_port: bool,
         expire: bool,
         expired_ttl: int,
@@ -84,9 +94,11 @@ def run(
 
     logger.info(f'Listing servers for {game} via valve/{principal}')
 
+    provider = ValveGameServersServiceProvider(web_api_key)
     lister = ValveServerLister(
         game,
         principal,
+        provider,
         timeout,
         filters,
         max_pages,
