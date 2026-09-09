@@ -22,6 +22,7 @@ class ServerLister:
     platform: Platform
     server_list_dir_path: str
     server_list_file_path: str
+    dedup: bool
     expire: bool
     expired_ttl: float
     recover: bool
@@ -39,6 +40,7 @@ class ServerLister:
             game: Game,
             platform: Platform,
             server_class: Type[Server],
+            dedup: bool,
             expire: bool,
             expired_ttl: float,
             recover: bool,
@@ -52,6 +54,7 @@ class ServerLister:
         self.server_list_dir_path = os.path.realpath(list_dir)
         self.server_list_file_path = self.build_server_list_file_path('json')
 
+        self.dedup = dedup
         self.expire = expire
         self.expired_ttl = expired_ttl
         self.recover = recover
@@ -91,19 +94,26 @@ class ServerLister:
         pass
 
     def add_update_servers(self, found_servers: List[Server]):
-        # Add/update found servers to/in known servers
         logging.info(f'Updating server list with {len(found_servers)} found servers')
         for found_server in found_servers:
-            known_server_uids = [s.uid for s in self.servers]
-            # Update existing server entry or add new one
-            if found_server.uid in known_server_uids:
+            index = next((i for i, s in enumerate(self.servers) if s.uid == found_server.uid), -1)
+            # servers are considered duplicates if they share any address (ip:port) used for querying/connecting
+            # such duplicates are most commonly introduced by server-side misconfigurations
+            # e.g. misconfigured ports/port forwarding for multiple servers on the same IP
+            duplicate = self.dedup and any(
+                found_server.uid != s.uid and x == y
+                for s in self.servers
+                for x, y in zip(found_server.addresses(), s.addresses())
+            )
+
+            if duplicate:
+                logging.warning(f'Found server {found_server.uid} is a duplicate, ignoring')
+            elif index != -1:
                 logging.debug(f'Found server {found_server.uid} already known, updating')
-                index = known_server_uids.index(found_server.uid)
                 self.servers[index].update(found_server)
                 self.servers[index].trim(self.expired_ttl)
             else:
                 logging.debug(f'Found server {found_server.uid} is new, adding')
-                # Add new server entry
                 self.servers.append(found_server)
 
     def remove_expired_servers(self) -> tuple:
@@ -187,6 +197,7 @@ class FrostbiteServerLister(ServerLister):
             game: Game,
             platform: Platform,
             server_class: Type[Server],
+            dedup: bool,
             expire: bool,
             expired_ttl: float,
             recover: bool,
@@ -195,7 +206,19 @@ class FrostbiteServerLister(ServerLister):
             list_dir: str,
             request_timeout: float = 5.0
     ):
-        super().__init__(game, platform, server_class, expire, expired_ttl, recover, add_links, txt, list_dir, request_timeout)
+        super().__init__(
+            game,
+            platform,
+            server_class,
+            dedup,
+            expire,
+            expired_ttl,
+            recover,
+            add_links,
+            txt,
+            list_dir,
+            request_timeout
+        )
 
     def find_query_ports(self, gamedig_bin_path: str, gamedig_concurrency: int, expired_ttl: float):
         logging.info(f'Searching query port for {len(self.servers)} servers')
@@ -276,6 +299,7 @@ class HttpServerLister(ServerLister):
             server_class: Type[Server],
             page_limit: int,
             per_page: int,
+            dedup: bool,
             expire: bool,
             expired_ttl: float,
             recover: bool,
@@ -289,6 +313,7 @@ class HttpServerLister(ServerLister):
             game,
             platform,
             server_class,
+            dedup,
             expire,
             expired_ttl,
             recover,

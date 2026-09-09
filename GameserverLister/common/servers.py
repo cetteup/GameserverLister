@@ -70,6 +70,9 @@ class Server:
     def txt(self) -> str:
         pass
 
+    def addresses(self) -> List[str]:
+        pass
+
     def __iter__(self):
         yield from self.dump().items()
 
@@ -114,6 +117,9 @@ class QueryableServer(Server):
 
     def txt(self) -> str:
         return f'{self.ip} {self.query_port}'
+
+    def addresses(self) -> List[str]:
+        return [f'{self.ip}:{self.query_port}']
 
     def __eq__(self, other: Any) -> bool:
         return Server.__eq__(self, other) and other.ip == self.ip and other.query_port == self.query_port
@@ -260,6 +266,14 @@ class ClassicServer(QueryableServer):
     def txt(self) -> str:
         return f'{self.ip} {self.game_port} {self.query_port}'
 
+    def addresses(self) -> List[str]:
+        return [
+            f'{self.ip}:{self.query_port}',
+            f'{self.ip}:{self.game_port}'
+        ] if self.game_port != -1 else [
+            f'{self.ip}:{self.query_port}'
+        ]
+
     def __eq__(self, other):
         return QueryableServer.__eq__(self, other) and \
             self.game_port == other.game_port and \
@@ -353,6 +367,14 @@ class FrostbiteServer(QueryableServer):
 
     def txt(self) -> str:
         return f'{self.ip} {self.game_port} {self.query_port}'
+
+    def addresses(self) -> List[str]:
+        return [
+            f'{self.ip}:{self.game_port}',
+            f'{self.ip}:{self.query_port}'
+        ] if self.query_port != -1 else [
+            f'{self.ip}:{self.game_port}'
+        ]
 
 
 class BadCompany2Server(FrostbiteServer):

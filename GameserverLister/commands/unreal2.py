@@ -40,6 +40,7 @@ from GameserverLister.listers import Unreal2ServerLister
     default=5,
     help='Timeout to use for principal query'
 )
+@common.dedup
 @common.expire
 @common.expired_ttl
 @common.list_dir
@@ -52,6 +53,7 @@ def run(
         principal: str,
         cd_key: str,
         timeout: int,
+        dedup: bool,
         expire: bool,
         expired_ttl: int,
         recover: bool,
@@ -80,6 +82,7 @@ def run(
         principal,
         cd_key,
         timeout,
+        dedup,
         expire,
         expired_ttl,
         recover,

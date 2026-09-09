@@ -1,5 +1,12 @@
 import click
 
+
+dedup = click.option(
+    '--dedup/--no-dedup',
+    default=True,
+    is_flag=True,
+    help='Deduplicate servers by game/query address (ip:port) when updating the list (use --no-dedup to keep duplicates)'
+)
 expire = click.option(
     '--expire/--no-expire',
     default=True,

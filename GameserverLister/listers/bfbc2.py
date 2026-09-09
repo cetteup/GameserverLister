@@ -17,6 +17,7 @@ class BadCompany2ServerLister(FrostbiteServerLister):
 
     def __init__(
             self,
+            dedup: bool,
             expire: bool,
             expired_ttl: float,
             recover: bool,
@@ -29,6 +30,7 @@ class BadCompany2ServerLister(FrostbiteServerLister):
             TheaterGame.BFBC2,
             TheaterPlatform.PC,
             BadCompany2Server,
+            dedup,
             expire,
             expired_ttl,
             recover,
