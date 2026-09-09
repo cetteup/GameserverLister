@@ -5,8 +5,7 @@ dedup = click.option(
     '--dedup/--no-dedup',
     default=True,
     is_flag=True,
-    help='Add found servers to list even if another server with matching game/query address is already in the list '
-         '(i.e. do not deduplicate servers by game/query address)'
+    help='Deduplicate servers by game/query address (ip:port) when updating the list (use --no-dedup to keep duplicates)'
 )
 expire = click.option(
     '--expire/--no-expire',
