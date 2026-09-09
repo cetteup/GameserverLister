@@ -97,9 +97,9 @@ class ServerLister:
         logging.info(f'Updating server list with {len(found_servers)} found servers')
         for found_server in found_servers:
             index = next((i for i, s in enumerate(self.servers) if s.uid == found_server.uid), -1)
-            # servers are considered duplicates if they share the same game/query address (ip:port)
-            # such duplicates are most commonly introduces by server-side misconfigurations
-            # e.g. misconfigured ports/port forwarding for multiple servers on the same ip
+            # servers are considered duplicates if they share any address (ip:port) used for querying/connecting
+            # such duplicates are most commonly introduced by server-side misconfigurations
+            # e.g. misconfigured ports/port forwarding for multiple servers on the same IP
             duplicate = self.dedup and any(
                 found_server.uid != s.uid and x == y
                 for s in self.servers
