@@ -1,8 +1,7 @@
 import click
 
 expire = click.option(
-    '--no-expire',
-    'expire',
+    '--expire/--no-expire',
     default=True,
     is_flag=True,
     help='Keep servers in list, even after they disappeared from the source principal(s)'
@@ -15,8 +14,7 @@ expired_ttl = click.option(
     help='How long to keep a server in list after it was last seen (in hours)'
 )
 recover = click.option(
-    '--no-recover',
-    'recover',
+    '--recover/--no-recover',
     default=True,
     is_flag=True,
     help='Remove servers that were not returned by the source after they expired, '
