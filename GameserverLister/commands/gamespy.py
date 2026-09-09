@@ -67,6 +67,7 @@ from GameserverLister.providers import GamespyListProtocolProvider, CrympAPIProv
     help='(Attempt to) verify game servers returned by principal are game servers for the current game'
 )
 @gameport.add
+@common.dedup
 @common.expire
 @common.expired_ttl
 @common.list_dir
@@ -83,6 +84,7 @@ def run(
         gslist_timeout: int,
         verify: bool,
         add_game_port: bool,
+        dedup: bool,
         expire: bool,
         expired_ttl: int,
         recover: bool,
@@ -120,6 +122,7 @@ def run(
         gslist_timeout,
         verify,
         add_game_port,
+        dedup,
         expire,
         expired_ttl,
         recover,

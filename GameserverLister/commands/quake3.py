@@ -26,6 +26,7 @@ from GameserverLister.listers import Quake3ServerLister
     required=True,
     help='Principal server to query'
 )
+@common.dedup
 @common.expire
 @common.expired_ttl
 @common.list_dir
@@ -36,6 +37,7 @@ from GameserverLister.listers import Quake3ServerLister
 def run(
         game: Quake3Game,
         principal: str,
+        dedup: bool,
         expire: bool,
         expired_ttl: int,
         recover: bool,
@@ -62,6 +64,7 @@ def run(
     lister = Quake3ServerLister(
         game,
         principal,
+        dedup,
         expire,
         expired_ttl,
         recover,

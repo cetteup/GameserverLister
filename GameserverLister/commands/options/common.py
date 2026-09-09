@@ -1,5 +1,13 @@
 import click
 
+
+dedup = click.option(
+    '--dedup/--no-dedup',
+    default=True,
+    is_flag=True,
+    help='Add found servers to list even if another server with matching game/query address is already in the list '
+         '(i.e. do not deduplicate servers by game/query address)'
+)
 expire = click.option(
     '--expire/--no-expire',
     default=True,

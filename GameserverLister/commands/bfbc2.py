@@ -19,6 +19,7 @@ from GameserverLister.listers import BadCompany2ServerLister
 @queryport.find
 @queryport.gamedig_bin
 @queryport.gamedig_concurrency
+@common.dedup
 @common.expire
 @common.expired_ttl
 @common.list_dir
@@ -31,6 +32,7 @@ def run(
         find_query_port: bool,
         gamedig_bin: str,
         gamedig_concurrency: int,
+        dedup: bool,
         expire: bool,
         expired_ttl: int,
         recover: bool,
@@ -45,6 +47,7 @@ def run(
     logger.info('Listing servers for bfbc2 via fesl.cetteup.com')
 
     lister = BadCompany2ServerLister(
+        dedup,
         expire,
         expired_ttl,
         recover,

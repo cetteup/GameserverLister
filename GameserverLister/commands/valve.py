@@ -58,6 +58,7 @@ from GameserverLister.providers.valve import ValveGameServersServiceProvider
     help='Steam Web API key to use for authentication'
 )
 @gameport.add
+@common.dedup
 @common.expire
 @common.expired_ttl
 @common.list_dir
@@ -73,6 +74,7 @@ def run(
         max_pages: int,
         web_api_key: str,
         add_game_port: bool,
+        dedup: bool,
         expire: bool,
         expired_ttl: int,
         recover: bool,
@@ -103,6 +105,7 @@ def run(
         filters,
         max_pages,
         add_game_port,
+        dedup,
         expire,
         expired_ttl,
         recover,
