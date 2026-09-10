@@ -97,24 +97,28 @@ class ServerLister:
         logging.info(f'Updating server list with {len(found_servers)} found servers')
         for found_server in found_servers:
             index = next((i for i, s in enumerate(self.servers) if s.uid == found_server.uid), -1)
+            known = index > -1
             # servers are considered duplicates if they share any address (ip:port) used for querying/connecting
             # such duplicates are most commonly introduced by server-side misconfigurations
             # e.g. misconfigured ports/port forwarding for multiple servers on the same IP
-            duplicate = self.dedup and any(
-                found_server.uid != s.uid and x == y
-                for s in self.servers
-                for x, y in zip(found_server.addresses(), s.addresses())
-            )
+            original = next((
+                s for s in self.servers
+                if found_server.uid != s.uid and any(x == y for x, y in zip(found_server.addresses(), s.addresses()))
+            ), None) if self.dedup else None
+            duplicate = original is not None
 
-            if duplicate:
-                logging.warning(f'Found server {found_server.uid} is a duplicate, ignoring')
-            elif index != -1:
+            if not known and not duplicate:
+                logging.debug(f'Found server {found_server.uid} is new, adding')
+                self.servers.append(found_server)
+            elif known and not duplicate:
                 logging.debug(f'Found server {found_server.uid} already known, updating')
                 self.servers[index].update(found_server)
                 self.servers[index].trim(self.expired_ttl)
+            elif known and duplicate:
+                logging.warning(f'Found server {found_server.uid} is a duplicate of {original.uid}, removing')
+                self.servers.pop(index)
             else:
-                logging.debug(f'Found server {found_server.uid} is new, adding')
-                self.servers.append(found_server)
+                logging.warning(f'Found server {found_server.uid} is a duplicate of {original.uid}, ignoring')
 
     def remove_expired_servers(self) -> tuple:
         # Skip removal if expiration is disabled
